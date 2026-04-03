@@ -1,0 +1,5 @@
+URL:
+https://fnodbpiwkkrdgqvmyanq.supabase.co
+
+Publishable key:
+sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T
