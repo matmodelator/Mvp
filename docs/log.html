@@ -94,64 +94,215 @@
     </div>
   </div>
 
+  
+  
+  
+  /*ФОРМА ПРОФИЛЯ*/
   <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  /*
+    Подключаем библиотеку Supabase из CDN.
+    createClient(...) нужен, чтобы связать страницу с твоим проектом Supabase.
+  */
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-    )
+  /*
+    Создаем клиент Supabase.
+    1) Первый параметр — URL проекта
+    2) Второй параметр — публичный publishable key
 
-    const form = document.getElementById('loginForm')
-    const message = document.getElementById('message')
+    Важно:
+    Этот ключ можно использовать в браузере.
+    service_role сюда вставлять нельзя.
+  */
+  const supabase = createClient(
+    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+  )
 
-    function showMessage(text, type = '') {
-      message.textContent = text
-      message.className = `msg ${type}`
+  /*
+    Берем форму входа со страницы.
+    Предполагается, что в HTML есть:
+    <form id="loginForm">...</form>
+  */
+  const form = document.getElementById('loginForm')
+
+  /*
+    Берем блок для сообщений.
+    Предполагается, что в HTML есть:
+    <div id="message" class="msg"></div>
+  */
+  const message = document.getElementById('message')
+
+  /*
+    Вспомогательная функция для вывода сообщений пользователю.
+
+    text — сам текст сообщения
+    type — класс оформления:
+      ''       -> обычный
+      'error'  -> ошибка
+      'success'-> успех
+
+    Пример:
+    showMessage('Входим...')
+    showMessage('Неверный пароль', 'error')
+  */
+  function showMessage(text, type = '') {
+    message.textContent = text
+    message.className = `msg ${type}`
+  }
+
+  /*
+    Вешаем обработчик на отправку формы.
+    То есть код внутри выполнится, когда пользователь нажмет кнопку "Войти".
+  */
+  form.addEventListener('submit', async (event) => {
+    /*
+      Отменяем стандартное поведение формы.
+      Иначе браузер сам перезагрузит страницу, и наш JS не успеет нормально отработать.
+    */
+    event.preventDefault()
+
+    /*
+      Показываем пользователю, что начался процесс входа.
+    */
+    showMessage('Входим...')
+
+    /*
+      Забираем email из поля формы.
+      trim() убирает случайные пробелы в начале и конце.
+    */
+    const email = document.getElementById('email').value.trim()
+
+    /*
+      Забираем пароль из поля формы.
+    */
+    const password = document.getElementById('password').value
+
+    /*
+      Пытаемся войти через Supabase Auth по email и паролю.
+
+      Если email/пароль правильные:
+      - получим data.user
+      - появится сессия
+
+      Если нет:
+      - получим error
+    */
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+
+    /*
+      Если вход не удался — показываем ошибку и останавливаем выполнение.
+    */
+    if (error) {
+      showMessage(error.message, 'error')
+      return
     }
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault()
-      showMessage('Входим...')
+    /*
+      Если вход удался — берем текущего пользователя.
+      У пользователя есть id, email и другие данные auth.
+    */
+    const user = data.user
 
-      const email = document.getElementById('email').value.trim()
-      const password = document.getElementById('password').value
+    /*
+      После успешного входа создаем профиль в таблице profiles,
+      если его еще нет.
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
+      Почему upsert:
+      - если строки еще нет -> создаст
+      - если строка уже есть -> обновит
 
-      if (error) {
-        showMessage(error.message, 'error')
-        return
-      }
+      Мы сохраняем минимальный набор:
+      - id пользователя
+      - email
 
-      const user = data.user
+      Остальные поля анкеты пользователь заполнит позже на profile.html
+    */
+    const { error: upsertError } = await supabase
+      .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          email: user.email
+        },
+        {
+          onConflict: 'id'
+        }
+      )
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(
-          {
-            id: user.id,
-            email: user.email
-          },
-          {
-            onConflict: 'id'
-          }
-        )
+    /*
+      Если ошибка при создании/обновлении профиля —
+      показываем ее и прекращаем выполнение.
+    */
+    if (upsertError) {
+      showMessage(upsertError.message, 'error')
+      return
+    }
 
-      if (profileError) {
-        showMessage(profileError.message, 'error')
-        return
-      }
+    /*
+      Теперь читаем профиль из таблицы profiles.
+      Нам нужно понять:
+      профиль уже заполнен или пока пустой.
 
-      showMessage('Вход выполнен', 'success')
+      Ищем запись по id текущего пользователя.
+      .single() означает: ожидаем ровно одну строку.
+    */
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
 
+    /*
+      Если не смогли прочитать профиль — показываем ошибку.
+    */
+    if (profileError) {
+      showMessage(profileError.message, 'error')
+      return
+    }
+
+    /*
+      Здесь проверяем, заполнен ли профиль.
+
+      Мы используем nickname как главный признак:
+      - если nickname пустой -> считаем, что профиль еще не заполнен
+      - если nickname есть -> считаем, что профиль уже существует
+
+      Это простая и удобная MVP-логика.
+    */
+    if (!profile.nickname) {
+      /*
+        Сообщаем пользователю, что нужно заполнить анкету.
+      */
+      showMessage('Нужно заполнить профиль')
+
+      /*
+        Небольшая задержка, чтобы человек успел увидеть сообщение,
+        потом отправляем его на страницу заполнения профиля.
+      */
       setTimeout(() => {
         window.location.href = 'profile.html'
-      }, 1000)
-    })
-  </script>
+      }, 800)
+
+      /*
+        Очень важно: выходим, чтобы код ниже уже не выполнялся.
+      */
+      return
+    }
+
+    /*
+      Если nickname уже есть — значит профиль заполнен.
+      Отправляем пользователя на главную страницу.
+    */
+    showMessage('Вход выполнен', 'success')
+
+    setTimeout(() => {
+      window.location.href = 'index.html'
+    }, 800)
+  })
+</script>
 </body>
 </html>
