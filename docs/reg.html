@@ -1,132 +1,166 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Регистрация</title>
+<meta charset="UTF-8">
+<title>Регистрация</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f8;
+}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-        }
+.container {
+    max-width: 420px;
+    margin: 40px auto;
+    background: white;
+    padding: 24px;
+    border-radius: 10px;
+}
 
-        header {
-            background: #2563eb;
-            color: white;
-            padding: 16px;
-            text-align: center;
-        }
+input, select, textarea, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+}
 
-        .container {
-            max-width: 420px;
-            margin: 40px auto;
-            background: white;
-            padding: 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+</style>
 
-        h2 {
-            text-align: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 16px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        .back {
-            margin-top: 16px;
-            display: block;
-            text-align: center;
-        }
-    </style>
 </head>
-
 <body>
-
-<header>
-    <h1>Dating App MVP</h1>
-</header>
 
 <div class="container">
 
-    <h2>Регистрация</h2>
+<h2>Регистрация</h2>
 
-    <form onsubmit="registerUser(event)">
+<form id="form">
 
-        <input
-            type="text"
-            id="name"
-            placeholder="Имя"
-            required
-        >
+<input id="nickname" placeholder="Ник" required>
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            required
-        >
+<input id="email" type="email" placeholder="Email" required>
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Пароль"
-            required
-        >
+<input id="password" type="password" placeholder="Пароль" required>
 
-        <button type="submit">
-            Зарегистрироваться
-        </button>
+<input id="age" type="number" placeholder="Возраст">
 
-    </form>
+<select id="gender">
+<option value="">Пол</option>
+<option value="male">Мужчина</option>
+<option value="female">Женщина</option>
+</select>
 
-    <a class="back" href="log.html">
-        Назад к входу
-    </a>
+<select id="looking_for">
+<option value="">Кого ищете</option>
+<option value="male">Мужчину</option>
+<option value="female">Женщину</option>
+<option value="any">Не важно</option>
+</select>
+
+<input id="city" placeholder="Город">
+
+<textarea id="bio" placeholder="О себе"></textarea>
+
+<button type="submit">
+Зарегистрироваться
+</button>
+
+</form>
+
+<br>
+
+<a href="log.html">
+Назад к входу
+</a>
 
 </div>
 
-<script>
+<script type="module">
 
-function registerUser(event) {
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
 
-    event.preventDefault();
+const supabase = createClient(
+'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+const form = document.getElementById("form")
 
-    console.log("Регистрация:", name, email);
+form.addEventListener("submit", async (e) => {
 
-    alert("Регистрация успешна (тест)");
+e.preventDefault()
 
-    // сюда потом подключим Supabase
+const nickname =
+document.getElementById("nickname").value
 
+const email =
+document.getElementById("email").value
+
+const password =
+document.getElementById("password").value
+
+const age =
+document.getElementById("age").value
+
+const gender =
+document.getElementById("gender").value
+
+const looking_for =
+document.getElementById("looking_for").value
+
+const city =
+document.getElementById("city").value
+
+const bio =
+document.getElementById("bio").value
+
+const { data, error } =
+await supabase.auth.signUp({
+email,
+password
+})
+
+if (error) {
+alert(error.message)
+return
 }
+
+const user = data.user
+
+if (!user) {
+alert("Проверь почту")
+return
+}
+
+const { error: profileError } =
+await supabase
+.from("profiles")
+.insert({
+id: user.id,
+email,
+nickname,
+age,
+gender,
+looking_for,
+city,
+bio
+})
+
+if (profileError) {
+alert(profileError.message)
+return
+}
+
+alert("Регистрация успешна")
+
+window.location.href = "log.html"
+
+})
 
 </script>
 
