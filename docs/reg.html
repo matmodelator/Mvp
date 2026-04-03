@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+        }
+
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 40px auto;
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back {
+            margin-top: 16px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+    <h2>Регистрация</h2>
+
+    <form onsubmit="registerUser(event)">
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Имя"
+            required
+        >
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Пароль"
+            required
+        >
+
+        <button type="submit">
+            Зарегистрироваться
+        </button>
+
+    </form>
+
+    <a class="back" href="log.html">
+        Назад к входу
+    </a>
+
+</div>
+
+<script>
+
+function registerUser(event) {
+
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    console.log("Регистрация:", name, email);
+
+    alert("Регистрация успешна (тест)");
+
+    // сюда потом подключим Supabase
+
+}
+
+</script>
+
+</body>
+</html>
