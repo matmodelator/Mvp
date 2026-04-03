@@ -1,0 +1,10 @@
+project/
+│
+├── docs/
+│   ├── mvp_flowchart_v1.png
+│   ├── requirements.md
+│   └── architecture.md
+│
+├── backend/
+├── frontend/
+└── database/
