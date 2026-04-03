@@ -1,95 +1,157 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Dating App MVP</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-        }
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-        header {
-            background: #2563eb;
-            color: white;
-            padding: 16px;
-            text-align: center;
-        }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
 
-        .container {
-            max-width: 420px;
-            margin: 40px auto;
-            background: white;
-            padding: 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
 
-        h2 {
-            text-align: center;
-        }
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
+    button:hover {
+      background: #1d4ed8;
+    }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 16px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    .msg {
+      margin-top: 14px;
+      font-size: 14px;
+      text-align: center;
+    }
 
-        button:hover {
-            background: #1d4ed8;
-        }
+    .error {
+      color: #b91c1c;
+    }
 
-        .secondary {
-            background: #e5e7eb;
-            color: black;
-        }
+    .success {
+      color: #15803d;
+    }
 
-        .secondary:hover {
-            background: #d1d5db;
-        }
-    </style>
+    .links {
+      margin-top: 18px;
+      text-align: center;
+    }
+  </style>
 </head>
-
 <body>
-
-<header>
+  <header>
     <h1>Dating App MVP</h1>
-</header>
+  </header>
 
-<div class="container">
-
+  <div class="container">
     <h2>Вход</h2>
 
-    <input type="email" placeholder="Email">
-    <input type="password" placeholder="Пароль">
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Пароль" required />
+      <button type="submit">Войти</button>
+    </form>
 
-    <button>Войти</button>
+    <div id="message" class="msg"></div>
 
-    <hr>
+    <div class="links">
+      <a href="reg.html">Нет аккаунта? Регистрация</a>
+    </div>
+  </div>
 
-    <button class="secondary">
-        Регистрация
-    </button>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-</div>
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
 
+    const form = document.getElementById('loginForm')
+    const message = document.getElementById('message')
+
+    function showMessage(text, type = '') {
+      message.textContent = text
+      message.className = `msg ${type}`
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      showMessage('Входим...')
+
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        showMessage(error.message, 'error')
+        return
+      }
+
+      const user = data.user
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            email: user.email
+          },
+          {
+            onConflict: 'id'
+          }
+        )
+
+      if (profileError) {
+        showMessage(profileError.message, 'error')
+        return
+      }
+
+      showMessage('Вход выполнен', 'success')
+
+      setTimeout(() => {
+        window.location.href = 'index.html'
+      }, 1000)
+    })
+  </script>
 </body>
 </html>
