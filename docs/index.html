@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Главная</title>
+  <title>Навигация</title>
 
   <style>
     body {
@@ -63,6 +63,15 @@
       background: #d1d5db;
     }
 
+    .warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .warning:hover {
+      background: #d97706;
+    }
+
     .msg {
       margin-top: 16px;
       font-size: 14px;
@@ -78,23 +87,28 @@
 
 <div class="container">
 
-  <h2>Главная страница</h2>
+  <h2>Навигация</h2>
 
-  <!-- сюда будет подставлен email пользователя -->
+  <!-- здесь показываем текущего пользователя -->
   <p id="welcome">
     Проверяем сессию...
   </p>
 
   <div class="buttons">
 
-    <!-- переход в профиль -->
-    <button onclick="goProfile()">
-      Мой профиль
+    <!-- переход на основную главную страницу -->
+    <button onclick="goMain()">
+      Главная
+    </button>
+
+    <!-- переход на страницу подтверждения почты -->
+    <button class="warning" onclick="goMail()">
+      Подтверждение почты
     </button>
 
     <!-- выход из системы -->
     <button class="secondary" onclick="logout()">
-      Выйти
+      Выход
     </button>
 
   </div>
@@ -104,91 +118,87 @@
 </div>
 
 <script type="module">
-
-/*
-  Подключаем Supabase
-*/
-import { createClient }
-from 'https://esm.sh/@supabase/supabase-js@2'
-
-/*
-  Создаем подключение к проекту
-*/
-const supabase = createClient(
-  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-)
-
-const welcome =
-  document.getElementById('welcome')
-
-const message =
-  document.getElementById('message')
-
-/*
-  Проверяем, вошел ли пользователь
-*/
-async function checkUser() {
-
-  const { data, error } =
-    await supabase.auth.getUser()
+  /*
+    Подключаем Supabase
+  */
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
   /*
-    Если пользователь не найден —
-    отправляем на страницу входа
+    Создаем соединение с проектом
   */
-  if (error || !data.user) {
+  const supabase = createClient(
+    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+  )
+
+  /*
+    Получаем элементы страницы
+  */
+  const welcome = document.getElementById('welcome')
+  const message = document.getElementById('message')
+
+  /*
+    Проверяем, вошел ли пользователь
+  */
+  async function checkUser() {
+    const { data, error } = await supabase.auth.getUser()
+
+    /*
+      Если сессии нет — отправляем на log.html
+    */
+    if (error || !data.user) {
+      window.location.href = 'log.html'
+      return
+    }
+
+    /*
+      Если пользователь найден — показываем email
+    */
+    const user = data.user
+    welcome.textContent = `Вы вошли как: ${user.email}`
+  }
+
+  /*
+    Переход на главную страницу приложения
+  */
+  function goMain() {
+    window.location.href = 'main.html'
+  }
+
+  /*
+    Переход на страницу подтверждения почты
+  */
+  function goMail() {
+    window.location.href = 'mail.html'
+  }
+
+  /*
+    Выход из системы
+  */
+  async function logout() {
+    message.textContent = 'Выходим...'
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      message.textContent = error.message
+      return
+    }
+
     window.location.href = 'log.html'
-    return
   }
 
   /*
-    Если пользователь есть —
-    показываем его email
+    Делаем функции доступными кнопкам
   */
-  const user = data.user
+  window.goMain = goMain
+  window.goMail = goMail
+  window.logout = logout
 
-  welcome.textContent =
-    `Вы вошли как: ${user.email}`
-}
-
-/*
-  Переход в профиль
-*/
-function goProfile() {
-  window.location.href = 'profile.html'
-}
-
-/*
-  Выход из системы
-*/
-async function logout() {
-
-  message.textContent = 'Выходим...'
-
-  const { error } =
-    await supabase.auth.signOut()
-
-  if (error) {
-    message.textContent =
-      error.message
-    return
-  }
-
-  window.location.href = 'log.html'
-}
-
-/*
-  Делаем функции доступными кнопкам
-*/
-window.goProfile = goProfile
-window.logout = logout
-
-/*
-  Проверяем пользователя при загрузке страницы
-*/
-checkUser()
-
+  /*
+    Проверяем пользователя при загрузке страницы
+  */
+  checkUser()
 </script>
 
 </body>
