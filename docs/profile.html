@@ -123,31 +123,67 @@
       message.className = `msg ${type}`
     }
 
+   
+   // ЗАГРУЗКА ПРОФИЛЯ 
     async function loadProfile() {
-      const { data: userData } = await supabase.auth.getUser()
-      const user = userData.user
 
-      if (!user) {
-        window.location.href = 'log.html'
-        return
-      }
+  // получаем текущего пользователя
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+  const { data: userData } =
+    await supabase.auth.getUser()
 
-      if (!error && data) {
-        document.getElementById('nickname').value = data.nickname || ''
-        document.getElementById('age').value = data.age || ''
-        document.getElementById('gender').value = data.gender || ''
-        document.getElementById('looking_for').value = data.looking_for || ''
-        document.getElementById('city').value = data.city || ''
-        document.getElementById('bio').value = data.bio || ''
-      }
-    }
+  const user = userData.user
 
+  // если пользователь не вошел — отправляем на логин
+
+  if (!user) {
+    window.location.href = 'log.html'
+    return
+  }
+
+  // читаем профиль из базы
+
+  const { data, error } =
+    await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+
+  /*
+    ВАЖНО:
+    мы НЕ проверяем "заполнен ли профиль"
+
+    мы просто подставляем данные,
+    если они есть
+  */
+
+  if (data) {
+
+    document.getElementById('nickname').value =
+      data.nickname || ''
+
+    document.getElementById('age').value =
+      data.age || ''
+
+    document.getElementById('gender').value =
+      data.gender || ''
+
+    document.getElementById('looking_for').value =
+      data.looking_for || ''
+
+    document.getElementById('city').value =
+      data.city || ''
+
+    document.getElementById('bio').value =
+      data.bio || ''
+  }
+}
     form.addEventListener('submit', async (event) => {
       event.preventDefault()
 
