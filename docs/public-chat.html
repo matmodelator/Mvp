@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Общий чат</title>
+  <link rel="stylesheet" href="styles/index.css" />
+  <style>
+    .chat-box {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .messages {
+      height: 420px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .msg-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .msg-meta {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .msg-text {
+      font-size: 14px;
+      color: #111;
+      word-break: break-word;
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-form input {
+      flex: 1;
+      padding: 12px;
+    }
+
+    .chat-form button {
+      width: 180px;
+    }
+
+    .top-actions {
+      max-width: 900px;
+      margin: 20px auto 0;
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Общий чат</h1>
+  </header>
+
+  <div class="top-actions">
+    <button onclick="goBack()">Назад</button>
+  </div>
+
+  <div class="chat-box">
+    <p id="status">Проверяем сессию...</p>
+
+    <div id="messages" class="messages"></div>
+
+    <form id="chatForm" class="chat-form">
+      <input id="messageInput" type="text" placeholder="Напишите сообщение..." maxlength="500" required />
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
+
+    const statusEl = document.getElementById('status')
+    const messagesEl = document.getElementById('messages')
+    const form = document.getElementById('chatForm')
+    const input = document.getElementById('messageInput')
+
+    let currentUser = null
+
+    function goBack() {
+      window.location.href = 'main.html'
+    }
+    window.goBack = goBack
+
+    function renderMessage(row) {
+      const item = document.createElement('div')
+      item.className = 'msg-item'
+
+      const meta = document.createElement('div')
+      meta.className = 'msg-meta'
+      meta.textContent = `${row.user_email || 'user'} • ${new Date(row.created_at).toLocaleString()}`
+
+      const text = document.createElement('div')
+      text.className = 'msg-text'
+      text.textContent = row.message
+
+      item.appendChild(meta)
+      item.appendChild(text)
+      messagesEl.appendChild(item)
+    }
+
+    async function loadUser() {
+      const { data, error } = await supabase.auth.getUser()
+
+      if (error || !data.user) {
+        window.location.href = 'log.html'
+        return false
+      }
+
+      currentUser = data.user
+      statusEl.textContent = `Вы вошли как: ${currentUser.email}`
+      return true
+    }
+
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('public_chat_messages')
+        .select('*')
+        .order('created_at', { ascending: true })
+        .limit(100)
+
+      if (error) {
+        statusEl.textContent = error.message
+        return
+      }
+
+      messagesEl.innerHTML = ''
+      data.forEach(renderMessage)
+      messagesEl.scrollTop = messagesEl.scrollHeight
+    }
+
+    async function sendMessage(event) {
+      event.preventDefault()
+
+      const text = input.value.trim()
+      if (!text || !currentUser) return
+
+      const { error } = await supabase
+        .from('public_chat_messages')
+        .insert({
+          user_id: currentUser.id,
+          user_email: currentUser.email,
+          message: text
+        })
+
+      if (error) {
+        statusEl.textContent = error.message
+        return
+      }
+
+      input.value = ''
+    }
+
+    function subscribeToMessages() {
+      supabase
+        .channel('public-chat-db-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'public_chat_messages'
+          },
+          (payload) => {
+            renderMessage(payload.new)
+            messagesEl.scrollTop = messagesEl.scrollHeight
+          }
+        )
+        .subscribe()
+    }
+
+    form.addEventListener('submit', sendMessage)
+
+    const ok = await loadUser()
+    if (ok) {
+      await loadMessages()
+      subscribeToMessages()
+    }
+  </script>
+</body>
+</html>
