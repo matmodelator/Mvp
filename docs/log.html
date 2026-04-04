@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    input,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .msg {
+      margin-top: 14px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
+    }
+
+    .links {
+      margin-top: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dating App MVP</h1>
+  </header>
+
+  <div class="container">
+    <h2>Вход</h2>
+
+    <!--
+      Форма входа.
+      Пользователь вводит email и пароль,
+      которые были созданы на странице reg.html
+    -->
+    <form id="loginForm">
+      <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        required
+      />
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Пароль"
+        required
+      />
+
+      <button type="submit">
+        Войти
+      </button>
+    </form>
+
+    <!--
+      Сюда будем выводить служебные сообщения:
+      - Входим...
+      - Вход выполнен
+      - Ошибку от Supabase
+    -->
+    <div id="message" class="msg"></div>
+
+    <div class="links">
+      <a href="reg.html">
+        Нет аккаунта? Регистрация
+      </a>
+    </div>
+  </div>
+
+  <script type="module">
+    /*
+      Подключаем библиотеку Supabase из CDN.
+
+      createClient(...) нужен, чтобы
+      страница могла общаться с твоим проектом Supabase.
+    */
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    /*
+      Создаем клиент Supabase.
+
+      1) URL проекта
+      2) публичный publishable key
+
+      Этот ключ можно использовать в браузере.
+      service_role сюда вставлять нельзя.
+    */
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
+
+    /*
+      Получаем ссылку на форму входа.
+    */
+    const form = document.getElementById('loginForm')
+
+    /*
+      Получаем блок для сообщений.
+    */
+    const message = document.getElementById('message')
+
+    /*
+      Универсальная функция для показа сообщений.
+
+      text — текст сообщения
+      type — CSS-класс:
+        ''        -> обычный текст
+        'error'   -> ошибка
+        'success' -> успех
+    */
+    function showMessage(text, type = '') {
+      message.textContent = text
+      message.className = `msg ${type}`
+    }
+
+    /*
+      Обрабатываем отправку формы.
+      Когда пользователь нажимает кнопку "Войти",
+      код ниже выполняется.
+    */
+    form.addEventListener('submit', async (event) => {
+      /*
+        Отменяем стандартную перезагрузку страницы,
+        чтобы форма обрабатывалась через JavaScript.
+      */
+      event.preventDefault()
+
+      /*
+        Показываем промежуточное сообщение.
+      */
+      showMessage('Входим...')
+
+      /*
+        Считываем email из поля формы.
+        trim() убирает случайные пробелы по краям.
+      */
+      const email = document.getElementById('email').value.trim()
+
+      /*
+        Считываем пароль из формы.
+      */
+      const password = document.getElementById('password').value
+
+      /*
+        Пытаемся выполнить вход через Supabase Auth.
+
+        Если email и пароль правильные:
+        - будет создана сессия
+        - пользователь считается вошедшим
+
+        Если данные неверные:
+        - Supabase вернет ошибку
+      */
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      /*
+        Если есть ошибка —
+        показываем ее и останавливаем скрипт.
+      */
+      if (error) {
+        showMessage(error.message, 'error')
+        return
+      }
+
+      /*
+        Если дошли сюда —
+        вход выполнен успешно.
+      */
+      showMessage('Вход выполнен', 'success')
+
+      /*
+        Даем пользователю коротко увидеть сообщение,
+        затем отправляем его на главную страницу.
+      */
+      setTimeout(() => {
+        window.location.href = 'index.html'
+      }, 800)
+    })
+  </script>
+
+</body>
+</html>
