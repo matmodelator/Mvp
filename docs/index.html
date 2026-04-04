@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<!--
+  Главная страница системы.
+  Это центральный навигационный хаб.
+
+  Отсюда пользователь переходит:
+  - в профиль
+  - в анкету (preferences)
+  - в чат
+  - в поиск
+  - в галерею
+  - в баланс
+  и т.д.
+-->
+
+<html lang="ru">
+
+<head>
+
+  <!-- Кодировка -->
+  <meta charset="UTF-8">
+
+  <!-- Адаптивность под мобильные устройства -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Заголовок вкладки -->
+  <title>Главная</title>
+
+  <!--
+    Подключаем внешний CSS
+
+    Важно:
+    файл лежит в:
+
+    docs/styles/index.css
+
+    поэтому путь:
+
+    styles/index.css
+  -->
+  <link rel="stylesheet" href="styles/index.css">
+
+</head>
+
+<body>
+
+  <!-- ========================= -->
+  <!-- HEADER                    -->
+  <!-- ========================= -->
+
+  <!--
+    Верхняя панель приложения
+    Здесь обычно:
+
+    - логотип
+    - название системы
+    - меню
+  -->
+
+  <header>
+
+    <h1>
+      Dating App MVP
+    </h1>
+
+  </header>
+
+  <!-- ========================= -->
+  <!-- MAIN CONTAINER            -->
+  <!-- ========================= -->
+
+  <div class="container">
+
+    <!-- ========================= -->
+    <!-- USER INFO BLOCK           -->
+    <!-- ========================= -->
+
+    <!--
+      Блок информации о пользователе
+
+      Здесь показываем:
+      - email
+      - статус
+      - сообщения
+    -->
+
+    <div class="top-box">
+
+      <h2>
+        Главная навигация
+      </h2>
+
+      <!--
+        Здесь будет показан email пользователя
+      -->
+      <p id="welcome">
+        Проверяем пользователя...
+      </p>
+
+      <!--
+        Служебные сообщения
+      -->
+      <div id="message"></div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- NAVIGATION GRID           -->
+    <!-- ========================= -->
+
+    <!--
+      Сетка карточек.
+
+      Каждая карточка —
+      переход в отдельный раздел системы.
+    -->
+
+    <div class="grid">
+
+      <!-- PROFILE -->
+
+      <div class="card">
+
+        <h3>
+          Профиль
+        </h3>
+
+        <p>
+          Основные данные пользователя
+        </p>
+
+        <button onclick="goTo('profile.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- PREFERENCES -->
+
+      <div class="card">
+
+        <h3>
+          Анкета
+        </h3>
+
+        <p>
+          Параметры поиска и предпочтения
+        </p>
+
+        <button onclick="goTo('preference.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- PUBLIC CHAT -->
+
+      <div class="card">
+
+        <h3>
+          Общий чат
+        </h3>
+
+        <p>
+          Публичное общение пользователей
+        </p>
+
+        <button onclick="goTo('public-chat.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- SEARCH -->
+
+      <div class="card">
+
+        <h3>
+          Поиск
+        </h3>
+
+        <p>
+          Форма поиска пользователей
+        </p>
+
+        <button onclick="goTo('search-form.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- FEED -->
+
+      <div class="card">
+
+        <h3>
+          Просмотр анкет
+        </h3>
+
+        <p>
+          Лента пользователей
+        </p>
+
+        <button onclick="goTo('feed.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- BALANCE -->
+
+      <div class="card">
+
+        <h3>
+          Баланс
+        </h3>
+
+        <p>
+          Монеты и платежи
+        </p>
+
+        <button onclick="goTo('balance.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- BLOG -->
+
+      <div class="card">
+
+        <h3>
+          Блог
+        </h3>
+
+        <p>
+          Публикации пользователей
+        </p>
+
+        <button onclick="goTo('blog.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- COMMUNITIES -->
+
+      <div class="card">
+
+        <h3>
+          Сообщества
+        </h3>
+
+        <p>
+          Группы по интересам
+        </p>
+
+        <button onclick="goTo('communities.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- GALLERY -->
+
+      <div class="card">
+
+        <h3>
+          Галерея
+        </h3>
+
+        <p>
+          Фото пользователя
+        </p>
+
+        <button onclick="goTo('gallery.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- AI BOT -->
+
+      <div class="card">
+
+        <h3>
+          ИИ бот
+        </h3>
+
+        <p>
+          Помощник пользователя
+        </p>
+
+        <button onclick="goTo('ai-bot.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- MESSAGES -->
+
+      <div class="card">
+
+        <h3>
+          Сообщения
+        </h3>
+
+        <p>
+          Личные переписки
+        </p>
+
+        <button onclick="goTo('messages.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- INSTANT CHAT -->
+
+      <div class="card">
+
+        <h3>
+          Мгновенный чат
+        </h3>
+
+        <p>
+          Быстрое общение
+        </p>
+
+        <button onclick="goTo('instant-chat.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- BLIND DATE -->
+
+      <div class="card">
+
+        <h3>
+          Свидание вслепую
+        </h3>
+
+        <p>
+          Случайная встреча
+        </p>
+
+        <button onclick="goTo('blind-date.html')">
+          Открыть
+        </button>
+
+      </div>
+
+      <!-- TENNIS / PADEL -->
+
+      <div class="card">
+
+        <h3>
+          Теннис / Паддл
+        </h3>
+
+        <p>
+          Спортивные встречи
+        </p>
+
+        <button onclick="goTo('tennis-padel.html')">
+          Открыть
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- FOOTER ACTIONS            -->
+    <!-- ========================= -->
+
+    <div class="footer-actions">
+
+      <button
+        class="secondary"
+        onclick="logout()"
+      >
+        Выйти
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- JAVASCRIPT                -->
+  <!-- ========================= -->
+
+  <script type="module">
+
+    /*
+      Подключаем Supabase
+    */
+
+    import { createClient }
+    from 'https://esm.sh/@supabase/supabase-js@2'
+
+    /*
+      Создаем соединение
+    */
+
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
+
+    const welcome =
+      document.getElementById('welcome')
+
+    const message =
+      document.getElementById('message')
+
+    /*
+      Проверяем пользователя
+    */
+
+    async function checkUser() {
+
+      const { data, error } =
+        await supabase.auth.getUser()
+
+      if (error || !data.user) {
+
+        window.location.href =
+          'log.html'
+
+        return
+      }
+
+      const user = data.user
+
+      welcome.textContent =
+        `Вы вошли как: ${user.email}`
+
+    }
+
+    /*
+      Переход между страницами
+    */
+
+    function goTo(page) {
+
+      window.location.href =
+        page
+
+    }
+
+    /*
+      Выход из системы
+    */
+
+    async function logout() {
+
+      message.textContent =
+        'Выходим...'
+
+      await supabase.auth.signOut()
+
+      window.location.href =
+        'log.html'
+
+    }
+
+    window.goTo = goTo
+    window.logout = logout
+
+    checkUser()
+
+  </script>
+
+</body>
+
+</html>
