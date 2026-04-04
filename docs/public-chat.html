@@ -84,120 +84,249 @@
     </form>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+
+  
+<!--
+===========================================================
+SCRIPT: PUBLIC CHAT REALTIME
+===========================================================
+
+1. Проверяет, вошел ли пользователь
+2. Загружает сообщения из таблицы public_chat_messages
+3. Позволяет отправлять новые сообщения
+4. Слушает новые сообщения в реальном времени (Realtime)
+5. Показывает сообщения на странице
+
+Таблица:
+
+public_chat_messages
+
+Поля:
+
+id
+user_id
+user_email
+message
+created_at
+
+Требования:
+
+- таблица создана
+- RLS включен
+- Realtime включен
+- пользователь авторизован
+===========================================================
+-->
+
+<script type="module">
+
+/*
+===========================================================
+ПОДКЛЮЧЕНИЕ SUPABASE
+===========================================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+Создаем соединение с проектом Supabase
+*/
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+===========================================================
+ПОЛУЧАЕМ ЭЛЕМЕНТЫ СТРАНИЦЫ
+===========================================================
+*/
+
+const messages =
+  document.getElementById('messages')
+
+const form =
+  document.getElementById('chatForm')
+
+const input =
+  document.getElementById('messageInput')
+
+let currentUser = null
+
+/*
+===========================================================
+ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
+===========================================================
+
+Если пользователь не вошел —
+перенаправляем на страницу входа
+*/
+
+async function loadUser() {
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  if (error || !data.user) {
+
+    window.location.href =
+      'log.html'
+
+    return
+  }
+
+  currentUser = data.user
+
+}
+
+/*
+===========================================================
+ЗАГРУЗКА СООБЩЕНИЙ ИЗ БАЗЫ
+===========================================================
+
+Берем последние сообщения
+и выводим их на экран
+*/
+
+async function loadMessages() {
+
+  const { data, error } =
+    await supabase
+      .from('public_chat_messages')
+      .select('*')
+      .order('created_at')
+
+  if (error) {
+
+    console.log(error.message)
+    return
+
+  }
+
+  messages.innerHTML = ''
+
+  data.forEach(renderMessage)
+
+}
+
+/*
+===========================================================
+ОТОБРАЖЕНИЕ СООБЩЕНИЯ
+===========================================================
+*/
+
+function renderMessage(row) {
+
+  const div =
+    document.createElement('div')
+
+  div.style.padding = '6px'
+
+  div.textContent =
+    row.user_email +
+    ': ' +
+    row.message
+
+  messages.appendChild(div)
+
+}
+
+/*
+===========================================================
+ОТПРАВКА СООБЩЕНИЯ
+===========================================================
+*/
+
+async function sendMessage(event) {
+
+  event.preventDefault()
+
+  const text =
+    input.value.trim()
+
+  if (!text) return
+
+  await supabase
+    .from('public_chat_messages')
+    .insert({
+
+      user_id:
+        currentUser.id,
+
+      user_email:
+        currentUser.email,
+
+      message:
+        text
+
+    })
+
+  input.value = ''
+
+}
+
+/*
+===========================================================
+REALTIME ПОДПИСКА
+===========================================================
+
+Слушаем новые сообщения
+без обновления страницы
+*/
+
+function subscribeRealtime() {
+
+  supabase
+    .channel('public-chat')
+
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'public_chat_messages'
+      },
+
+      (payload) => {
+
+        renderMessage(
+          payload.new
+        )
+
+      }
+
     )
 
-    const statusEl = document.getElementById('status')
-    const messagesEl = document.getElementById('messages')
-    const form = document.getElementById('chatForm')
-    const input = document.getElementById('messageInput')
+    .subscribe()
 
-    let currentUser = null
+}
 
-    function goBack() {
-      window.location.href = 'main.html'
-    }
-    window.goBack = goBack
+/*
+===========================================================
+СОБЫТИЕ ОТПРАВКИ ФОРМЫ
+===========================================================
+*/
 
-    function renderMessage(row) {
-      const item = document.createElement('div')
-      item.className = 'msg-item'
+form.addEventListener(
+  'submit',
+  sendMessage
+)
 
-      const meta = document.createElement('div')
-      meta.className = 'msg-meta'
-      meta.textContent = `${row.user_email || 'user'} • ${new Date(row.created_at).toLocaleString()}`
+/*
+===========================================================
+ЗАПУСК ЧАТА
+===========================================================
+*/
 
-      const text = document.createElement('div')
-      text.className = 'msg-text'
-      text.textContent = row.message
+await loadUser()
 
-      item.appendChild(meta)
-      item.appendChild(text)
-      messagesEl.appendChild(item)
-    }
+await loadMessages()
 
-    async function loadUser() {
-      const { data, error } = await supabase.auth.getUser()
+subscribeRealtime()
 
-      if (error || !data.user) {
-        window.location.href = 'log.html'
-        return false
-      }
-
-      currentUser = data.user
-      statusEl.textContent = `Вы вошли как: ${currentUser.email}`
-      return true
-    }
-
-    async function loadMessages() {
-      const { data, error } = await supabase
-        .from('public_chat_messages')
-        .select('*')
-        .order('created_at', { ascending: true })
-        .limit(100)
-
-      if (error) {
-        statusEl.textContent = error.message
-        return
-      }
-
-      messagesEl.innerHTML = ''
-      data.forEach(renderMessage)
-      messagesEl.scrollTop = messagesEl.scrollHeight
-    }
-
-    async function sendMessage(event) {
-      event.preventDefault()
-
-      const text = input.value.trim()
-      if (!text || !currentUser) return
-
-      const { error } = await supabase
-        .from('public_chat_messages')
-        .insert({
-          user_id: currentUser.id,
-          user_email: currentUser.email,
-          message: text
-        })
-
-      if (error) {
-        statusEl.textContent = error.message
-        return
-      }
-
-      input.value = ''
-    }
-
-    function subscribeToMessages() {
-      supabase
-        .channel('public-chat-db-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'public_chat_messages'
-          },
-          (payload) => {
-            renderMessage(payload.new)
-            messagesEl.scrollTop = messagesEl.scrollHeight
-          }
-        )
-        .subscribe()
-    }
-
-    form.addEventListener('submit', sendMessage)
-
-    const ok = await loadUser()
-    if (ok) {
-      await loadMessages()
-      subscribeToMessages()
-    }
-  </script>
+</script>
 </body>
 </html>
