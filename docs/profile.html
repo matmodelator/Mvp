@@ -127,23 +127,23 @@
    // ЗАГРУЗКА ПРОФИЛЯ 
     async function loadProfile() {
 
-  // получаем текущего пользователя
+  // получаем пользователя
 
   const { data: userData } =
     await supabase.auth.getUser()
 
   const user = userData.user
 
-  // если пользователь не вошел — отправляем на логин
+  // если не вошел — отправляем на логин
 
   if (!user) {
     window.location.href = 'log.html'
     return
   }
 
-  // читаем профиль из базы
+  // читаем профиль
 
-  const { data, error } =
+  const { data: profile, error } =
     await supabase
       .from('profiles')
       .select('*')
@@ -155,34 +155,29 @@
     return
   }
 
-  /*
-    ВАЖНО:
-    мы НЕ проверяем "заполнен ли профиль"
+  // если профиль есть — просто подставляем данные
 
-    мы просто подставляем данные,
-    если они есть
-  */
-
-  if (data) {
+  if (profile) {
 
     document.getElementById('nickname').value =
-      data.nickname || ''
+      profile.nickname || ''
 
     document.getElementById('age').value =
-      data.age || ''
+      profile.age || ''
 
     document.getElementById('gender').value =
-      data.gender || ''
+      profile.gender || ''
 
     document.getElementById('looking_for').value =
-      data.looking_for || ''
+      profile.looking_for || ''
 
     document.getElementById('city').value =
-      data.city || ''
+      profile.city || ''
 
     document.getElementById('bio').value =
-      data.bio || ''
+      profile.bio || ''
   }
+
 }
     form.addEventListener('submit', async (event) => {
       event.preventDefault()
