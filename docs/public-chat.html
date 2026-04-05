@@ -220,19 +220,40 @@ async function loadMessages() {
 
 function renderMessage(row) {
 
+  /*
+  Получаем время сообщения
+  */
+
+  const time =
+    new Date(row.created_at)
+      .toLocaleTimeString()
+
+  /*
+  Создаем элемент сообщения
+  */
+
   const div =
     document.createElement('div')
 
+  /*
+  Формируем текст сообщения
+  */
+
   div.textContent =
     row.user_email +
+    ' • ' +
+    time +
     ': ' +
     row.message
+
+  /*
+  Добавляем сообщение в чат
+  */
 
   messages.appendChild(div)
 
   /*
   Автоскролл вниз
-  Показывает последнее сообщение
   */
 
   messages.scrollTop =
