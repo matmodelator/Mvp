@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
   <title>Вход</title>
 
   <style>
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -20,17 +26,17 @@
     }
 
     .container {
-      max-width: 420px;
+      max-width: 520px;
       margin: 40px auto;
       background: white;
       padding: 24px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     h2 {
-      text-align: center;
       margin-top: 0;
+      text-align: center;
     }
 
     input,
@@ -38,27 +44,50 @@
       width: 100%;
       box-sizing: border-box;
       padding: 12px;
-      margin-top: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 14px;
     }
 
-    button {
-      border: none;
-      background: #2563eb;
-      color: white;
+    .password-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .password-row input {
+      flex: 1;
+    }
+
+    .eye-button {
+      width: 56px;
+      min-width: 56px;
+      background: #e5e7eb;
+      color: #111;
+      border: 1px solid #ccc;
       cursor: pointer;
     }
 
-    button:hover {
+    .eye-button:hover {
+      background: #d1d5db;
+    }
+
+    .submit-button {
+      margin-top: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .submit-button:hover {
       background: #1d4ed8;
     }
 
     .msg {
       margin-top: 14px;
-      font-size: 14px;
       text-align: center;
+      font-size: 14px;
     }
 
     .error {
@@ -73,29 +102,39 @@
       margin-top: 18px;
       text-align: center;
     }
+
   </style>
+
 </head>
+
 <body>
 
-  <header>
-    <h1>Dating App MVP</h1>
-  </header>
+<header>
+  <h1>Dating App MVP</h1>
+</header>
 
-  <div class="container">
-    <h2>Вход</h2>
+<div class="container">
 
-    <!--
-      Форма входа.
-      Пользователь вводит email и пароль,
-      которые были созданы на странице reg.html
-    -->
-    <form id="loginForm">
-      <input
-        id="email"
-        type="email"
-        placeholder="Email"
-        required
-      />
+  <h2>Вход</h2>
+
+  <!-- ========================= -->
+  <!-- ФОРМА ВХОДА -->
+  <!-- ========================= -->
+
+  <form id="loginForm">
+
+    <!-- Email -->
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      required
+    />
+
+    <!-- Пароль с глазком -->
+
+    <div class="password-row">
 
       <input
         id="password"
@@ -104,140 +143,164 @@
         required
       />
 
-      <button type="submit">
-        Войти
+      <button
+        type="button"
+        class="eye-button"
+        onclick="togglePassword()"
+      >
+        👁
       </button>
-    </form>
 
-    <!--
-      Сюда будем выводить служебные сообщения:
-      - Входим...
-      - Вход выполнен
-      - Ошибку от Supabase
-    -->
-    <div id="message" class="msg"></div>
-
-    <div class="links">
-      <a href="reg.html">
-        Нет аккаунта? Регистрация
-      </a>
     </div>
+
+    <button
+      type="submit"
+      class="submit-button"
+    >
+      Войти
+    </button>
+
+  </form>
+
+  <!-- Сообщения -->
+
+  <div id="message" class="msg"></div>
+
+  <div class="links">
+    <a href="reg.html">
+      Нет аккаунта? Зарегистрироваться
+    </a>
   </div>
 
-  <script type="module">
+</div>
+
+<script type="module">
+
+/*
+========================
+Подключаем Supabase
+========================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+========================
+Элементы страницы
+========================
+*/
+
+const form =
+  document.getElementById('loginForm')
+
+const message =
+  document.getElementById('message')
+
+/*
+========================
+Глазок показать пароль
+========================
+*/
+
+function togglePassword() {
+
+  const input =
+    document.getElementById('password')
+
+  if (input.type === 'password') {
+
+    input.type = 'text'
+
+  }
+
+  else {
+
+    input.type = 'password'
+
+  }
+
+}
+
+window.togglePassword =
+  togglePassword
+
+/*
+========================
+Вход
+========================
+*/
+
+form.addEventListener(
+  'submit',
+  async (event) => {
+
+    event.preventDefault()
+
+    message.textContent =
+      'Входим...'
+
+    const email =
+      document.getElementById('email').value.trim()
+
+    const password =
+      document.getElementById('password').value
+
     /*
-      Подключаем библиотеку Supabase из CDN.
-
-      createClient(...) нужен, чтобы
-      страница могла общаться с твоим проектом Supabase.
+    Пытаемся войти
     */
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    /*
-      Создаем клиент Supabase.
+    const { error } =
+      await supabase.auth.signInWithPassword({
 
-      1) URL проекта
-      2) публичный publishable key
+        email,
+        password
 
-      Этот ключ можно использовать в браузере.
-      service_role сюда вставлять нельзя.
-    */
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-    )
+      })
 
-    /*
-      Получаем ссылку на форму входа.
-    */
-    const form = document.getElementById('loginForm')
+    if (error) {
 
-    /*
-      Получаем блок для сообщений.
-    */
-    const message = document.getElementById('message')
+      /*
+      Проверяем подтверждение почты
+      */
 
-    /*
-      Универсальная функция для показа сообщений.
+      if (
+        error.message.includes(
+          'Email not confirmed'
+        )
+      ) {
 
-      text — текст сообщения
-      type — CSS-класс:
-        ''        -> обычный текст
-        'error'   -> ошибка
-        'success' -> успех
-    */
-    function showMessage(text, type = '') {
-      message.textContent = text
-      message.className = `msg ${type}`
+        message.textContent =
+          'Подтвердите почту перед входом'
+
+        return
+
+      }
+
+      message.textContent =
+        error.message
+
+      return
+
     }
 
     /*
-      Обрабатываем отправку формы.
-      Когда пользователь нажимает кнопку "Войти",
-      код ниже выполняется.
+    Успешный вход
     */
-    form.addEventListener('submit', async (event) => {
-      /*
-        Отменяем стандартную перезагрузку страницы,
-        чтобы форма обрабатывалась через JavaScript.
-      */
-      event.preventDefault()
 
-      /*
-        Показываем промежуточное сообщение.
-      */
-      showMessage('Входим...')
+    window.location.href =
+      'index.html'
 
-      /*
-        Считываем email из поля формы.
-        trim() убирает случайные пробелы по краям.
-      */
-      const email = document.getElementById('email').value.trim()
+  }
 
-      /*
-        Считываем пароль из формы.
-      */
-      const password = document.getElementById('password').value
+)
 
-      /*
-        Пытаемся выполнить вход через Supabase Auth.
-
-        Если email и пароль правильные:
-        - будет создана сессия
-        - пользователь считается вошедшим
-
-        Если данные неверные:
-        - Supabase вернет ошибку
-      */
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-
-      /*
-        Если есть ошибка —
-        показываем ее и останавливаем скрипт.
-      */
-      if (error) {
-        showMessage(error.message, 'error')
-        return
-      }
-
-      /*
-        Если дошли сюда —
-        вход выполнен успешно.
-      */
-      showMessage('Вход выполнен', 'success')
-
-      /*
-        Даем пользователю коротко увидеть сообщение,
-        затем отправляем его на главную страницу.
-      */
-      setTimeout(() => {
-        window.location.href = 'index.html'
-      }, 800)
-    })
-  </script>
+</script>
 
 </body>
 </html>
