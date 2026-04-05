@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Вход в чат</title>
+
+</head>
+
+<body>
+
+<h2>Вход в чат</h2>
+
+<!-- ========================= -->
+<!-- ВЫБОР МАСКИ -->
+<!-- ========================= -->
+
+<label>
+Выберите маску:
+</label>
+
+<br><br>
+
+<select id="maskSelect">
+
+  <option>🦊 Лис</option>
+  <option>🐺 Волк</option>
+  <option>🐼 Панда</option>
+  <option>🦉 Сова</option>
+  <option>🐬 Дельфин</option>
+  <option>🦁 Лев</option>
+  <option>🐯 Тигр</option>
+  <option>🦅 Орел</option>
+  <option>🐉 Дракон</option>
+  <option>🦄 Единорог</option>
+
+</select>
+
+<br><br>
+
+<!-- ========================= -->
+<!-- ВЫБОР ЦВЕТА -->
+<!-- ========================= -->
+
+<label>
+Выберите цвет:
+</label>
+
+<br><br>
+
+<select id="colorSelect">
+
+  <option value="#FF0000">Red</option>
+  <option value="#FFA500">Orange</option>
+  <option value="#FFD700">Gold</option>
+  <option value="#FFFF00">Yellow</option>
+  <option value="#00FF00">Lime</option>
+  <option value="#00FFFF">Cyan</option>
+  <option value="#1E90FF">Blue</option>
+  <option value="#FF00FF">Magenta</option>
+  <option value="#FF69B4">HotPink</option>
+  <option value="#FFFFFF">White</option>
+
+</select>
+
+<br><br><br>
+
+<!-- ========================= -->
+<!-- КНОПКА ВХОДА -->
+<!-- ========================= -->
+
+<button onclick="enterChat()">
+Войти в чат
+</button>
+
+<!-- ========================= -->
+<!-- SCRIPT -->
+<!-- ========================= -->
+
+<script>
+
+/*
+Сохранение выбора
+и переход в чат
+*/
+
+function enterChat() {
+
+  const mask =
+    document.getElementById('maskSelect').value
+
+  const color =
+    document.getElementById('colorSelect').value
+
+  /*
+  сохраняем локально
+  */
+
+  localStorage.setItem(
+    'chatMask',
+    mask
+  )
+
+  localStorage.setItem(
+    'chatColor',
+    color
+  )
+
+  /*
+  переход в чат
+  */
+
+  window.location.href =
+    'public-chat.html'
+
+}
+
+</script>
+
+</body>
+</html>
