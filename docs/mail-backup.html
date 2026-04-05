@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <title>Подтверждение почты</title>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    .secondary:hover {
+      background: #d1d5db;
+    }
+
+    .msg {
+      margin-top: 16px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .ok {
+      color: green;
+    }
+
+    .notok {
+      color: #b91c1c;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<header>
+
+  <h1>
+    Подтверждение почты
+  </h1>
+
+</header>
+
+<div class="container">
+
+  <!--
+    Сюда будет выведен статус:
+    подтверждена почта или нет
+  -->
+  <div id="statusMessage"
+       class="msg">
+    Проверяем статус...
+  </div>
+
+  <!--
+    Кнопки перехода
+  -->
+  <div class="buttons">
+
+    <button onclick="goIndex()">
+      На index
+    </button>
+
+    <button class="secondary"
+            onclick="goMain()">
+      На main
+    </button>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+ЭЛЕМЕНТ СТАТУСА
+================================
+*/
+
+const statusMessage =
+  document.getElementById('statusMessage')
+
+/*
+================================
+ПРОВЕРКА СТАТУСА ПОДТВЕРЖДЕНИЯ
+================================
+
+Вот здесь и идет обращение к Supabase.
+Без этого блока страница ничего не знает
+о пользователе и о подтверждении почты.
+*/
+
+async function checkEmailStatus() {
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  /*
+    Если пользователя нет —
+    значит сессия не найдена
+  */
+
+  if (error || !data.user) {
+
+    statusMessage.textContent =
+      'Пользователь не найден'
+
+    statusMessage.className =
+      'msg notok'
+
+    return
+  }
+
+  const user = data.user
+
+  /*
+    Проверяем:
+    если email_confirmed_at заполнен —
+    почта подтверждена
+  */
+
+  if (user.email_confirmed_at) {
+
+    statusMessage.textContent =
+      'Почта подтверждена'
+
+    statusMessage.className =
+      'msg ok'
+
+  }
+
+  else {
+
+    statusMessage.textContent =
+      'Почта не подтверждена'
+
+    statusMessage.className =
+      'msg notok'
+
+  }
+
+}
+
+/*
+================================
+ПЕРЕХОДЫ
+================================
+*/
+
+function goIndex() {
+  window.location.href = 'index.html'
+}
+
+function goMain() {
+  window.location.href = 'main.html'
+}
+
+window.goIndex = goIndex
+window.goMain = goMain
+
+/*
+================================
+ЗАПУСК ПРОВЕРКИ ПРИ ЗАГРУЗКЕ
+================================
+*/
+
+checkEmailStatus()
+
+</script>
+
+</body>
+</html>
