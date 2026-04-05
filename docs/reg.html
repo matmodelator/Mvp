@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Регистрация</title>
+  <title>Вход</title>
 
   <style>
     body {
@@ -40,7 +40,6 @@
       width: 100%;
       box-sizing: border-box;
       padding: 12px;
-      margin-top: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 14px;
@@ -53,15 +52,12 @@
     }
 
     .password-row input {
-      margin-top: 0;
       flex: 1;
     }
 
     .eye-button {
       width: 56px;
       min-width: 56px;
-      margin-top: 0;
-      padding: 12px;
       background: #e5e7eb;
       color: #111;
       border: 1px solid #ccc;
@@ -73,6 +69,7 @@
     }
 
     .submit-button {
+      margin-top: 12px;
       background: #2563eb;
       color: white;
       border: none;
@@ -113,9 +110,15 @@
 
 <div class="container">
 
-  <h2>Регистрация</h2>
+  <h2>Вход</h2>
 
-  <form id="registerForm">
+  <!-- ========================= -->
+  <!-- ФОРМА ВХОДА -->
+  <!-- ========================= -->
+
+  <form id="loginForm">
+
+    <!-- EMAIL -->
 
     <input
       id="email"
@@ -124,134 +127,202 @@
       required
     />
 
-    <!-- Пароль -->
+    <!-- ПАРОЛЬ + ГЛАЗОК -->
+
     <div class="password-row">
+
       <input
         id="password"
         type="password"
         placeholder="Пароль"
         required
       />
+
       <button
+        id="togglePasswordButton"
         type="button"
         class="eye-button"
-        onclick="togglePassword('password', this)"
+        onclick="togglePassword()"
       >
         👁
       </button>
+
     </div>
 
-    <!-- Подтверждение пароля -->
-    <div class="password-row">
-      <input
-        id="passwordConfirm"
-        type="password"
-        placeholder="Подтвердите пароль"
-        required
-      />
-      <button
-        type="button"
-        class="eye-button"
-        onclick="togglePassword('passwordConfirm', this)"
-      >
-        👁
-      </button>
-    </div>
-
-    <button type="submit" class="submit-button">
-      Зарегистрироваться
+    <button
+      type="submit"
+      class="submit-button"
+    >
+      Войти
     </button>
 
   </form>
 
+  <!-- СООБЩЕНИЯ -->
+
   <div id="message" class="msg"></div>
 
   <div class="links">
-    <a href="log.html">
-      Уже есть аккаунт? Войти
+    <a href="reg.html">
+      Нет аккаунта? Регистрация
     </a>
   </div>
 
 </div>
 
 <script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-  const supabase = createClient(
-    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-  )
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
 
-  const form = document.getElementById('registerForm')
-  const message = document.getElementById('message')
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
 
-  function showMessage(text, type = '') {
-    message.textContent = text
-    message.className = `msg ${type}`
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
+
+const form =
+  document.getElementById('loginForm')
+
+const message =
+  document.getElementById('message')
+
+/*
+================================
+ПОКАЗАТЬ / СКРЫТЬ ПАРОЛЬ
+================================
+*/
+
+function togglePassword() {
+
+  const input =
+    document.getElementById('password')
+
+  const button =
+    document.getElementById('togglePasswordButton')
+
+  if (input.type === 'password') {
+
+    input.type = 'text'
+    button.textContent = '🙈'
+
   }
 
-  /*
-    Переключение видимости пароля
-    fieldId — id нужного input
-    button — сама кнопка-глазок
-  */
-  function togglePassword(fieldId, button) {
-    const input = document.getElementById(fieldId)
+  else {
 
-    if (input.type === 'password') {
-      input.type = 'text'
-      button.textContent = '🙈'
-    } else {
-      input.type = 'password'
-      button.textContent = '👁'
-    }
+    input.type = 'password'
+    button.textContent = '👁'
+
   }
 
-  window.togglePassword = togglePassword
+}
 
-  form.addEventListener('submit', async (event) => {
+window.togglePassword = togglePassword
+
+/*
+================================
+ВСПОМОГАТЕЛЬНОЕ СООБЩЕНИЕ
+================================
+*/
+
+function showMessage(text, type = '') {
+  message.textContent = text
+  message.className = `msg ${type}`
+}
+
+/*
+================================
+ВХОД
+================================
+*/
+
+form.addEventListener(
+  'submit',
+  async (event) => {
+
     event.preventDefault()
 
-    showMessage('Создаем аккаунт...')
+    showMessage('Входим...')
 
-    const email = document.getElementById('email').value.trim()
-    const password = document.getElementById('password').value
-    const passwordConfirm = document.getElementById('passwordConfirm').value
+    const email =
+      document.getElementById('email').value.trim()
 
-    /*
-      Проверка совпадения паролей
-    */
-    if (password !== passwordConfirm) {
-      showMessage('Пароли не совпадают', 'error')
-      return
-    }
+    const password =
+      document.getElementById('password').value
 
     /*
-      Регистрация пользователя
+    ПЫТАЕМСЯ ВОЙТИ
     */
+
     const { error } =
-  await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: 'https://matmodelator.github.io/Mvp/mail-confirm.html'
-    }
-  })
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    /*
+    ЕСЛИ ЕСТЬ ОШИБКА
+    */
 
     if (error) {
+
+      /*
+      ЕСЛИ ПОЧТА НЕ ПОДТВЕРЖДЕНА
+      → СОХРАНЯЕМ EMAIL
+      → ПЕРЕХОДИМ НА mail-confirm.html
+      */
+
+      if (
+        error.message &&
+        (
+          error.message.includes('Email not confirmed') ||
+          error.message.includes('email not confirmed')
+        )
+      ) {
+
+        localStorage.setItem(
+          'pendingEmail',
+          email
+        )
+
+        window.location.href =
+          'mail-confirm.html'
+
+        return
+      }
+
+      /*
+      ЛЮБАЯ ДРУГАЯ ОШИБКА
+      */
+
       showMessage(error.message, 'error')
       return
     }
 
-    showMessage(
-      'Аккаунт создан. Проверьте почту для подтверждения.',
-      'success'
-    )
+    /*
+    УСПЕШНЫЙ ВХОД
+    */
+
+    showMessage('Вход выполнен', 'success')
 
     setTimeout(() => {
-      window.location.href = 'mail-confirm.html'
-    }, 1200)
-  })
+      window.location.href = 'index.html'
+    }, 600)
+
+  }
+)
+
 </script>
 
 </body>
