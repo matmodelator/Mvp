@@ -107,3 +107,115 @@
 98. LightSkyBlue2 — #A4D3EE
 99. MediumPurple2 — #AB82FF
 100. BrightCyan — #00FFFF
+
+
+
+
+
+
+
+
+
+
+<div style="font-family: sans-serif; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 20px; background: #fff;">
+  <div style="color: #FF0000;">1. Red — #FF0000</div>
+  <div style="color: #FF4500;">2. OrangeRed — #FF4500</div>
+  <div style="color: #FF6347;">3. Tomato — #FF6347</div>
+  <div style="color: #FF7F50;">4. Coral — #FF7F50</div>
+  <div style="color: #FF8C00;">5. DarkOrange — #FF8C00</div>
+  <div style="color: #FFA500;">6. Orange — #FFA500</div>
+  <div style="color: #FFD700;">7. Gold — #FFD700</div>
+  <div style="color: #FFFF00; background: #333; padding: 2px;">8. Yellow — #FFFF00</div>
+  <div style="color: #ADFF2F;">9. GreenYellow — #ADFF2F</div>
+  <div style="color: #7FFF00;">10. Chartreuse — #7FFF00</div>
+  <div style="color: #00FF00;">11. Lime — #00FF00</div>
+  <div style="color: #32CD32;">12. LimeGreen — #32CD32</div>
+  <div style="color: #00FF7F;">13. SpringGreen — #00FF7F</div>
+  <div style="color: #00FA9A;">14. MediumSpringGreen — #00FA9A</div>
+  <div style="color: #3CB371;">15. MediumSeaGreen — #3CB371</div>
+  <div style="color: #66CDAA;">16. MediumAquamarine — #66CDAA</div>
+  <div style="color: #20B2AA;">17. LightSeaGreen — #20B2AA</div>
+  <div style="color: #40E0D0;">18. Turquoise — #40E0D0</div>
+  <div style="color: #00FFFF;">19. Cyan — #00FFFF</div>
+  <div style="color: #00CED1;">20. DarkTurquoise — #00CED1</div>
+  <div style="color: #00BFFF;">21. DeepSkyBlue — #00BFFF</div>
+  <div style="color: #1E90FF;">22. DodgerBlue — #1E90FF</div>
+  <div style="color: #4169E1;">23. RoyalBlue — #4169E1</div>
+  <div style="color: #6495ED;">24. CornflowerBlue — #6495ED</div>
+  <div style="color: #87CEFA;">25. LightSkyBlue — #87CEFA</div>
+  <div style="color: #87CEEB;">26. SkyBlue — #87CEEB</div>
+  <div style="color: #ADD8E6;">27. LightBlue — #ADD8E6</div>
+  <div style="color: #B0E0E6;">28. PowderBlue — #B0E0E6</div>
+  <div style="color: #AFEEEE;">29. PaleTurquoise — #AFEEEE</div>
+  <div style="color: #E0FFFF; background: #333; padding: 2px;">30. LightCyan — #E0FFFF</div>
+  <div style="color: #FF00FF;">31. Magenta — #FF00FF</div>
+  <div style="color: #FF1493;">32. DeepPink — #FF1493</div>
+  <div style="color: #FF69B4;">33. HotPink — #FF69B4</div>
+  <div style="color: #FFB6C1;">34. LightPink — #FFB6C1</div>
+  <div style="color: #DB7093;">35. PaleVioletRed — #DB7093</div>
+  <div style="color: #C71585;">36. MediumVioletRed — #C71585</div>
+  <div style="color: #DA70D6;">37. Orchid — #DA70D6</div>
+  <div style="color: #DDA0DD;">38. Plum — #DDA0DD</div>
+  <div style="color: #EE82EE;">39. Violet — #EE82EE</div>
+  <div style="color: #BA55D3;">40. MediumOrchid — #BA55D3</div>
+  <div style="color: #9370DB;">41. MediumPurple — #9370DB</div>
+  <div style="color: #8A2BE2;">42. BlueViolet — #8A2BE2</div>
+  <div style="color: #9932CC;">43. DarkOrchid — #9932CC</div>
+  <div style="color: #9400D3;">44. DarkViolet — #9400D3</div>
+  <div style="color: #D8BFD8;">45. Thistle — #D8BFD8</div>
+  <div style="color: #E6E6FA;">46. Lavender — #E6E6FA</div>
+  <div style="color: #FFFACD;">47. LemonChiffon — #FFFACD</div>
+  <div style="color: #FAFAD2;">48. LightGoldenRodYellow — #FAFAD2</div>
+  <div style="color: #FFEFD5;">49. PapayaWhip — #FFEFD5</div>
+  <div style="color: #FFDAB9;">50. PeachPuff — #FFDAB9</div>
+  <div style="color: #FFE4B5;">51. Moccasin — #FFE4B5</div>
+  <div style="color: #F0E68C;">52. Khaki — #F0E68C</div>
+  <div style="color: #EEE8AA;">53. PaleGoldenRod — #EEE8AA</div>
+  <div style="color: #F5DEB3;">54. Wheat — #F5DEB3</div>
+  <div style="color: #DEB887;">55. BurlyWood — #DEB887</div>
+  <div style="color: #D2B48C;">56. Tan — #D2B48C</div>
+  <div style="color: #BC8F8F;">57. RosyBrown — #BC8F8F</div>
+  <div style="color: #F4A460;">58. SandyBrown — #F4A460</div>
+  <div style="color: #DAA520;">59. GoldenRod — #DAA520</div>
+  <div style="color: #CD853F;">60. Peru — #CD853F</div>
+  <div style="color: #DC143C;">61. Crimson — #DC143C</div>
+  <div style="color: #FA8072;">62. Salmon — #FA8072</div>
+  <div style="color: #FFA07A;">63. LightSalmon — #FFA07A</div>
+  <div style="color: #CD5C5C;">64. IndianRed — #CD5C5C</div>
+  <div style="color: #B22222;">65. FireBrick — #B22222</div>
+  <div style="color: #FFC0CB;">66. Pink — #FFC0CB</div>
+  <div style="color: #FF00FF;">67. Fuchsia — #FF00FF</div>
+  <div style="color: #00FFFF;">68. Aqua — #00FFFF</div>
+  <div style="color: #7FFFD4;">69. Aquamarine — #7FFFD4</div>
+  <div style="color: #4682B4;">70. SteelBlue — #4682B4</div>
+  <div style="color: #6A5ACD;">71. SlateBlue — #6A5ACD</div>
+  <div style="color: #7B68EE;">72. MediumSlateBlue — #7B68EE</div>
+  <div style="color: #FFF0F5;">73. LavenderBlush — #FFF0F5</div>
+  <div style="color: #F5FFFA;">74. MintCream — #F5FFFA</div>
+  <div style="color: #F0FFF0;">75. HoneyDew — #F0FFF0</div>
+  <div style="color: #F0FFFF;">76. Azure — #F0FFFF</div>
+  <div style="color: #FFEBCD;">77. BlanchedAlmond — #FFEBCD</div>
+  <div style="color: #FFE4C4;">78. Bisque — #FFE4C4</div>
+  <div style="color: #FFDEAD;">79. NavajoWhite — #FFDEAD</div>
+  <div style="color: #B0C4DE;">80. LightSteelBlue — #B0C4DE</div>
+  <div style="color: #C0C0C0;">81. Silver — #C0C0C0</div>
+  <div style="color: #DCDCDC;">82. Gainsboro — #DCDCDC</div>
+  <div style="color: #FFFAFA;">83. Snow — #FFFAFA</div>
+  <div style="color: #FFFFF0;">84. Ivory — #FFFFF0</div>
+  <div style="color: #FAEBD7;">85. AntiqueWhite — #FAEBD7</div>
+  <div style="color: #FDF5E6;">86. OldLace — #FDF5E6</div>
+  <div style="color: #FFFAF0;">87. FloralWhite — #FFFAF0</div>
+  <div style="color: #FFF8DC;">88. Cornsilk — #FFF8DC</div>
+  <div style="color: #FFF5EE;">89. Seashell — #FFF5EE</div>
+  <div style="color: #F5F5DC;">90. Beige — #F5F5DC</div>
+  <div style="color: #FFFFE0;">91. LightYellow — #FFFFE0</div>
+  <div style="color: #F08080;">92. LightCoral — #F08080</div>
+  <div style="color: #48D1CC;">93. MediumTurquoise — #48D1CC</div>
+  <div style="color: #90EE90;">94. LightGreen — #90EE90</div>
+  <div style="color: #7CFC00;">95. LawnGreen — #7CFC00</div>
+  <div style="color: #9ACD32;">96. YellowGreen — #9ACD32</div>
+  <div style="color: #00B2EE;">97. DeepSkyBlue2 — #00B2EE</div>
+  <div style="color: #A4D3EE;">98. LightSkyBlue2 — #A4D3EE</div>
+  <div style="color: #AB82FF;">99. MediumPurple2 — #AB82FF</div>
+  <div style="color: #00FFFF;">100. BrightCyan — #00FFFF</div>
+</div>
