@@ -1,0 +1,54 @@
+1.  white
+2.  silver
+3.  lightgray
+4.  gainsboro
+5.  yellow
+6.  gold
+7.  orange
+8.  darkorange
+9.  coral
+10. tomato
+
+11. red
+12. orangered
+13. pink
+14. hotpink
+15. deeppink
+16. magenta
+17. violet
+18. purple
+19. plum
+20. orchid
+
+21. cyan
+22. aqua
+23. turquoise
+24. mediumturquoise
+25. deepskyblue
+26. dodgerblue
+27. royalblue
+28. lightskyblue
+29. steelblue
+30. skyblue
+
+31. lime
+32. lightgreen
+33. springgreen
+34. chartreuse
+35. greenyellow
+36. palegreen
+37. mediumspringgreen
+38. lawngreen
+39. khaki
+40. lemonchiffon
+
+41. peachpuff
+42. moccasin
+43. navajowhite
+44. sandybrown
+45. peru
+46. chocolate
+47. tan
+48. wheat
+49. thistle
+50. lavender
