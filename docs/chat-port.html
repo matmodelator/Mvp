@@ -16,63 +16,112 @@
 <!-- ВЫБОР МАСКИ -->
 <!-- ========================= -->
 
-<label>
-Выберите маску:
-</label>
+<div class="group">
 
-<br><br>
+  <label>
+    Выберите маску:
+  </label>
 
-<select id="maskSelect">
+  <br><br>
 
-  <option>🦊 Лис</option>
-  <option>🐺 Волк</option>
-  <option>🐼 Панда</option>
-  <option>🦉 Сова</option>
-  <option>🐬 Дельфин</option>
-  <option>🦁 Лев</option>
-  <option>🐯 Тигр</option>
-  <option>🦅 Орел</option>
-  <option>🐉 Дракон</option>
-  <option>🦄 Единорог</option>
+  <select id="maskSelect">
 
-</select>
+    <option>🦊 Лис</option>
+    <option>🐺 Волк</option>
+    <option>🐼 Панда</option>
+    <option>🦉 Сова</option>
+    <option>🐬 Дельфин</option>
+    <option>🦁 Лев</option>
+    <option>🐯 Тигр</option>
+    <option>🦅 Орел</option>
+    <option>🐉 Дракон</option>
+    <option>🦄 Единорог</option>
 
-<br><br>
+  </select>
+
+</div>
+
+<br>
 
 <!-- ========================= -->
 <!-- ВЫБОР ЦВЕТА -->
 <!-- ========================= -->
 
-<label>
-Выберите цвет:
-</label>
+<div class="group">
+
+  <label>
+    Выберите цвет:
+  </label>
+
+  <br><br>
+
+  <!-- Цвета -->
+
+  <div style="color:#FF0000; cursor:pointer;"
+       onclick="selectColor('#FF0000')">
+    Red — #FF0000
+  </div>
+
+  <div style="color:#FFA500; cursor:pointer;"
+       onclick="selectColor('#FFA500')">
+    Orange — #FFA500
+  </div>
+
+  <div style="color:#FFD700; cursor:pointer;"
+       onclick="selectColor('#FFD700')">
+    Gold — #FFD700
+  </div>
+
+  <div style="color:#FFFF00; cursor:pointer;"
+       onclick="selectColor('#FFFF00')">
+    Yellow — #FFFF00
+  </div>
+
+  <div style="color:#00FF00; cursor:pointer;"
+       onclick="selectColor('#00FF00')">
+    Lime — #00FF00
+  </div>
+
+  <div style="color:#00FFFF; cursor:pointer;"
+       onclick="selectColor('#00FFFF')">
+    Cyan — #00FFFF
+  </div>
+
+  <div style="color:#1E90FF; cursor:pointer;"
+       onclick="selectColor('#1E90FF')">
+    Blue — #1E90FF
+  </div>
+
+  <div style="color:#FF00FF; cursor:pointer;"
+       onclick="selectColor('#FF00FF')">
+    Magenta — #FF00FF
+  </div>
+
+  <div style="color:#FF69B4; cursor:pointer;"
+       onclick="selectColor('#FF69B4')">
+    HotPink — #FF69B4
+  </div>
+
+  <div style="color:#FFFFFF; cursor:pointer;"
+       onclick="selectColor('#FFFFFF')">
+    White — #FFFFFF
+  </div>
+
+</div>
 
 <br><br>
 
-<select id="colorSelect">
-
-  <option value="#FF0000">Red</option>
-  <option value="#FFA500">Orange</option>
-  <option value="#FFD700">Gold</option>
-  <option value="#FFFF00">Yellow</option>
-  <option value="#00FF00">Lime</option>
-  <option value="#00FFFF">Cyan</option>
-  <option value="#1E90FF">Blue</option>
-  <option value="#FF00FF">Magenta</option>
-  <option value="#FF69B4">HotPink</option>
-  <option value="#FFFFFF">White</option>
-
-</select>
-
-<br><br><br>
-
 <!-- ========================= -->
-<!-- КНОПКА ВХОДА -->
+<!-- КНОПКА -->
 <!-- ========================= -->
 
-<button onclick="enterChat()">
-Войти в чат
-</button>
+<div class="group">
+
+  <button onclick="enterChat()">
+    Войти в чат
+  </button>
+
+</div>
 
 <!-- ========================= -->
 <!-- SCRIPT -->
@@ -81,21 +130,42 @@
 <script>
 
 /*
-Сохранение выбора
-и переход в чат
+выбранный цвет
+*/
+
+let selectedColor = null
+
+function selectColor(color) {
+
+  selectedColor = color
+
+  console.log(
+    'Выбран цвет:',
+    color
+  )
+
+}
+
+/*
+вход в чат
 */
 
 function enterChat() {
 
   const mask =
-    document.getElementById('maskSelect').value
+    document.getElementById(
+      'maskSelect'
+    ).value
 
-  const color =
-    document.getElementById('colorSelect').value
+  if (!selectedColor) {
 
-  /*
-  сохраняем локально
-  */
+    alert(
+      'Выберите цвет'
+    )
+
+    return
+
+  }
 
   localStorage.setItem(
     'chatMask',
@@ -104,12 +174,8 @@ function enterChat() {
 
   localStorage.setItem(
     'chatColor',
-    color
+    selectedColor
   )
-
-  /*
-  переход в чат
-  */
 
   window.location.href =
     'public-chat.html'
