@@ -95,17 +95,18 @@
 
 <div class="container">
 
-  <!-- Сообщение о статусе -->
-
+  <!--
+    Сюда будет выведен статус:
+    подтверждена почта или нет
+  -->
   <div id="statusMessage"
        class="msg">
-
     Проверяем статус...
-
   </div>
 
-  <!-- Кнопки -->
-
+  <!--
+    Кнопки перехода
+  -->
   <div class="buttons">
 
     <button onclick="goIndex()">
@@ -124,9 +125,9 @@
 <script type="module">
 
 /*
-========================
-Подключаем Supabase
-========================
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
 */
 
 import { createClient }
@@ -138,26 +139,33 @@ const supabase = createClient(
 )
 
 /*
-========================
-Элемент сообщения
-========================
+================================
+ЭЛЕМЕНТ СТАТУСА
+================================
 */
 
 const statusMessage =
-  document.getElementById(
-    'statusMessage'
-  )
+  document.getElementById('statusMessage')
 
 /*
-========================
-Проверка подтверждения почты
-========================
+================================
+ПРОВЕРКА СТАТУСА ПОДТВЕРЖДЕНИЯ
+================================
+
+Вот здесь и идет обращение к Supabase.
+Без этого блока страница ничего не знает
+о пользователе и о подтверждении почты.
 */
 
 async function checkEmailStatus() {
 
   const { data, error } =
     await supabase.auth.getUser()
+
+  /*
+    Если пользователя нет —
+    значит сессия не найдена
+  */
 
   if (error || !data.user) {
 
@@ -168,14 +176,14 @@ async function checkEmailStatus() {
       'msg notok'
 
     return
-
   }
 
-  const user =
-    data.user
+  const user = data.user
 
   /*
-  Проверяем подтверждение
+    Проверяем:
+    если email_confirmed_at заполнен —
+    почта подтверждена
   */
 
   if (user.email_confirmed_at) {
@@ -201,32 +209,26 @@ async function checkEmailStatus() {
 }
 
 /*
-========================
-Переходы
-========================
+================================
+ПЕРЕХОДЫ
+================================
 */
 
 function goIndex() {
-
-  window.location.href =
-    'index.html'
-
+  window.location.href = 'index.html'
 }
 
 function goMain() {
-
-  window.location.href =
-    'main.html'
-
+  window.location.href = 'main.html'
 }
 
 window.goIndex = goIndex
 window.goMain = goMain
 
 /*
-========================
-Запуск проверки
-========================
+================================
+ЗАПУСК ПРОВЕРКИ ПРИ ЗАГРУЗКЕ
+================================
 */
 
 checkEmailStatus()
