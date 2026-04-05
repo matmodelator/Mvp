@@ -3,11 +3,14 @@
 
 <head>
 
+  <!-- Кодировка -->
   <meta charset="UTF-8" />
 
+  <!-- Адаптация под мобильные -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0" />
 
+  <!-- Заголовок -->
   <title>Регистрация</title>
 
   <style>
@@ -100,12 +103,16 @@
 
   <form id="registerForm">
 
+    <!-- Email -->
+
     <input
       id="email"
       type="email"
       placeholder="Email"
       required
     />
+
+    <!-- Пароль -->
 
     <input
       id="password"
@@ -114,13 +121,24 @@
       required
     />
 
+    <!-- Подтверждение пароля -->
+
+    <input
+      id="passwordConfirm"
+      type="password"
+      placeholder="Подтвердите пароль"
+      required
+    />
+
+    <!-- Кнопка регистрации -->
+
     <button type="submit">
       Зарегистрироваться
     </button>
 
   </form>
 
-  <!-- Сообщения системы -->
+  <!-- Служебные сообщения -->
 
   <div id="message" class="msg"></div>
 
@@ -136,7 +154,7 @@
 
 /*
 ================================
-ПОДКЛЮЧАЕМ SUPABASE
+Подключаем Supabase
 ================================
 */
 
@@ -145,7 +163,7 @@ from 'https://esm.sh/@supabase/supabase-js@2'
 
 /*
 ================================
-СОЕДИНЕНИЕ С ПРОЕКТОМ
+Создаем подключение
 ================================
 */
 
@@ -156,7 +174,7 @@ const supabase = createClient(
 
 /*
 ================================
-ЭЛЕМЕНТЫ СТРАНИЦЫ
+Получаем элементы страницы
 ================================
 */
 
@@ -168,7 +186,7 @@ const message =
 
 /*
 ================================
-ПОКАЗ СООБЩЕНИЯ
+Функция вывода сообщений
 ================================
 */
 
@@ -181,20 +199,23 @@ function showMessage(text, type = '') {
 
 /*
 ================================
-РЕГИСТРАЦИЯ
+Обработка формы регистрации
 ================================
-
-Важно:
-При Confirm Email = ON
-пользователь должен подтвердить почту,
-прежде чем сможет нормально войти.
 */
 
 form.addEventListener('submit', async (event) => {
 
+  /*
+  Отключаем стандартную отправку формы
+  */
+
   event.preventDefault()
 
   showMessage('Создаем аккаунт...')
+
+  /*
+  Берем значения из полей
+  */
 
   const email =
     document.getElementById('email').value.trim()
@@ -202,11 +223,29 @@ form.addEventListener('submit', async (event) => {
   const password =
     document.getElementById('password').value
 
+  const passwordConfirm =
+    document.getElementById('passwordConfirm').value
+
   /*
-  Создаем пользователя
+  Проверяем совпадение паролей
   */
 
-  const { data, error } =
+  if (password !== passwordConfirm) {
+
+    showMessage(
+      'Пароли не совпадают',
+      'error'
+    )
+
+    return
+
+  }
+
+  /*
+  Создаем пользователя в Supabase Auth
+  */
+
+  const { error } =
     await supabase.auth.signUp({
       email,
       password
@@ -224,10 +263,8 @@ form.addEventListener('submit', async (event) => {
   }
 
   /*
-  При включенном Confirm Email
-  Supabase обычно не дает полноценную сессию,
-  пока пользователь не подтвердит почту.
-  Поэтому здесь просто сообщаем, что письмо отправлено.
+  Если регистрация успешна —
+  просим подтвердить почту
   */
 
   showMessage(
@@ -236,7 +273,7 @@ form.addEventListener('submit', async (event) => {
   )
 
   /*
-  Перенаправляем на страницу проверки почты
+  Переход на страницу подтверждения почты
   */
 
   setTimeout(() => {
