@@ -223,14 +223,20 @@ function renderMessage(row) {
   const div =
     document.createElement('div')
 
-  div.style.padding = '6px'
-
   div.textContent =
     row.user_email +
     ': ' +
     row.message
 
   messages.appendChild(div)
+
+  /*
+  Автоскролл вниз
+  Показывает последнее сообщение
+  */
+
+  messages.scrollTop =
+    messages.scrollHeight
 
 }
 
