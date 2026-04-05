@@ -65,6 +65,11 @@
   </style>
 </head>
 <body>
+
+  <button onclick="goMain()">
+  Назад на главную
+</button>
+  
   <header>
     <h1>Общий чат</h1>
   </header>
@@ -386,6 +391,17 @@ await loadMessages()
 
 subscribeRealtime()
 
+  /*
+Кнопка "Назад на главную"
+*/
+
+function goMain() {
+  window.location.href = 'main.html'
+}
+
+window.goMain = goMain
+
 </script>
+
 </body>
 </html>
