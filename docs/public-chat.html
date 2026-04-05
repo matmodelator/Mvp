@@ -77,11 +77,25 @@
     <p id="status">Проверяем сессию...</p>
 
     <div id="messages" class="messages"></div>
+    
+<!-- Ограничение длины сообщения -->
 
-    <form id="chatForm" class="chat-form">
-      <input id="messageInput" type="text" placeholder="Напишите сообщение..." maxlength="500" required />
-      <button type="submit">Отправить</button>
-    </form>
+  <form id="chatForm">
+
+    <input
+      id="messageInput"
+      type="text"
+      placeholder="Напишите сообщение..."
+      maxlength="150"
+      required
+    >
+
+    <button type="submit">
+      Отправить
+    </button>
+
+  </form>
+   
   </div>
 
 
@@ -153,6 +167,24 @@ const form =
 
 const input =
   document.getElementById('messageInput')
+
+  /*
+Если пользователь нажимает Enter —
+форма отправляется
+*/
+
+input.addEventListener(
+  'keydown',
+  (event) => {
+
+    if (event.key === 'Enter') {
+
+      form.requestSubmit()
+
+    }
+
+  }
+)
 
 let currentUser = null
 
