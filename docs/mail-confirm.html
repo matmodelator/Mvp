@@ -3,92 +3,169 @@
 
 <head>
 
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
   <title>Подтверждение почты</title>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    .secondary:hover {
+      background: #d1d5db;
+    }
+
+    .msg {
+      margin-top: 16px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .ok {
+      color: green;
+    }
+
+    .notok {
+      color: #b91c1c;
+    }
+
+  </style>
 
 </head>
 
 <body>
 
-<!-- КНОПКА НАЗАД -->
+<header>
 
-<button onclick="window.location.href='index.html'">
-Назад
-</button>
+  <h1>
+    Подтверждение почты
+  </h1>
 
+</header>
 
-<h2>
-Подтверждение почты
-</h2>
+<div class="container">
 
-<div>
+  <!-- Сообщение о статусе -->
 
-  <p id="status">
+  <div id="statusMessage"
+       class="msg">
 
-    Проверяем подтверждение...
+    Проверяем статус...
 
-  </p>
+  </div>
 
-</div>
+  <!-- Кнопки -->
 
-<br>
+  <div class="buttons">
 
-<div>
+    <button onclick="goIndex()">
+      На index
+    </button>
 
-  <button onclick="checkEmail()">
+    <button class="secondary"
+            onclick="goMain()">
+      На main
+    </button>
 
-    Проверить снова
-
-  </button>
-
-  <button onclick="goMain()">
-
-    На главную
-
-  </button>
+  </div>
 
 </div>
 
 <script type="module">
 
 /*
+========================
 Подключаем Supabase
+========================
 */
 
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
-/*
-Твой проект
-*/
-
 const supabase = createClient(
-
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-
 )
 
-const statusText =
-  document.getElementById('status')
-
 /*
-Проверка подтверждения почты
+========================
+Элемент сообщения
+========================
 */
 
-async function checkEmail() {
+const statusMessage =
+  document.getElementById(
+    'statusMessage'
+  )
 
-  statusText.textContent =
-    'Проверяем...'
+/*
+========================
+Проверка подтверждения почты
+========================
+*/
+
+async function checkEmailStatus() {
 
   const { data, error } =
     await supabase.auth.getUser()
 
   if (error || !data.user) {
 
-    statusText.textContent =
+    statusMessage.textContent =
       'Пользователь не найден'
+
+    statusMessage.className =
+      'msg notok'
 
     return
 
@@ -103,23 +180,38 @@ async function checkEmail() {
 
   if (user.email_confirmed_at) {
 
-    statusText.textContent =
+    statusMessage.textContent =
       'Почта подтверждена'
+
+    statusMessage.className =
+      'msg ok'
 
   }
 
   else {
 
-    statusText.textContent =
-      'Почта еще не подтверждена'
+    statusMessage.textContent =
+      'Почта не подтверждена'
+
+    statusMessage.className =
+      'msg notok'
 
   }
 
 }
 
 /*
-Переход на главную
+========================
+Переходы
+========================
 */
+
+function goIndex() {
+
+  window.location.href =
+    'index.html'
+
+}
 
 function goMain() {
 
@@ -128,13 +220,16 @@ function goMain() {
 
 }
 
+window.goIndex = goIndex
 window.goMain = goMain
 
 /*
-Проверяем сразу при загрузке
+========================
+Запуск проверки
+========================
 */
 
-checkEmail()
+checkEmailStatus()
 
 </script>
 
