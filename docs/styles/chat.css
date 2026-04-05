@@ -1,0 +1,42 @@
+/* контейнер чата */
+
+.chat-container {
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+/* список сообщений */
+
+.messages {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+/* сообщение */
+
+.message {
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+/* имя пользователя */
+
+.message-user {
+  font-weight: bold;
+}
+
+/* время */
+
+.message-time {
+  font-size: 12px;
+  color: gray;
+}
+
+/* форма */
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
