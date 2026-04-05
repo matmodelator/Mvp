@@ -1,54 +1,109 @@
-1.  white
-2.  silver
-3.  lightgray
-4.  gainsboro
-5.  yellow
-6.  gold
-7.  orange
-8.  darkorange
-9.  coral
-10. tomato
+1. Red — #FF0000
+2. OrangeRed — #FF4500
+3. Tomato — #FF6347
+4. Coral — #FF7F50
+5. DarkOrange — #FF8C00
+6. Orange — #FFA500
+7. Gold — #FFD700
+8. Yellow — #FFFF00
+9. GreenYellow — #ADFF2F
+10. Chartreuse — #7FFF00
 
-11. red
-12. orangered
-13. pink
-14. hotpink
-15. deeppink
-16. magenta
-17. violet
-18. purple
-19. plum
-20. orchid
+11. Lime — #00FF00
+12. LimeGreen — #32CD32
+13. SpringGreen — #00FF7F
+14. MediumSpringGreen — #00FA9A
+15. MediumSeaGreen — #3CB371
+16. MediumAquamarine — #66CDAA
+17. LightSeaGreen — #20B2AA
+18. Turquoise — #40E0D0
+19. Cyan — #00FFFF
+20. DarkTurquoise — #00CED1
 
-21. cyan
-22. aqua
-23. turquoise
-24. mediumturquoise
-25. deepskyblue
-26. dodgerblue
-27. royalblue
-28. lightskyblue
-29. steelblue
-30. skyblue
+21. DeepSkyBlue — #00BFFF
+22. DodgerBlue — #1E90FF
+23. RoyalBlue — #4169E1
+24. CornflowerBlue — #6495ED
+25. LightSkyBlue — #87CEFA
+26. SkyBlue — #87CEEB
+27. LightBlue — #ADD8E6
+28. PowderBlue — #B0E0E6
+29. PaleTurquoise — #AFEEEE
+30. LightCyan — #E0FFFF
 
-31. lime
-32. lightgreen
-33. springgreen
-34. chartreuse
-35. greenyellow
-36. palegreen
-37. mediumspringgreen
-38. lawngreen
-39. khaki
-40. lemonchiffon
+31. Magenta — #FF00FF
+32. DeepPink — #FF1493
+33. HotPink — #FF69B4
+34. LightPink — #FFB6C1
+35. PaleVioletRed — #DB7093
+36. MediumVioletRed — #C71585
+37. Orchid — #DA70D6
+38. Plum — #DDA0DD
+39. Violet — #EE82EE
+40. MediumOrchid — #BA55D3
 
-41. peachpuff
-42. moccasin
-43. navajowhite
-44. sandybrown
-45. peru
-46. chocolate
-47. tan
-48. wheat
-49. thistle
-50. lavender
+41. MediumPurple — #9370DB
+42. BlueViolet — #8A2BE2
+43. DarkOrchid — #9932CC
+44. DarkViolet — #9400D3
+45. Thistle — #D8BFD8
+46. Lavender — #E6E6FA
+47. LemonChiffon — #FFFACD
+48. LightGoldenRodYellow — #FAFAD2
+49. PapayaWhip — #FFEFD5
+50. PeachPuff — #FFDAB9
+
+51. Moccasin — #FFE4B5
+52. Khaki — #F0E68C
+53. PaleGoldenRod — #EEE8AA
+54. Wheat — #F5DEB3
+55. BurlyWood — #DEB887
+56. Tan — #D2B48C
+57. RosyBrown — #BC8F8F
+58. SandyBrown — #F4A460
+59. GoldenRod — #DAA520
+60. Peru — #CD853F
+
+61. Crimson — #DC143C
+62. Salmon — #FA8072
+63. LightSalmon — #FFA07A
+64. IndianRed — #CD5C5C
+65. FireBrick — #B22222
+66. Pink — #FFC0CB
+67. Fuchsia — #FF00FF
+68. Aqua — #00FFFF
+69. Aquamarine — #7FFFD4
+70. SteelBlue — #4682B4
+
+71. SlateBlue — #6A5ACD
+72. MediumSlateBlue — #7B68EE
+73. LavenderBlush — #FFF0F5
+74. MintCream — #F5FFFA
+75. HoneyDew — #F0FFF0
+76. Azure — #F0FFFF
+77. BlanchedAlmond — #FFEBCD
+78. Bisque — #FFE4C4
+79. NavajoWhite — #FFDEAD
+80. LightSteelBlue — #B0C4DE
+
+81. Silver — #C0C0C0
+82. Gainsboro — #DCDCDC
+83. Snow — #FFFAFA
+84. Ivory — #FFFFF0
+85. AntiqueWhite — #FAEBD7
+86. OldLace — #FDF5E6
+87. FloralWhite — #FFFAF0
+88. Cornsilk — #FFF8DC
+89. Seashell — #FFF5EE
+90. Beige — #F5F5DC
+
+91. LightYellow — #FFFFE0
+92. LightCoral — #F08080
+93. MediumTurquoise — #48D1CC
+94. LightGreen — #90EE90
+95. LawnGreen — #7CFC00
+96. YellowGreen — #9ACD32
+97. DeepSkyBlue2 — #00B2EE
+98. LightSkyBlue2 — #A4D3EE
+99. MediumPurple2 — #AB82FF
+100. BrightCyan — #00FFFF
