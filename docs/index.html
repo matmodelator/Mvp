@@ -1,1 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
 
+<head>
+
+  <!-- Кодировка -->
+  <meta charset="UTF-8" />
+
+  <!-- Адаптация под мобильные -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Заголовок вкладки -->
+  <title>Навигация</title>
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .buttons {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    .secondary:hover {
+      background: #d1d5db;
+    }
+
+    .warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .warning:hover {
+      background: #d97706;
+    }
+
+    .msg {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #555;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Навигация</h2>
+
+  <!-- Здесь будет email пользователя -->
+  <p id="welcome">
+    Проверяем сессию...
+  </p>
+
+  <!-- Здесь будет одна основная кнопка -->
+  <div class="buttons" id="mainButtons">
+
+    <!--
+      Кнопка "Главная"
+      по умолчанию скрыта
+    -->
+    <button id="mainButton"
+            onclick="goMain()"
+            style="display: none;">
+      Главная
+    </button>
+
+    <!--
+      Кнопка "Подтверждение почты"
+      по умолчанию скрыта
+    -->
+    <button id="mailButton"
+            class="warning"
+            onclick="goMailConfirm()"
+            style="display: none;">
+      Подтверждение почты
+    </button>
+
+    <!--
+      Кнопка выхода
+      оставляем отдельно
+    -->
+    <button class="secondary"
+            onclick="logout()">
+      Выход
+    </button>
+
+  </div>
+
+  <!-- Служебные сообщения -->
+  <div id="message" class="msg"></div>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+Подключаем Supabase
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+================================
+Создаем подключение к проекту
+================================
+*/
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+Получаем элементы страницы
+================================
+*/
+
+const welcome =
+  document.getElementById('welcome')
+
+const message =
+  document.getElementById('message')
+
+const mainButton =
+  document.getElementById('mainButton')
+
+const mailButton =
+  document.getElementById('mailButton')
+
+/*
+================================
+Проверяем пользователя
+================================
+
+Логика:
+- если пользователь не вошел -> log.html
+- если почта подтверждена -> показываем только "Главная"
+- если почта не подтверждена -> показываем только "Подтверждение почты"
+*/
+
+async function checkUser() {
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  /*
+  Если нет сессии — отправляем на вход
+  */
+
+  if (error || !data.user) {
+
+    window.location.href = 'log.html'
+    return
+
+  }
+
+  const user = data.user
+
+  /*
+  Показываем email пользователя
+  */
+
+  welcome.textContent =
+    `Вы вошли как: ${user.email}`
+
+  /*
+  Сначала скрываем обе основные кнопки
+  */
+
+  mainButton.style.display = 'none'
+  mailButton.style.display = 'none'
+
+  /*
+  Если почта подтверждена —
+  показываем только кнопку "Главная"
+  */
+
+  if (user.email_confirmed_at) {
+
+    mainButton.style.display = 'block'
+
+  }
+
+  /*
+  Если почта НЕ подтверждена —
+  показываем только кнопку "Подтверждение почты"
+  */
+
+  else {
+
+    mailButton.style.display = 'block'
+
+  }
+
+}
+
+/*
+================================
+Переход на главную страницу
+================================
+*/
+
+function goMain() {
+  window.location.href = 'main.html'
+}
+
+/*
+================================
+Переход на страницу подтверждения почты
+================================
+*/
+
+function goMailConfirm() {
+  window.location.href = 'mail-confirm.html'
+}
+
+/*
+================================
+Выход из системы
+================================
+*/
+
+async function logout() {
+
+  message.textContent = 'Выходим...'
+
+  const { error } =
+    await supabase.auth.signOut()
+
+  if (error) {
+    message.textContent = error.message
+    return
+  }
+
+  window.location.href = 'log.html'
+
+}
+
+/*
+================================
+Делаем функции доступными кнопкам
+================================
+*/
+
+window.goMain = goMain
+window.goMailConfirm = goMailConfirm
+window.logout = logout
+
+/*
+================================
+Запуск проверки при открытии страницы
+================================
+*/
+
+checkUser()
+
+</script>
+
+</body>
+</html>
