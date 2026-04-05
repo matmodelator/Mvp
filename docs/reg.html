@@ -3,14 +3,12 @@
 
 <head>
 
-  <!-- Кодировка -->
   <meta charset="UTF-8" />
 
-  <!-- Адаптация под мобильные -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
 
-  <!-- Заголовок вкладки -->
-  <title>Навигация</title>
+  <title>Регистрация</title>
 
   <style>
 
@@ -28,62 +26,58 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 520px;
       margin: 40px auto;
       background: white;
       padding: 24px;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
     }
 
     h2 {
       margin-top: 0;
+      text-align: center;
     }
 
-    .buttons {
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    input,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
 
     button {
-      padding: 12px;
-      border: none;
       background: #2563eb;
       color: white;
-      border-radius: 6px;
+      border: none;
       cursor: pointer;
-      font-size: 16px;
     }
 
     button:hover {
       background: #1d4ed8;
     }
 
-    .secondary {
-      background: #e5e7eb;
-      color: #111;
-    }
-
-    .secondary:hover {
-      background: #d1d5db;
-    }
-
-    .warning {
-      background: #f59e0b;
-      color: white;
-    }
-
-    .warning:hover {
-      background: #d97706;
-    }
-
     .msg {
-      margin-top: 16px;
+      margin-top: 14px;
+      text-align: center;
       font-size: 14px;
-      color: #555;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
+    }
+
+    .links {
+      margin-top: 18px;
+      text-align: center;
     }
 
   </style>
@@ -98,50 +92,43 @@
 
 <div class="container">
 
-  <h2>Навигация</h2>
+  <h2>Регистрация</h2>
 
-  <!-- Здесь будет email пользователя -->
-  <p id="welcome">
-    Проверяем сессию...
-  </p>
+  <!-- ========================= -->
+  <!-- ФОРМА РЕГИСТРАЦИИ -->
+  <!-- ========================= -->
 
-  <!-- Здесь будет одна основная кнопка -->
-  <div class="buttons" id="mainButtons">
+  <form id="registerForm">
 
-    <!--
-      Кнопка "Главная"
-      по умолчанию скрыта
-    -->
-    <button id="mainButton"
-            onclick="goMain()"
-            style="display: none;">
-      Главная
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      required
+    />
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Пароль"
+      required
+    />
+
+    <button type="submit">
+      Зарегистрироваться
     </button>
 
-    <!--
-      Кнопка "Подтверждение почты"
-      по умолчанию скрыта
-    -->
-    <button id="mailButton"
-            class="warning"
-            onclick="goMailConfirm()"
-            style="display: none;">
-      Подтверждение почты
-    </button>
+  </form>
 
-    <!--
-      Кнопка выхода
-      оставляем отдельно
-    -->
-    <button class="secondary"
-            onclick="logout()">
-      Выход
-    </button>
+  <!-- Сообщения системы -->
 
-  </div>
-
-  <!-- Служебные сообщения -->
   <div id="message" class="msg"></div>
+
+  <div class="links">
+    <a href="log.html">
+      Уже есть аккаунт? Войти
+    </a>
+  </div>
 
 </div>
 
@@ -149,7 +136,7 @@
 
 /*
 ================================
-Подключаем Supabase
+ПОДКЛЮЧАЕМ SUPABASE
 ================================
 */
 
@@ -158,7 +145,7 @@ from 'https://esm.sh/@supabase/supabase-js@2'
 
 /*
 ================================
-Создаем подключение к проекту
+СОЕДИНЕНИЕ С ПРОЕКТОМ
 ================================
 */
 
@@ -169,148 +156,97 @@ const supabase = createClient(
 
 /*
 ================================
-Получаем элементы страницы
+ЭЛЕМЕНТЫ СТРАНИЦЫ
 ================================
 */
 
-const welcome =
-  document.getElementById('welcome')
+const form =
+  document.getElementById('registerForm')
 
 const message =
   document.getElementById('message')
 
-const mainButton =
-  document.getElementById('mainButton')
+/*
+================================
+ПОКАЗ СООБЩЕНИЯ
+================================
+*/
 
-const mailButton =
-  document.getElementById('mailButton')
+function showMessage(text, type = '') {
+
+  message.textContent = text
+  message.className = `msg ${type}`
+
+}
 
 /*
 ================================
-Проверяем пользователя
+РЕГИСТРАЦИЯ
 ================================
 
-Логика:
-- если пользователь не вошел -> log.html
-- если почта подтверждена -> показываем только "Главная"
-- если почта не подтверждена -> показываем только "Подтверждение почты"
+Важно:
+При Confirm Email = ON
+пользователь должен подтвердить почту,
+прежде чем сможет нормально войти.
 */
 
-async function checkUser() {
+form.addEventListener('submit', async (event) => {
+
+  event.preventDefault()
+
+  showMessage('Создаем аккаунт...')
+
+  const email =
+    document.getElementById('email').value.trim()
+
+  const password =
+    document.getElementById('password').value
+
+  /*
+  Создаем пользователя
+  */
 
   const { data, error } =
-    await supabase.auth.getUser()
+    await supabase.auth.signUp({
+      email,
+      password
+    })
 
   /*
-  Если нет сессии — отправляем на вход
+  Если ошибка — показываем
   */
-
-  if (error || !data.user) {
-
-    window.location.href = 'log.html'
-    return
-
-  }
-
-  const user = data.user
-
-  /*
-  Показываем email пользователя
-  */
-
-  welcome.textContent =
-    `Вы вошли как: ${user.email}`
-
-  /*
-  Сначала скрываем обе основные кнопки
-  */
-
-  mainButton.style.display = 'none'
-  mailButton.style.display = 'none'
-
-  /*
-  Если почта подтверждена —
-  показываем только кнопку "Главная"
-  */
-
-  if (user.email_confirmed_at) {
-
-    mainButton.style.display = 'block'
-
-  }
-
-  /*
-  Если почта НЕ подтверждена —
-  показываем только кнопку "Подтверждение почты"
-  */
-
-  else {
-
-    mailButton.style.display = 'block'
-
-  }
-
-}
-
-/*
-================================
-Переход на главную страницу
-================================
-*/
-
-function goMain() {
-  window.location.href = 'main.html'
-}
-
-/*
-================================
-Переход на страницу подтверждения почты
-================================
-*/
-
-function goMailConfirm() {
-  window.location.href = 'mail-confirm.html'
-}
-
-/*
-================================
-Выход из системы
-================================
-*/
-
-async function logout() {
-
-  message.textContent = 'Выходим...'
-
-  const { error } =
-    await supabase.auth.signOut()
 
   if (error) {
-    message.textContent = error.message
+
+    showMessage(error.message, 'error')
     return
+
   }
 
-  window.location.href = 'log.html'
+  /*
+  При включенном Confirm Email
+  Supabase обычно не дает полноценную сессию,
+  пока пользователь не подтвердит почту.
+  Поэтому здесь просто сообщаем, что письмо отправлено.
+  */
 
-}
+  showMessage(
+    'Аккаунт создан. Проверьте почту для подтверждения.',
+    'success'
+  )
 
-/*
-================================
-Делаем функции доступными кнопкам
-================================
-*/
+  /*
+  Перенаправляем на страницу проверки почты
+  */
 
-window.goMain = goMain
-window.goMailConfirm = goMailConfirm
-window.logout = logout
+  setTimeout(() => {
 
-/*
-================================
-Запуск проверки при открытии страницы
-================================
-*/
+    window.location.href =
+      'mail-confirm.html'
 
-checkUser()
+  }, 1200)
+
+})
 
 </script>
 
