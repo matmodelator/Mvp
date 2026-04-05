@@ -229,10 +229,14 @@
     /*
       Регистрация пользователя
     */
-    const { error } = await supabase.auth.signUp({
-      email,
-      password
-    })
+    const { error } =
+  await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: 'https://matmodelator.github.io/Mvp/mail-confirm.html'
+    }
+  })
 
     if (error) {
       showMessage(error.message, 'error')
