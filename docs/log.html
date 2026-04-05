@@ -4,14 +4,10 @@
 <head>
 
   <meta charset="UTF-8" />
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Вход</title>
 
   <style>
-
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -102,7 +98,6 @@
       margin-top: 18px;
       text-align: center;
     }
-
   </style>
 
 </head>
@@ -123,7 +118,7 @@
 
   <form id="loginForm">
 
-    <!-- Email -->
+    <!-- EMAIL -->
 
     <input
       id="email"
@@ -132,7 +127,7 @@
       required
     />
 
-    <!-- Пароль с глазком -->
+    <!-- ПАРОЛЬ + ГЛАЗОК -->
 
     <div class="password-row">
 
@@ -144,6 +139,7 @@
       />
 
       <button
+        id="togglePasswordButton"
         type="button"
         class="eye-button"
         onclick="togglePassword()"
@@ -162,13 +158,13 @@
 
   </form>
 
-  <!-- Сообщения -->
+  <!-- СООБЩЕНИЯ -->
 
   <div id="message" class="msg"></div>
 
   <div class="links">
     <a href="reg.html">
-      Нет аккаунта? Зарегистрироваться
+      Нет аккаунта? Регистрация
     </a>
   </div>
 
@@ -177,9 +173,9 @@
 <script type="module">
 
 /*
-========================
-Подключаем Supabase
-========================
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
 */
 
 import { createClient }
@@ -191,9 +187,9 @@ const supabase = createClient(
 )
 
 /*
-========================
-Элементы страницы
-========================
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
 */
 
 const form =
@@ -203,9 +199,9 @@ const message =
   document.getElementById('message')
 
 /*
-========================
-Глазок показать пароль
-========================
+================================
+ПОКАЗАТЬ / СКРЫТЬ ПАРОЛЬ
+================================
 */
 
 function togglePassword() {
@@ -213,27 +209,42 @@ function togglePassword() {
   const input =
     document.getElementById('password')
 
+  const button =
+    document.getElementById('togglePasswordButton')
+
   if (input.type === 'password') {
 
     input.type = 'text'
+    button.textContent = '🙈'
 
   }
 
   else {
 
     input.type = 'password'
+    button.textContent = '👁'
 
   }
 
 }
 
-window.togglePassword =
-  togglePassword
+window.togglePassword = togglePassword
 
 /*
-========================
-Вход
-========================
+================================
+ВСПОМОГАТЕЛЬНОЕ СООБЩЕНИЕ
+================================
+*/
+
+function showMessage(text, type = '') {
+  message.textContent = text
+  message.className = `msg ${type}`
+}
+
+/*
+================================
+ВХОД
+================================
 */
 
 form.addEventListener(
@@ -242,8 +253,7 @@ form.addEventListener(
 
     event.preventDefault()
 
-    message.textContent =
-      'Входим...'
+    showMessage('Входим...')
 
     const email =
       document.getElementById('email').value.trim()
@@ -252,52 +262,65 @@ form.addEventListener(
       document.getElementById('password').value
 
     /*
-    Пытаемся войти
+    ПЫТАЕМСЯ ВОЙТИ
     */
 
     const { error } =
       await supabase.auth.signInWithPassword({
-
         email,
         password
-
       })
+
+    /*
+    ЕСЛИ ЕСТЬ ОШИБКА
+    */
 
     if (error) {
 
       /*
-      Проверяем подтверждение почты
+      ЕСЛИ ПОЧТА НЕ ПОДТВЕРЖДЕНА
+      → СОХРАНЯЕМ EMAIL
+      → ПЕРЕХОДИМ НА mail-confirm.html
       */
 
       if (
-        error.message.includes(
-          'Email not confirmed'
+        error.message &&
+        (
+          error.message.includes('Email not confirmed') ||
+          error.message.includes('email not confirmed')
         )
       ) {
 
-        message.textContent =
-          'Подтвердите почту перед входом'
+        localStorage.setItem(
+          'pendingEmail',
+          email
+        )
+
+        window.location.href =
+          'mail-confirm.html'
 
         return
-
       }
 
-      message.textContent =
-        error.message
+      /*
+      ЛЮБАЯ ДРУГАЯ ОШИБКА
+      */
 
+      showMessage(error.message, 'error')
       return
-
     }
 
     /*
-    Успешный вход
+    УСПЕШНЫЙ ВХОД
     */
 
-    window.location.href =
-      'index.html'
+    showMessage('Вход выполнен', 'success')
+
+    setTimeout(() => {
+      window.location.href = 'index.html'
+    }, 600)
 
   }
-
 )
 
 </script>
