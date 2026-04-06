@@ -30,41 +30,19 @@
 
   <!--
   ========================================
-  СТАТУС ПОДТВЕРЖДЕНИЯ
+  СТАТУС
   ========================================
   -->
-
-  <div id="statusMessage" class="msg">
-    Проверяем статус...
+  <div id="message" class="msg">
+    Отправляем письмо для подтверждения...
   </div>
 
   <!--
   ========================================
-  КНОПКИ ДЕЙСТВИЙ
+  КНОПКИ ПЕРЕХОДА
   ========================================
   -->
-
-  <div
-    id="actionButtons"
-    class="buttons"
-    style="display: none;"
-  >
-
-    <!--
-    ЕСЛИ РЕЗУЛЬТАТ = ДА
-    -->
-
-    <button
-      id="toMain"
-      class="submit-button"
-      style="display: none;"
-    >
-      На main
-    </button>
-
-    <!--
-    ЕСЛИ РЕЗУЛЬТАТ = НЕТ
-    -->
+  <div class="buttons">
 
     <button
       id="toLog"
@@ -73,10 +51,6 @@
     >
       На log
     </button>
-
-    <!--
-    ДОСТУПНО ВСЕГДА
-    -->
 
     <button
       id="toIndex"
@@ -112,14 +86,8 @@ const supabase = createClient(
 ================================
 */
 
-const statusMessage =
-  document.getElementById('statusMessage')
-
-const actionButtons =
-  document.getElementById('actionButtons')
-
-const toMain =
-  document.getElementById('toMain')
+const message =
+  document.getElementById('message')
 
 const toLog =
   document.getElementById('toLog')
@@ -129,121 +97,84 @@ const toIndex =
 
 /*
 ================================
-СКРЫТЬ ВСЕ КНОПКИ
+ПОКАЗАТЬ КНОПКИ
 ================================
 */
 
-function hideButtons() {
-
-  actionButtons.style.display = 'none'
-
-  toMain.style.display = 'none'
-  toLog.style.display = 'none'
-  toIndex.style.display = 'none'
-
-}
-
-/*
-================================
-ПОКАЗАТЬ КНОПКИ ДЛЯ УСПЕХА
-================================
-*/
-
-function showSuccessButtons() {
-
-  hideButtons()
-
-  actionButtons.style.display = 'flex'
-
-  toMain.style.display = 'block'
-  toIndex.style.display = 'block'
-
-}
-
-/*
-================================
-ПОКАЗАТЬ КНОПКИ ДЛЯ НЕУСПЕХА
-================================
-*/
-
-function showFailButtons() {
-
-  hideButtons()
-
-  actionButtons.style.display = 'flex'
-
+function showButtons() {
   toLog.style.display = 'block'
   toIndex.style.display = 'block'
-
 }
 
 /*
 ================================
-ПРОВЕРКА СТАТУСА ПОДТВЕРЖДЕНИЯ
+ОТПРАВИТЬ ПИСЬМО ВЕРИФИКАЦИИ
+
+ВАЖНО:
+этот файл не проверяет user через getUser()
+а именно отправляет запрос на письмо
+через supabase.auth.resend(...)
 ================================
 */
 
-async function checkEmailStatus() {
+async function sendVerificationEmail() {
 
-  hideButtons()
-
-  statusMessage.textContent =
-    'Проверяем статус...'
-
-  statusMessage.className =
-    'msg'
-
-  const { data, error } =
-    await supabase.auth.getUser()
+  const pendingEmail =
+    localStorage.getItem('pendingEmail')
 
   /*
-  ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН
+  ЕСЛИ EMAIL НЕ СОХРАНЕН
   */
 
-  if (error || !data.user) {
+  if (!pendingEmail) {
 
-    statusMessage.textContent =
-      'Пользователь не найден'
+    message.textContent =
+      'Не найден e-mail для верификации'
 
-    statusMessage.className =
+    message.className =
       'msg error'
 
-    showFailButtons()
+    showButtons()
     return
-
-  }
-
-  const user =
-    data.user
-
-  /*
-  ЕСЛИ ПОЧТА ПОДТВЕРЖДЕНА
-  */
-
-  if (user.email_confirmed_at) {
-
-    statusMessage.textContent =
-      'Почта подтверждена'
-
-    statusMessage.className =
-      'msg success'
-
-    showSuccessButtons()
-    return
-
   }
 
   /*
-  ЕСЛИ ПОЧТА НЕ ПОДТВЕРЖДЕНА
+  ОТПРАВЛЯЕМ ПИСЬМО ПОДТВЕРЖДЕНИЯ
   */
 
-  statusMessage.textContent =
-    'Почта не подтверждена'
+  const { error } =
+    await supabase.auth.resend({
+      type: 'signup',
+      email: pendingEmail
+    })
 
-  statusMessage.className =
-    'msg error'
+  /*
+  ЕСЛИ ЕСТЬ ОШИБКА
+  */
 
-  showFailButtons()
+  if (error) {
+
+    message.textContent =
+      error.message
+
+    message.className =
+      'msg error'
+
+    showButtons()
+    return
+  }
+
+  /*
+  ЕСЛИ ПИСЬМО УШЛО
+  */
+
+  message.textContent =
+    'Письмо для подтверждения e-mail отправлено. Проверьте почту.'
+
+  message.className =
+    'msg success'
+
+  showButtons()
 
 }
 
@@ -252,10 +183,6 @@ async function checkEmailStatus() {
 ПЕРЕХОДЫ
 ================================
 */
-
-toMain.addEventListener('click', function () {
-  window.location.href = 'main.html'
-})
 
 toLog.addEventListener('click', function () {
   window.location.href = 'log.html'
@@ -267,11 +194,11 @@ toIndex.addEventListener('click', function () {
 
 /*
 ================================
-ЗАПУСК ПРОВЕРКИ ПРИ ЗАГРУЗКЕ
+ЗАПУСК ПРИ ЗАГРУЗКЕ
 ================================
 */
 
-checkEmailStatus()
+sendVerificationEmail()
 
 </script>
 
