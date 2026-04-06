@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <title>Регистрация</title>
+
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="start.css" />
+
+</head>
+
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Регистрация</h2>
+
+  <!-- ========================= -->
+  <!-- ФОРМА РЕГИСТРАЦИИ -->
+  <!-- ========================= -->
+
+  <form id="registerForm">
+
+    <!-- EMAIL -->
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      required
+    />
+
+    <!-- ПАРОЛЬ -->
+
+    <div class="password-row">
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Пароль"
+        required
+      />
+
+      <button
+        id="togglePasswordButton"
+        type="button"
+        class="eye-button"
+        onclick="togglePassword()"
+      >
+        👁
+      </button>
+
+    </div>
+
+    <!-- КНОПКА РЕГИСТРАЦИИ -->
+
+    <button
+      type="submit"
+      class="submit-button"
+    >
+      Зарегистрироваться
+    </button>
+
+  </form>
+
+  <!--
+  ========================================
+  СООБЩЕНИЕ СТАТУСА
+  ========================================
+  -->
+
+  <div id="message" class="msg"></div>
+
+  <!--
+  ========================================
+  КНОПКИ ПЕРЕХОДА
+  ========================================
+  -->
+
+  <div
+    id="actionButtons"
+    class="buttons"
+    style="display: none;"
+  >
+
+    <button
+      id="toConfirm"
+      class="submit-button"
+    >
+      Перейти к подтверждению e-mail
+    </button>
+
+    <button
+      id="toIndex"
+      class="secondary-button"
+    >
+      На index
+    </button>
+
+  </div>
+
+  <div class="links">
+    <a href="log.html">
+      Уже есть аккаунт? Войти
+    </a>
+  </div>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
+
+const form =
+  document.getElementById('registerForm')
+
+const message =
+  document.getElementById('message')
+
+const actionButtons =
+  document.getElementById('actionButtons')
+
+const toConfirm =
+  document.getElementById('toConfirm')
+
+const toIndex =
+  document.getElementById('toIndex')
+
+/*
+================================
+ПОКАЗАТЬ / СКРЫТЬ ПАРОЛЬ
+================================
+*/
+
+function togglePassword() {
+
+  const input =
+    document.getElementById('password')
+
+  const button =
+    document.getElementById('togglePasswordButton')
+
+  if (input.type === 'password') {
+
+    input.type = 'text'
+    button.textContent = '🙈'
+
+  }
+
+  else {
+
+    input.type = 'password'
+    button.textContent = '👁'
+
+  }
+
+}
+
+window.togglePassword = togglePassword
+
+/*
+================================
+ПОКАЗАТЬ КНОПКИ ПЕРЕХОДА
+================================
+*/
+
+function showButtons() {
+
+  actionButtons.style.display = 'flex'
+
+}
+
+/*
+================================
+РЕГИСТРАЦИЯ
+================================
+*/
+
+form.addEventListener(
+  'submit',
+  async (event) => {
+
+    event.preventDefault()
+
+    message.textContent =
+      'Регистрируем...'
+
+    message.className =
+      'msg'
+
+    const email =
+      document.getElementById('email').value.trim()
+
+    const password =
+      document.getElementById('password').value
+
+    /*
+    ПЫТАЕМСЯ ЗАРЕГИСТРИРОВАТЬСЯ
+    */
+
+    const { error } =
+      await supabase.auth.signUp({
+        email,
+        password
+      })
+
+    /*
+    ЕСЛИ ЯВНАЯ ОШИБКА
+    */
+
+    if (error) {
+
+      message.textContent =
+        error.message
+
+      message.className =
+        'msg error'
+
+      return
+
+    }
+
+    /*
+    ВАЖНО:
+    Мы НЕ можем надежно определить,
+    существует ли пользователь.
+
+    Поэтому сообщение нейтральное.
+    */
+
+    message.textContent =
+      'Если этот e-mail можно зарегистрировать, письмо для подтверждения отправлено. Проверьте почту.'
+
+    message.className =
+      'msg success'
+
+    showButtons()
+
+  }
+)
+
+/*
+================================
+ПЕРЕХОДЫ
+================================
+*/
+
+toConfirm.addEventListener('click', function () {
+
+  window.location.href =
+    'mail-confirm.html'
+
+})
+
+toIndex.addEventListener('click', function () {
+
+  window.location.href =
+    'index.html'
+
+})
+
+</script>
+
+</body>
+</html>
