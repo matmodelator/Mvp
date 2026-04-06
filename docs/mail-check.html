@@ -12,7 +12,7 @@
   ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
   ========================================
   -->
-  <link rel="stylesheet" href="start.css" />
+  <link rel="stylesheet" href="styles/start.css" />
 
 </head>
 
@@ -44,48 +44,40 @@
   -->
   <div
     id="actionButtons"
-    class="links"
+    class="buttons"
     style="display: none;"
   >
 
     <button
       id="toMain"
       class="submit-button"
-      style="display: none; margin-top: 10px;"
+      style="display: none;"
     >
-      В main
+      На main
     </button>
 
     <button
       id="toConfirm"
       class="submit-button"
-      style="display: none; margin-top: 10px;"
+      style="display: none;"
     >
-      В mail-confirm
+      На mail-confirm
     </button>
 
     <button
       id="toLog"
       class="submit-button"
-      style="display: none; margin-top: 10px;"
+      style="display: none;"
     >
-      В log
+      На log
     </button>
 
     <button
       id="toIndex"
-      class="submit-button"
-      style="display: none; margin-top: 10px;"
+      class="secondary-button"
+      style="display: none;"
     >
-      В index
-    </button>
-
-    <button
-      id="checkAgain"
-      class="submit-button"
-      style="margin-top: 10px;"
-    >
-      Проверить снова
+      На index
     </button>
 
   </div>
@@ -132,9 +124,6 @@ const toLog =
 const toIndex =
   document.getElementById('toIndex')
 
-const checkAgain =
-  document.getElementById('checkAgain')
-
 /*
 ================================
 СКРЫТЬ ВСЕ КНОПКИ ПЕРЕХОДА
@@ -164,7 +153,7 @@ function showButtons(list) {
 
   hideButtons()
 
-  actionButtons.style.display = 'block'
+  actionButtons.style.display = 'flex'
 
   if (list.includes('main')) {
     toMain.style.display = 'block'
@@ -201,10 +190,6 @@ async function checkEmail() {
 
   message.className =
     'msg'
-
-  /*
-  ПОЛУЧАЕМ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
-  */
 
   const { data, error } =
     await supabase.auth.getUser()
@@ -247,7 +232,7 @@ async function checkEmail() {
   }
 
   /*
-  ЕСЛИ ПОЧТА ЕЩЕ НЕ ПОДТВЕРЖДЕНА
+  ЕСЛИ ПОЧТА НЕ ПОДТВЕРЖДЕНА
   */
 
   message.textContent =
@@ -280,16 +265,6 @@ toLog.addEventListener('click', function () {
 
 toIndex.addEventListener('click', function () {
   window.location.href = 'index.html'
-})
-
-/*
-================================
-КНОПКА ПОВТОРНОЙ ПРОВЕРКИ
-================================
-*/
-
-checkAgain.addEventListener('click', function () {
-  checkEmail()
 })
 
 /*
