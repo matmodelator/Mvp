@@ -31,9 +31,9 @@
   <!--
   ========================================
   СТАТУС ПОДТВЕРЖДЕНИЯ
-  Сюда выводим результат проверки
   ========================================
   -->
+
   <div id="statusMessage" class="msg">
     Проверяем статус...
   </div>
@@ -41,10 +41,9 @@
   <!--
   ========================================
   КНОПКИ ДЕЙСТВИЙ
-  Показываем только те,
-  которые соответствуют результату
   ========================================
   -->
+
   <div
     id="actionButtons"
     class="buttons"
@@ -52,8 +51,9 @@
   >
 
     <!--
-    Если результат = ДА
+    ЕСЛИ РЕЗУЛЬТАТ = ДА
     -->
+
     <button
       id="toMain"
       class="submit-button"
@@ -63,19 +63,9 @@
     </button>
 
     <!--
-    На index можно идти в любом случае
+    ЕСЛИ РЕЗУЛЬТАТ = НЕТ
     -->
-    <button
-      id="toIndex"
-      class="secondary-button"
-      style="display: none;"
-    >
-      На index
-    </button>
 
-    <!--
-    Если результат = НЕТ
-    -->
     <button
       id="toLog"
       class="submit-button"
@@ -85,13 +75,15 @@
     </button>
 
     <!--
-    Повторная проверка
+    ДОСТУПНО ВСЕГДА
     -->
+
     <button
-      id="checkAgain"
+      id="toIndex"
       class="secondary-button"
+      style="display: none;"
     >
-      Проверить снова
+      На index
     </button>
 
   </div>
@@ -129,18 +121,15 @@ const actionButtons =
 const toMain =
   document.getElementById('toMain')
 
-const toIndex =
-  document.getElementById('toIndex')
-
 const toLog =
   document.getElementById('toLog')
 
-const checkAgain =
-  document.getElementById('checkAgain')
+const toIndex =
+  document.getElementById('toIndex')
 
 /*
 ================================
-СКРЫТЬ ВСЕ КНОПКИ ПЕРЕХОДА
+СКРЫТЬ ВСЕ КНОПКИ
 ================================
 */
 
@@ -149,16 +138,14 @@ function hideButtons() {
   actionButtons.style.display = 'none'
 
   toMain.style.display = 'none'
-  toIndex.style.display = 'none'
   toLog.style.display = 'none'
+  toIndex.style.display = 'none'
 
 }
 
 /*
 ================================
 ПОКАЗАТЬ КНОПКИ ДЛЯ УСПЕХА
-РЕЗУЛЬТАТ = ДА
-main + index
 ================================
 */
 
@@ -176,8 +163,6 @@ function showSuccessButtons() {
 /*
 ================================
 ПОКАЗАТЬ КНОПКИ ДЛЯ НЕУСПЕХА
-РЕЗУЛЬТАТ = НЕТ
-log + index
 ================================
 */
 
@@ -195,14 +180,6 @@ function showFailButtons() {
 /*
 ================================
 ПРОВЕРКА СТАТУСА ПОДТВЕРЖДЕНИЯ
-
-ВАЖНО:
-ядро обращения к базе сохранено:
-supabase.auth.getUser()
-
-Именно здесь страница узнает:
-1. найден ли пользователь
-2. подтверждена ли почта
 ================================
 */
 
@@ -216,16 +193,11 @@ async function checkEmailStatus() {
   statusMessage.className =
     'msg'
 
-  /*
-  ПОЛУЧАЕМ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
-  */
-
   const { data, error } =
     await supabase.auth.getUser()
 
   /*
   ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН
-  → РЕЗУЛЬТАТ = НЕТ
   */
 
   if (error || !data.user) {
@@ -241,11 +213,11 @@ async function checkEmailStatus() {
 
   }
 
-  const user = data.user
+  const user =
+    data.user
 
   /*
-  ЕСЛИ email_confirmed_at ЕСТЬ
-  → РЕЗУЛЬТАТ = ДА
+  ЕСЛИ ПОЧТА ПОДТВЕРЖДЕНА
   */
 
   if (user.email_confirmed_at) {
@@ -262,8 +234,7 @@ async function checkEmailStatus() {
   }
 
   /*
-  ЕСЛИ email_confirmed_at НЕТ
-  → РЕЗУЛЬТАТ = НЕТ
+  ЕСЛИ ПОЧТА НЕ ПОДТВЕРЖДЕНА
   */
 
   statusMessage.textContent =
@@ -286,22 +257,12 @@ toMain.addEventListener('click', function () {
   window.location.href = 'main.html'
 })
 
-toIndex.addEventListener('click', function () {
-  window.location.href = 'index.html'
-})
-
 toLog.addEventListener('click', function () {
   window.location.href = 'log.html'
 })
 
-/*
-================================
-ПОВТОРНАЯ ПРОВЕРКА
-================================
-*/
-
-checkAgain.addEventListener('click', function () {
-  checkEmailStatus()
+toIndex.addEventListener('click', function () {
+  window.location.href = 'index.html'
 })
 
 /*
