@@ -47,4 +47,5 @@
 
       // ⚠️ Вывод результата
       if (error) {
-        document
+        document.getElementById('status').textContent =
+          'Ошибка: ' + error.message
