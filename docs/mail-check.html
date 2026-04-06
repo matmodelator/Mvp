@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Проверка почты</title>
+
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="start.css" />
+
+</head>
+
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Проверка почты</h2>
+
+  <!--
+  ========================================
+  ТЕКСТ СТАТУСА
+  ========================================
+  -->
+  <div id="message" class="msg">
+    Проверяем...
+  </div>
+
+  <!--
+  ========================================
+  КНОПКИ ДЕЙСТВИЙ
+  Сначала скрыты,
+  потом mail-check показывает нужные
+  ========================================
+  -->
+  <div
+    id="actionButtons"
+    class="links"
+    style="display: none;"
+  >
+
+    <button
+      id="toMain"
+      class="submit-button"
+      style="display: none; margin-top: 10px;"
+    >
+      В main
+    </button>
+
+    <button
+      id="toConfirm"
+      class="submit-button"
+      style="display: none; margin-top: 10px;"
+    >
+      В mail-confirm
+    </button>
+
+    <button
+      id="toLog"
+      class="submit-button"
+      style="display: none; margin-top: 10px;"
+    >
+      В log
+    </button>
+
+    <button
+      id="toIndex"
+      class="submit-button"
+      style="display: none; margin-top: 10px;"
+    >
+      В index
+    </button>
+
+    <button
+      id="checkAgain"
+      class="submit-button"
+      style="margin-top: 10px;"
+    >
+      Проверить снова
+    </button>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
+
+const message =
+  document.getElementById('message')
+
+const actionButtons =
+  document.getElementById('actionButtons')
+
+const toMain =
+  document.getElementById('toMain')
+
+const toConfirm =
+  document.getElementById('toConfirm')
+
+const toLog =
+  document.getElementById('toLog')
+
+const toIndex =
+  document.getElementById('toIndex')
+
+const checkAgain =
+  document.getElementById('checkAgain')
+
+/*
+================================
+СКРЫТЬ ВСЕ КНОПКИ ПЕРЕХОДА
+================================
+*/
+
+function hideButtons() {
+
+  actionButtons.style.display = 'none'
+
+  toMain.style.display = 'none'
+  toConfirm.style.display = 'none'
+  toLog.style.display = 'none'
+  toIndex.style.display = 'none'
+
+}
+
+/*
+================================
+ПОКАЗАТЬ НУЖНЫЕ КНОПКИ
+list:
+main / confirm / log / index
+================================
+*/
+
+function showButtons(list) {
+
+  hideButtons()
+
+  actionButtons.style.display = 'block'
+
+  if (list.includes('main')) {
+    toMain.style.display = 'block'
+  }
+
+  if (list.includes('confirm')) {
+    toConfirm.style.display = 'block'
+  }
+
+  if (list.includes('log')) {
+    toLog.style.display = 'block'
+  }
+
+  if (list.includes('index')) {
+    toIndex.style.display = 'block'
+  }
+
+}
+
+/*
+================================
+ПРОВЕРКА ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
+1. Есть ли пользователь
+2. Подтвержден ли e-mail
+================================
+*/
+
+async function checkEmail() {
+
+  hideButtons()
+
+  message.textContent =
+    'Проверяем...'
+
+  message.className =
+    'msg'
+
+  /*
+  ПОЛУЧАЕМ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
+  */
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  /*
+  ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН
+  */
+
+  if (error || !data.user) {
+
+    message.textContent =
+      'Пользователь не найден'
+
+    message.className =
+      'msg error'
+
+    showButtons(['log', 'index'])
+    return
+
+  }
+
+  const user =
+    data.user
+
+  /*
+  ЕСЛИ ПОЧТА ПОДТВЕРЖДЕНА
+  */
+
+  if (user.email_confirmed_at) {
+
+    message.textContent =
+      'Почта подтверждена'
+
+    message.className =
+      'msg success'
+
+    showButtons(['main', 'index'])
+    return
+
+  }
+
+  /*
+  ЕСЛИ ПОЧТА ЕЩЕ НЕ ПОДТВЕРЖДЕНА
+  */
+
+  message.textContent =
+    'Требуется верификация e-mail'
+
+  message.className =
+    'msg error'
+
+  showButtons(['confirm', 'index'])
+
+}
+
+/*
+================================
+КНОПКИ ПЕРЕХОДА
+================================
+*/
+
+toMain.addEventListener('click', function () {
+  window.location.href = 'main.html'
+})
+
+toConfirm.addEventListener('click', function () {
+  window.location.href = 'mail-confirm.html'
+})
+
+toLog.addEventListener('click', function () {
+  window.location.href = 'log.html'
+})
+
+toIndex.addEventListener('click', function () {
+  window.location.href = 'index.html'
+})
+
+/*
+================================
+КНОПКА ПОВТОРНОЙ ПРОВЕРКИ
+================================
+*/
+
+checkAgain.addEventListener('click', function () {
+  checkEmail()
+})
+
+/*
+================================
+ПРОВЕРЯЕМ СРАЗУ ПРИ ЗАГРУЗКЕ
+================================
+*/
+
+checkEmail()
+
+</script>
+
+</body>
+</html>
