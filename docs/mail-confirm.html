@@ -4,118 +4,94 @@
 <head>
 
   <meta charset="UTF-8" />
-
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0" />
 
   <title>Подтверждение почты</title>
 
-  <style>
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-    }
-
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .container {
-      max-width: 520px;
-      margin: 40px auto;
-      background: white;
-      padding: 24px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .buttons {
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    button {
-      padding: 12px;
-      border: none;
-      background: #2563eb;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .secondary {
-      background: #e5e7eb;
-      color: #111;
-    }
-
-    .secondary:hover {
-      background: #d1d5db;
-    }
-
-    .msg {
-      margin-top: 16px;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    .ok {
-      color: green;
-    }
-
-    .notok {
-      color: #b91c1c;
-    }
-
-  </style>
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="start.css" />
 
 </head>
 
 <body>
 
 <header>
-
-  <h1>
-    Подтверждение почты
-  </h1>
-
+  <h1>Dating App MVP</h1>
 </header>
 
 <div class="container">
 
+  <h2>Подтверждение почты</h2>
+
   <!--
-    Сюда будет выведен статус:
-    подтверждена почта или нет
+  ========================================
+  СТАТУС ПОДТВЕРЖДЕНИЯ
+  Сюда выводим результат проверки
+  ========================================
   -->
-  <div id="statusMessage"
-       class="msg">
+  <div id="statusMessage" class="msg">
     Проверяем статус...
   </div>
 
   <!--
-    Кнопки перехода
+  ========================================
+  КНОПКИ ДЕЙСТВИЙ
+  Показываем только те,
+  которые соответствуют результату
+  ========================================
   -->
-  <div class="buttons">
+  <div
+    id="actionButtons"
+    class="buttons"
+    style="display: none;"
+  >
 
-    <button onclick="goIndex()">
+    <!--
+    Если результат = ДА
+    -->
+    <button
+      id="toMain"
+      class="submit-button"
+      style="display: none;"
+    >
+      На main
+    </button>
+
+    <!--
+    На index можно идти в любом случае
+    -->
+    <button
+      id="toIndex"
+      class="secondary-button"
+      style="display: none;"
+    >
       На index
     </button>
 
-    <button class="secondary"
-            onclick="goMain()">
-      На main
+    <!--
+    Если результат = НЕТ
+    -->
+    <button
+      id="toLog"
+      class="submit-button"
+      style="display: none;"
+    >
+      На log
+    </button>
+
+    <!--
+    Повторная проверка
+    -->
+    <button
+      id="checkAgain"
+      class="secondary-button"
+    >
+      Проверить снова
     </button>
 
   </div>
@@ -140,31 +116,116 @@ const supabase = createClient(
 
 /*
 ================================
-ЭЛЕМЕНТ СТАТУСА
+ЭЛЕМЕНТЫ СТРАНИЦЫ
 ================================
 */
 
 const statusMessage =
   document.getElementById('statusMessage')
 
+const actionButtons =
+  document.getElementById('actionButtons')
+
+const toMain =
+  document.getElementById('toMain')
+
+const toIndex =
+  document.getElementById('toIndex')
+
+const toLog =
+  document.getElementById('toLog')
+
+const checkAgain =
+  document.getElementById('checkAgain')
+
+/*
+================================
+СКРЫТЬ ВСЕ КНОПКИ ПЕРЕХОДА
+================================
+*/
+
+function hideButtons() {
+
+  actionButtons.style.display = 'none'
+
+  toMain.style.display = 'none'
+  toIndex.style.display = 'none'
+  toLog.style.display = 'none'
+
+}
+
+/*
+================================
+ПОКАЗАТЬ КНОПКИ ДЛЯ УСПЕХА
+РЕЗУЛЬТАТ = ДА
+main + index
+================================
+*/
+
+function showSuccessButtons() {
+
+  hideButtons()
+
+  actionButtons.style.display = 'flex'
+
+  toMain.style.display = 'block'
+  toIndex.style.display = 'block'
+
+}
+
+/*
+================================
+ПОКАЗАТЬ КНОПКИ ДЛЯ НЕУСПЕХА
+РЕЗУЛЬТАТ = НЕТ
+log + index
+================================
+*/
+
+function showFailButtons() {
+
+  hideButtons()
+
+  actionButtons.style.display = 'flex'
+
+  toLog.style.display = 'block'
+  toIndex.style.display = 'block'
+
+}
+
 /*
 ================================
 ПРОВЕРКА СТАТУСА ПОДТВЕРЖДЕНИЯ
-================================
 
-Вот здесь и идет обращение к Supabase.
-Без этого блока страница ничего не знает
-о пользователе и о подтверждении почты.
+ВАЖНО:
+ядро обращения к базе сохранено:
+supabase.auth.getUser()
+
+Именно здесь страница узнает:
+1. найден ли пользователь
+2. подтверждена ли почта
+================================
 */
 
 async function checkEmailStatus() {
+
+  hideButtons()
+
+  statusMessage.textContent =
+    'Проверяем статус...'
+
+  statusMessage.className =
+    'msg'
+
+  /*
+  ПОЛУЧАЕМ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
+  */
 
   const { data, error } =
     await supabase.auth.getUser()
 
   /*
-    Если пользователя нет —
-    значит сессия не найдена
+  ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН
+  → РЕЗУЛЬТАТ = НЕТ
   */
 
   if (error || !data.user) {
@@ -173,17 +234,18 @@ async function checkEmailStatus() {
       'Пользователь не найден'
 
     statusMessage.className =
-      'msg notok'
+      'msg error'
 
+    showFailButtons()
     return
+
   }
 
   const user = data.user
 
   /*
-    Проверяем:
-    если email_confirmed_at заполнен —
-    почта подтверждена
+  ЕСЛИ email_confirmed_at ЕСТЬ
+  → РЕЗУЛЬТАТ = ДА
   */
 
   if (user.email_confirmed_at) {
@@ -192,19 +254,25 @@ async function checkEmailStatus() {
       'Почта подтверждена'
 
     statusMessage.className =
-      'msg ok'
+      'msg success'
+
+    showSuccessButtons()
+    return
 
   }
 
-  else {
+  /*
+  ЕСЛИ email_confirmed_at НЕТ
+  → РЕЗУЛЬТАТ = НЕТ
+  */
 
-    statusMessage.textContent =
-      'Почта не подтверждена'
+  statusMessage.textContent =
+    'Почта не подтверждена'
 
-    statusMessage.className =
-      'msg notok'
+  statusMessage.className =
+    'msg error'
 
-  }
+  showFailButtons()
 
 }
 
@@ -214,16 +282,27 @@ async function checkEmailStatus() {
 ================================
 */
 
-function goIndex() {
-  window.location.href = 'index.html'
-}
-
-function goMain() {
+toMain.addEventListener('click', function () {
   window.location.href = 'main.html'
-}
+})
 
-window.goIndex = goIndex
-window.goMain = goMain
+toIndex.addEventListener('click', function () {
+  window.location.href = 'index.html'
+})
+
+toLog.addEventListener('click', function () {
+  window.location.href = 'log.html'
+})
+
+/*
+================================
+ПОВТОРНАЯ ПРОВЕРКА
+================================
+*/
+
+checkAgain.addEventListener('click', function () {
+  checkEmailStatus()
+})
 
 /*
 ================================
