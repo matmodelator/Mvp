@@ -154,7 +154,6 @@ button {
   color: #15803d;
 }
 
-
 /* ========================================
    ССЫЛКИ ПОД ФОРМОЙ
    Например:
@@ -165,7 +164,6 @@ button {
   margin-top: 18px;
   text-align: center;
 }
-
 
 /* ========================================
    ВЕРТИКАЛЬНЫЙ БЛОК КНОПОК
@@ -178,7 +176,6 @@ button {
   flex-direction: column;
   gap: 12px;
 }
-
 
 /* ========================================
    ВТОРИЧНАЯ КНОПКА
@@ -194,9 +191,127 @@ button {
   cursor: pointer;
 }
 
-
 /* Наведение на вторичную кнопку */
 
 .secondary-button:hover {
   background: #d1d5db;
 }
+
+/* ========================================
+   БАЗОВАЯ СТРАНИЦА для index
+======================================== */
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+header {
+  background: #2563eb;
+  color: white;
+  padding: 16px;
+  text-align: center;
+}
+
+
+/* ========================================
+   ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР
+======================================== */
+
+.container {
+  max-width: 520px;
+  margin: 40px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+/* ========================================
+   ЗАГОЛОВОК
+======================================== */
+
+h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+
+/* ========================================
+   ОБЩИЙ СТИЛЬ КНОПОК И INPUT
+======================================== */
+
+input,
+button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+
+/* ========================================
+   ОСНОВНАЯ КНОПКА
+======================================== */
+
+.submit-button {
+  margin-top: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* ========================================
+   ВТОРИЧНАЯ КНОПКА
+======================================== */
+
+.secondary-button {
+  background: #e5e7eb;
+  color: #111;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: #d1d5db;
+}
+
+
+/* ========================================
+   БЛОК СООБЩЕНИЙ
+======================================== */
+
+.msg {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 14px;
+}
+
+
+/* ========================================
+   ВЕРТИКАЛЬНЫЙ БЛОК КНОПОК
+======================================== */
+
+.buttons {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
