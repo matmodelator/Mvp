@@ -1,30 +1,40 @@
 <!DOCTYPE html>
-<html>
-  <body>
-    <h2>Подтверждение email...</h2>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Подтверждение email</title>
+</head>
+<body>
+  <h2>Подтверждение email...</h2>
+  <p id="status">Проверяем код подтверждения...</p>
 
-    <script type="module">
-      import { createClient } from 'https://esm.sh/@supabase/supabase-js';
-      
-// ⚠️ ВСТАВЬ СВОИ ДАННЫЕ ПРОЕКТА
-const supabase = createClient(
-  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
-);
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
+    // Подключение к Supabase
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
+    );
 
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
+    // Получаем код из URL
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
 
-      if (code) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!code) {
+      document.getElementById('status').textContent =
+        'Ошибка: код подтверждения не найден.';
+    } else {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-        if (error) {
-          document.body.innerHTML = '<h3>Ошибка подтверждения</h3>';
-        } else {
-          document.body.innerHTML = '<h3>Email успешно подтверждён!</h3>';
-        }
+      if (error) {
+        document.getElementById('status').textContent =
+          'Ошибка подтверждения: ' + error.message;
+      } else {
+        document.getElementById('status').textContent =
+          'Email успешно подтверждён! Теперь вы можете войти.';
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
