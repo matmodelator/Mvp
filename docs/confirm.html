@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Подтверждение email...</h2>
+
+    <script type="module">
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+
+      const supabase = createClient(
+        'https://YOUR-PROJECT.supabase.co',
+        'public-anon-key'
+      );
+
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+
+      if (code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+        if (error) {
+          document.body.innerHTML = '<h3>Ошибка подтверждения</h3>';
+        } else {
+          document.body.innerHTML = '<h3>Email успешно подтверждён!</h3>';
+        }
+      }
+    </script>
+  </body>
+</html>
