@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход</title>
+
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="start.css" />
+
+</head>
+
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Вход</h2>
+
+  <!-- ========================= -->
+  <!-- ФОРМА ВХОДА -->
+  <!-- ========================= -->
+
+  <form id="loginForm">
+
+    <!-- EMAIL -->
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      required
+    />
+
+    <!-- ПАРОЛЬ + ГЛАЗОК -->
+
+    <div class="password-row">
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Пароль"
+        required
+      />
+
+      <button
+        id="togglePasswordButton"
+        type="button"
+        class="eye-button"
+        onclick="togglePassword()"
+      >
+        👁
+      </button>
+
+    </div>
+
+    <button
+      type="submit"
+      class="submit-button"
+    >
+      Войти
+    </button>
+
+  </form>
+
+  <!-- СООБЩЕНИЯ -->
+
+  <div id="message" class="msg"></div>
+
+  <div class="links">
+    <a href="reg.html">
+      Нет аккаунта? Регистрация
+    </a>
+  </div>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
+
+const form =
+  document.getElementById('loginForm')
+
+const message =
+  document.getElementById('message')
+
+/*
+================================
+ПОКАЗАТЬ / СКРЫТЬ ПАРОЛЬ
+================================
+*/
+
+function togglePassword() {
+
+  const input =
+    document.getElementById('password')
+
+  const button =
+    document.getElementById('togglePasswordButton')
+
+  if (input.type === 'password') {
+
+    input.type = 'text'
+    button.textContent = '🙈'
+
+  }
+
+  else {
+
+    input.type = 'password'
+    button.textContent = '👁'
+
+  }
+
+}
+
+window.togglePassword = togglePassword
+
+/*
+================================
+ВСПОМОГАТЕЛЬНОЕ СООБЩЕНИЕ
+================================
+*/
+
+function showMessage(text, type = '') {
+  message.textContent = text
+  message.className = `msg ${type}`
+}
+
+/*
+================================
+ВХОД
+================================
+*/
+
+form.addEventListener(
+  'submit',
+  async (event) => {
+
+    event.preventDefault()
+
+    showMessage('Входим...')
+
+    const email =
+      document.getElementById('email').value.trim()
+
+    const password =
+      document.getElementById('password').value
+
+    /*
+    ПЫТАЕМСЯ ВОЙТИ
+    */
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    /*
+    ЕСЛИ ЕСТЬ ОШИБКА
+    */
+
+    if (error) {
+
+      /*
+      ЛЮБАЯ ОШИБКА ВХОДА
+      */
+
+      showMessage(error.message, 'error')
+      return
+    }
+
+    /*
+    УСПЕШНЫЙ ВХОД
+    */
+
+    showMessage('Вход выполнен', 'success')
+
+    /*
+    ПОСЛЕ УСПЕШНОГО ВХОДА
+    ПЕРЕХОДИМ НЕ НА index,
+    А НА mail-check.html
+    */
+
+    setTimeout(() => {
+      window.location.href = 'mail-check.html'
+    }, 600)
+
+  }
+)
+
+</script>
+
+</body>
+</html>
