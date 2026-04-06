@@ -46,6 +46,14 @@
       console.log(data, error);
 
       // ⚠️ Вывод результата
-      if (error) {
+       if (error) {
         document.getElementById('status').textContent =
-          'Ошибка: ' + error.message
+          'Ошибка: ' + error.message;
+      } else {
+        document.getElementById('status').textContent =
+          'Письмо отправлено! Проверь почту.';
+      }
+    };
+  </script>
+</body>
+</html>
