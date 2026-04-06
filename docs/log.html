@@ -72,14 +72,42 @@
 
   </form>
 
-  <!-- СООБЩЕНИЯ -->
+  <!--
+  ========================================
+  СООБЩЕНИЯ
+  ========================================
+  -->
 
   <div id="message" class="msg"></div>
 
+  <!--
+  ========================================
+  НИЖНИЙ БЛОК ССЫЛОК
+  ПО УМОЛЧАНИЮ:
+  "Нет аккаунта? Регистрация"
+
+  ПРИ НЕПОДТВЕРЖДЕННОМ EMAIL:
+  "Перейти к верификации e-mail"
+  ========================================
+  -->
+
   <div class="links">
-    <a href="reg.html">
+
+    <a
+      id="regLink"
+      href="reg.html"
+    >
       Нет аккаунта? Регистрация
     </a>
+
+    <a
+      id="confirmLink"
+      href="mail-confirm.html"
+      style="display: none;"
+    >
+      Перейти к верификации e-mail
+    </a>
+
   </div>
 
 </div>
@@ -111,6 +139,12 @@ const form =
 
 const message =
   document.getElementById('message')
+
+const regLink =
+  document.getElementById('regLink')
+
+const confirmLink =
+  document.getElementById('confirmLink')
 
 /*
 ================================
@@ -157,6 +191,30 @@ function showMessage(text, type = '') {
 
 /*
 ================================
+ПОКАЗАТЬ ССЫЛКУ НА РЕГИСТРАЦИЮ
+И СКРЫТЬ ССЫЛКУ НА ВЕРИФИКАЦИЮ
+================================
+*/
+
+function showRegisterLink() {
+  regLink.style.display = 'inline'
+  confirmLink.style.display = 'none'
+}
+
+/*
+================================
+ПОКАЗАТЬ ССЫЛКУ НА ВЕРИФИКАЦИЮ
+И СКРЫТЬ ССЫЛКУ НА РЕГИСТРАЦИЮ
+================================
+*/
+
+function showConfirmLink() {
+  regLink.style.display = 'none'
+  confirmLink.style.display = 'inline'
+}
+
+/*
+================================
 ВХОД
 ================================
 */
@@ -166,6 +224,13 @@ form.addEventListener(
   async (event) => {
 
     event.preventDefault()
+
+    /*
+    ПЕРЕД НОВОЙ ПОПЫТКОЙ ВОЗВРАЩАЕМ
+    ОБЫЧНУЮ ССЫЛКУ НА РЕГИСТРАЦИЮ
+    */
+
+    showRegisterLink()
 
     showMessage('Входим...')
 
@@ -192,7 +257,26 @@ form.addEventListener(
     if (error) {
 
       /*
-      ЛЮБАЯ ОШИБКА ВХОДА
+      ЕСЛИ EMAIL НЕ ПОДТВЕРЖДЕН
+      → ПОКАЗЫВАЕМ СООБЩЕНИЕ
+      → МЕНЯЕМ НИЖНЮЮ ССЫЛКУ
+      */
+
+      if (
+        error.message &&
+        (
+          error.message.includes('Email not confirmed') ||
+          error.message.includes('email not confirmed')
+        )
+      ) {
+
+        showMessage('Требуется верификация e-mail', 'error')
+        showConfirmLink()
+        return
+      }
+
+      /*
+      ЛЮБАЯ ДРУГАЯ ОШИБКА ВХОДА
       */
 
       showMessage(error.message, 'error')
@@ -205,14 +289,8 @@ form.addEventListener(
 
     showMessage('Вход выполнен', 'success')
 
-    /*
-    ПОСЛЕ УСПЕШНОГО ВХОДА
-    ПЕРЕХОДИМ НЕ НА index,
-    А НА mail-check.html
-    */
-
     setTimeout(() => {
-      window.location.href = 'mail-check.html'
+      window.location.href = 'main.html'
     }, 600)
 
   }
