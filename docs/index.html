@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <title>Dating App MVP</title>
+
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="start.css" />
+
+</head>
+
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <!--
+  ========================================
+  ЗАГОЛОВОК СТАРТОВОЙ СТРАНИЦЫ
+  ========================================
+  -->
+  <h2>Стартовая страница</h2>
+
+  <!--
+  ========================================
+  КРАТКОЕ ОПИСАНИЕ
+  ========================================
+  -->
+  <div class="msg">
+    Выберите действие
+  </div>
+
+  <!--
+  ========================================
+  ОСНОВНЫЕ КНОПКИ ПЕРЕХОДА
+  ========================================
+  -->
+  <div class="buttons">
+
+    <!--
+    ПЕРЕХОД НА ВХОД
+    -->
+    <button
+      id="goLog"
+      class="submit-button"
+    >
+      Войти
+    </button>
+
+    <!--
+    ПЕРЕХОД НА РЕГИСТРАЦИЮ
+    -->
+    <button
+      id="goReg"
+      class="secondary-button"
+    >
+      Регистрация
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
+
+const goLog =
+  document.getElementById('goLog')
+
+const goReg =
+  document.getElementById('goReg')
+
+/*
+================================
+ПЕРЕХОД НА СТРАНИЦУ ВХОДА
+================================
+*/
+
+goLog.addEventListener('click', function () {
+  window.location.href = 'log.html'
+})
+
+/*
+================================
+ПЕРЕХОД НА СТРАНИЦУ РЕГИСТРАЦИИ
+================================
+*/
+
+goReg.addEventListener('click', function () {
+  window.location.href = 'reg.html'
+})
+
+</script>
+
+</body>
+</html>
