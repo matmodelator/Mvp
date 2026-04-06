@@ -9,6 +9,45 @@
   <p id="status">Проверяем код подтверждения...</p>
 
   <script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const client = createClient(
+    "https://fnodbpiwkkrdgqvmyanq.supabase.co",
+    "АНОН_КЛЮЧ"
+  );
+
+  async function run() {
+    document.body.innerHTML = "<h2>Подтверждение email...</h2>";
+
+    // 1. Пробуем query
+    const params = new URLSearchParams(window.location.search);
+    let token = params.get("access_token");
+
+    // 2. Пробуем hash
+    if (!token) {
+      const hash = new URLSearchParams(window.location.hash.substring(1));
+      token = hash.get("access_token");
+    }
+
+    if (!token) {
+      document.body.innerHTML += "<p>Ошибка: код подтверждения не найден.</p>";
+      return;
+    }
+
+    const { data, error } = await client.auth.exchangeCodeForSession(token);
+
+    if (error) {
+      document.body.innerHTML += "<p>Ошибка: " + error.message + "</p>";
+    } else {
+      document.body.innerHTML += "<p>Email успешно подтверждён!</p>";
+    }
+  }
+
+  run();
+</script>
+  
+  <!--
+  <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
     // Подключение к Supabase
@@ -36,5 +75,6 @@
       }
     }
   </script>
+  -->
 </body>
 </html>
