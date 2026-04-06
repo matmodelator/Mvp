@@ -165,3 +165,38 @@ button {
   margin-top: 18px;
   text-align: center;
 }
+
+
+/* ========================================
+   ВЕРТИКАЛЬНЫЙ БЛОК КНОПОК
+   Например для mail-check / mail-confirm
+======================================== */
+
+.buttons {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ========================================
+   ВТОРИЧНАЯ КНОПКА
+   Например:
+   На index
+   Проверить снова
+======================================== */
+
+.secondary-button {
+  background: #e5e7eb;
+  color: #111;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+
+/* Наведение на вторичную кнопку */
+
+.secondary-button:hover {
+  background: #d1d5db;
+}
