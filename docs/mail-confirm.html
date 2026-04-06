@@ -26,15 +26,20 @@
 
 <div class="container">
 
+  <!--
+  ========================================
+  ЗАГОЛОВОК СТРАНИЦЫ
+  ========================================
+  -->
   <h2>Подтверждение почты</h2>
 
   <!--
   ========================================
-  СТАТУС
+  СТАТУС ПРОВЕРКИ
   ========================================
   -->
-  <div id="message" class="msg">
-    Отправляем письмо для подтверждения...
+  <div id="status" class="msg">
+    Проверяем подтверждение...
   </div>
 
   <!--
@@ -45,19 +50,19 @@
   <div class="buttons">
 
     <button
-      id="toLog"
-      class="submit-button"
-      style="display: none;"
+      id="goIndexButton"
+      class="secondary-button"
+      type="button"
     >
-      На log
+      На index
     </button>
 
     <button
-      id="toIndex"
-      class="secondary-button"
-      style="display: none;"
+      id="goMainButton"
+      class="submit-button"
+      type="button"
     >
-      На index
+      На главную
     </button>
 
   </div>
@@ -75,6 +80,12 @@
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
+/*
+================================
+ПОДКЛЮЧЕНИЕ К ПРОЕКТУ
+================================
+*/
+
 const supabase = createClient(
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
@@ -86,119 +97,111 @@ const supabase = createClient(
 ================================
 */
 
-const message =
-  document.getElementById('message')
+const statusText =
+  document.getElementById('status')
 
-const toLog =
-  document.getElementById('toLog')
+const goIndexButton =
+  document.getElementById('goIndexButton')
 
-const toIndex =
-  document.getElementById('toIndex')
-
-/*
-================================
-ПОКАЗАТЬ КНОПКИ
-================================
-*/
-
-function showButtons() {
-  toLog.style.display = 'block'
-  toIndex.style.display = 'block'
-}
+const goMainButton =
+  document.getElementById('goMainButton')
 
 /*
 ================================
-ОТПРАВИТЬ ПИСЬМО ВЕРИФИКАЦИИ
-
-ВАЖНО:
-этот файл не проверяет user через getUser()
-а именно отправляет запрос на письмо
-через supabase.auth.resend(...)
+ПРОВЕРКА ПОДТВЕРЖДЕНИЯ ПОЧТЫ
 ================================
 */
 
-async function sendVerificationEmail() {
+async function checkEmail() {
 
-  const pendingEmail =
-    localStorage.getItem('pendingEmail')
+  statusText.textContent =
+    'Проверяем...'
 
-  /*
-  ЕСЛИ EMAIL НЕ СОХРАНЕН
-  */
+  statusText.className =
+    'msg'
 
-  if (!pendingEmail) {
+  const { data, error } =
+    await supabase.auth.getUser()
 
-    message.textContent =
-      'Не найден e-mail для верификации'
+  if (error || !data.user) {
 
-    message.className =
+    statusText.textContent =
+      'Пользователь не найден'
+
+    statusText.className =
       'msg error'
 
-    showButtons()
     return
+
   }
 
-  /*
-  ОТПРАВЛЯЕМ ПИСЬМО ПОДТВЕРЖДЕНИЯ
-  */
-
-  const { error } =
-    await supabase.auth.resend({
-      type: 'signup',
-      email: pendingEmail
-    })
+  const user =
+    data.user
 
   /*
-  ЕСЛИ ЕСТЬ ОШИБКА
+  ========================================
+  ПРОВЕРЯЕМ ПОДТВЕРЖДЕНИЕ EMAIL
+  ========================================
   */
 
-  if (error) {
+  if (user.email_confirmed_at) {
 
-    message.textContent =
-      error.message
+    statusText.textContent =
+      'Почта подтверждена'
 
-    message.className =
+    statusText.className =
+      'msg success'
+
+  }
+
+  else {
+
+    statusText.textContent =
+      'Почта еще не подтверждена'
+
+    statusText.className =
       'msg error'
 
-    showButtons()
-    return
   }
-
-  /*
-  ЕСЛИ ПИСЬМО УШЛО
-  */
-
-  message.textContent =
-    'Письмо для подтверждения e-mail отправлено. Проверьте почту.'
-
-  message.className =
-    'msg success'
-
-  showButtons()
 
 }
 
 /*
 ================================
-ПЕРЕХОДЫ
+ПЕРЕХОД НА INDEX
 ================================
 */
 
-toLog.addEventListener('click', function () {
-  window.location.href = 'log.html'
-})
+function goIndex() {
 
-toIndex.addEventListener('click', function () {
-  window.location.href = 'index.html'
-})
+  window.location.href =
+    'index.html'
+
+}
 
 /*
 ================================
-ЗАПУСК ПРИ ЗАГРУЗКЕ
+ПЕРЕХОД НА MAIN
 ================================
 */
 
-sendVerificationEmail()
+function goMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+
+goIndexButton.addEventListener('click', goIndex)
+goMainButton.addEventListener('click', goMain)
+
+/*
+================================
+ПРОВЕРЯЕМ СРАЗУ ПРИ ЗАГРУЗКЕ
+================================
+*/
+
+checkEmail()
 
 </script>
 
