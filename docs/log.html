@@ -109,6 +109,22 @@
       </button>
     </form>
 
+<!-- ========================= -->
+<!-- ВОССТАНОВЛЕНИЕ ПАРОЛЯ -->
+<!-- ========================= -->
+
+<div class="repass-block">
+
+  <button
+    type="button"
+    id="repassBtn"
+    class="repass-btn"
+  >
+    Забыли пароль?
+  </button>
+
+</div>
+    
     <!--
       Сюда будем выводить служебные сообщения:
       - Входим...
@@ -239,5 +255,26 @@
     })
   </script>
 
+ /* Переход на форму восстановления доступа */
+  
+<script>
+  const repassBtn =
+    document.getElementById('repassBtn')
+
+  if (repassBtn) {
+
+    repassBtn.addEventListener(
+      'click',
+      function () {
+
+        window.location.href =
+          're-pass.html'
+
+      }
+    )
+
+  }
+</script>
+  
 </body>
 </html>
