@@ -5,178 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Восстановление пароля</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f6f8;
-      color: #222;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
     }
 
-    .card {
+    .box {
       width: 100%;
       max-width: 420px;
-      background: #fff;
+      background: white;
       border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 28px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: 24px;
+      margin-top: 0;
       text-align: center;
+      font-size: 24px;
     }
 
     p {
-      margin: 0 0 24px;
-      font-size: 14px;
-      line-height: 1.5;
       color: #555;
-      text-align: center;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
+      line-height: 1.5;
       font-size: 14px;
-      font-weight: 600;
     }
 
-    input[type="email"] {
+    input {
       width: 100%;
-      padding: 12px 14px;
-      font-size: 14px;
-      border: 1px solid #d0d7de;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 14px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      outline: none;
-      margin-bottom: 16px;
-    }
-
-    input[type="email"]:focus {
-      border-color: #2d6cdf;
+      box-sizing: border-box;
+      font-size: 15px;
     }
 
     button {
       width: 100%;
-      padding: 12px 14px;
+      padding: 12px;
       border: none;
       border-radius: 8px;
-      background: #2d6cdf;
-      color: #fff;
+      background: #2563eb;
+      color: white;
       font-size: 15px;
-      font-weight: 600;
       cursor: pointer;
     }
 
     button:hover {
-      background: #1f57b8;
+      background: #1d4ed8;
     }
 
-    .message {
+    #status {
       margin-top: 16px;
       font-size: 14px;
       text-align: center;
-      display: none;
+      min-height: 20px;
     }
 
-    .message.success {
-      color: #147a2e;
+    .success {
+      color: green;
     }
 
-    .message.error {
-      color: #b42318;
+    .error {
+      color: #b00020;
     }
 
-    .footer-link {
-      margin-top: 20px;
+    .link-back {
+      display: block;
+      margin-top: 18px;
       text-align: center;
-      font-size: 14px;
-    }
-
-    .footer-link a {
-      color: #2d6cdf;
       text-decoration: none;
-    }
-
-    .footer-link a:hover {
-      text-decoration: underline;
+      color: #2563eb;
     }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="box">
     <h1>Восстановление пароля</h1>
+
     <p>
-      Укажите email, который вы использовали при регистрации.
-      Мы отправим ссылку для сброса пароля.
+      Введите email, указанный при регистрации.
+      На него будет отправлена ссылка для смены пароля.
     </p>
 
-    <form id="forgotPasswordForm">
-      <label for="email">Email</label>
+    <form id="recoveryForm">
       <input
-        type="email"
         id="email"
-        name="email"
-        placeholder="example@mail.com"
+        type="email"
+        placeholder="Email"
         required
       />
-
       <button type="submit">Отправить ссылку</button>
     </form>
 
-    <div id="successMessage" class="message success">
-      Если такой email найден, инструкция по восстановлению уже отправлена.
-    </div>
+    <div id="status"></div>
 
-    <div id="errorMessage" class="message error">
-      Не удалось отправить запрос. Попробуйте позже.
-    </div>
-
-    <div class="footer-link">
-      <a href="/login.html">Вернуться ко входу</a>
-    </div>
+    <a class="link-back" href="index.html">Назад</a>
   </div>
 
-  <script>
-    const form = document.getElementById('forgotPasswordForm');
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL'
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'
 
-      successMessage.style.display = 'none';
-      errorMessage.style.display = 'none';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-      const email = document.getElementById('email').value.trim();
+    const form = document.getElementById('recoveryForm')
+    const emailInput = document.getElementById('email')
+    const statusEl = document.getElementById('status')
 
-      try {
-        const response = await fetch('/api/auth/forgot-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email })
-        });
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault()
 
-        if (!response.ok) {
-          throw new Error('Request failed');
-        }
+      statusEl.textContent = 'Отправляем письмо...'
+      statusEl.className = ''
 
-        successMessage.style.display = 'block';
-        form.reset();
-      } catch (error) {
-        errorMessage.style.display = 'block';
+      const email = emailInput.value.trim()
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://matmodelator.github.io/Mvp/update-password.html'
+      })
+
+      if (error) {
+        statusEl.textContent = 'Ошибка: ' + error.message
+        statusEl.className = 'error'
+        return
       }
-    });
+
+      statusEl.textContent =
+        'Если такой email существует, ссылка для смены пароля отправлена.'
+      statusEl.className = 'success'
+    })
   </script>
 </body>
 </html>
