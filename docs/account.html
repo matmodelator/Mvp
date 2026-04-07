@@ -109,6 +109,7 @@ async function saveAccount() {
       .from('accounts')
       .upsert({
         id: user.id,
+        email: user.email,
         name: name,
         gender: gender,
         birthday: birthday
