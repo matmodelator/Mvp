@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Навигация</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .buttons {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    .secondary:hover {
+      background: #d1d5db;
+    }
+
+    .warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .warning:hover {
+      background: #d97706;
+    }
+
+    .msg {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Навигация</h2>
+
+  <!-- здесь показываем текущего пользователя -->
+  <p id="welcome">
+    Проверяем сессию...
+  </p>
+
+  <div class="buttons">
+
+    <!-- переход на основную главную страницу -->
+    <button onclick="goMain()">
+      Главная
+    </button>
+
+    <!-- переход на страницу подтверждения почты -->
+    <button class="warning" onclick="goMail()">
+      Подтверждение почты
+    </button>
+
+    <!-- выход из системы -->
+    <button class="secondary" onclick="logout()">
+      Выход
+    </button>
+
+  </div>
+
+  <div id="message" class="msg"></div>
+
+</div>
+
+<script type="module">
+  /*
+    Подключаем Supabase
+  */
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+  /*
+    Создаем соединение с проектом
+  */
+  const supabase = createClient(
+    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+  )
+
+  /*
+    Получаем элементы страницы
+  */
+  const welcome = document.getElementById('welcome')
+  const message = document.getElementById('message')
+
+  /*
+    Проверяем, вошел ли пользователь
+  */
+  async function checkUser() {
+    const { data, error } = await supabase.auth.getUser()
+
+    /*
+      Если сессии нет — отправляем на log.html
+    */
+    if (error || !data.user) {
+      window.location.href = 'log.html'
+      return
+    }
+
+    /*
+      Если пользователь найден — показываем email
+    */
+    const user = data.user
+    welcome.textContent = `Вы вошли как: ${user.email}`
+  }
+
+  /*
+    Переход на главную страницу приложения
+  */
+  function goMain() {
+    window.location.href = 'main.html'
+  }
+
+  /*
+    Переход на страницу подтверждения почты
+  */
+  function goMail() {
+    window.location.href = 'mail.html'
+  }
+
+  /*
+    Выход из системы
+  */
+  async function logout() {
+    message.textContent = 'Выходим...'
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      message.textContent = error.message
+      return
+    }
+
+    window.location.href = 'log.html'
+  }
+
+  /*
+    Делаем функции доступными кнопкам
+  */
+  window.goMain = goMain
+  window.goMail = goMail
+  window.logout = logout
+
+  /*
+    Проверяем пользователя при загрузке страницы
+  */
+  checkUser()
+</script>
+
+</body>
+</html>
