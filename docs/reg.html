@@ -4,83 +4,17 @@
 <head>
 
   <meta charset="UTF-8" />
-
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0" />
 
   <title>Регистрация</title>
 
-  <style>
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-    }
-
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .container {
-      max-width: 520px;
-      margin: 40px auto;
-      background: white;
-      padding: 24px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      margin-top: 0;
-      text-align: center;
-    }
-
-    input,
-    button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    .msg {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .error {
-      color: #b91c1c;
-    }
-
-    .success {
-      color: #15803d;
-    }
-
-    .links {
-      margin-top: 18px;
-      text-align: center;
-    }
-
-  </style>
+  <!--
+  ========================================
+  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
+  ========================================
+  -->
+  <link rel="stylesheet" href="styles/start.css" />
 
 </head>
 
@@ -100,6 +34,8 @@
 
   <form id="registerForm">
 
+    <!-- EMAIL -->
+
     <input
       id="email"
       type="email"
@@ -107,22 +43,74 @@
       required
     />
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Пароль"
-      required
-    />
+    <!-- ПАРОЛЬ -->
 
-    <button type="submit">
+    <div class="password-row">
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Пароль"
+        required
+      />
+
+      <button
+        id="togglePasswordButton"
+        type="button"
+        class="eye-button"
+        onclick="togglePassword()"
+      >
+        👁
+      </button>
+
+    </div>
+
+    <!-- КНОПКА РЕГИСТРАЦИИ -->
+
+    <button
+      type="submit"
+      class="submit-button"
+    >
       Зарегистрироваться
     </button>
 
   </form>
 
-  <!-- Сообщения системы -->
+  <!--
+  ========================================
+  СООБЩЕНИЕ СТАТУСА
+  ========================================
+  -->
 
   <div id="message" class="msg"></div>
+
+  <!--
+  ========================================
+  КНОПКИ ПЕРЕХОДА
+  ========================================
+  -->
+
+  <div
+    id="actionButtons"
+    class="buttons"
+    style="display: none;"
+  >
+
+    <button
+      id="toConfirm"
+      class="submit-button"
+    >
+      Перейти к подтверждению e-mail
+    </button>
+
+    <button
+      id="toIndex"
+      class="secondary-button"
+    >
+      На index
+    </button>
+
+  </div>
 
   <div class="links">
     <a href="log.html">
@@ -143,12 +131,6 @@
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
-/*
-================================
-СОЕДИНЕНИЕ С ПРОЕКТОМ
-================================
-*/
-
 const supabase = createClient(
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
@@ -166,16 +148,56 @@ const form =
 const message =
   document.getElementById('message')
 
+const actionButtons =
+  document.getElementById('actionButtons')
+
+const toConfirm =
+  document.getElementById('toConfirm')
+
+const toIndex =
+  document.getElementById('toIndex')
+
 /*
 ================================
-ПОКАЗ СООБЩЕНИЯ
+ПОКАЗАТЬ / СКРЫТЬ ПАРОЛЬ
 ================================
 */
 
-function showMessage(text, type = '') {
+function togglePassword() {
 
-  message.textContent = text
-  message.className = `msg ${type}`
+  const input =
+    document.getElementById('password')
+
+  const button =
+    document.getElementById('togglePasswordButton')
+
+  if (input.type === 'password') {
+
+    input.type = 'text'
+    button.textContent = '🙈'
+
+  }
+
+  else {
+
+    input.type = 'password'
+    button.textContent = '👁'
+
+  }
+
+}
+
+window.togglePassword = togglePassword
+
+/*
+================================
+ПОКАЗАТЬ КНОПКИ ПЕРЕХОДА
+================================
+*/
+
+function showButtons() {
+
+  actionButtons.style.display = 'flex'
 
 }
 
@@ -183,68 +205,88 @@ function showMessage(text, type = '') {
 ================================
 РЕГИСТРАЦИЯ
 ================================
-
-Важно:
-При Confirm Email = ON
-пользователь должен подтвердить почту,
-прежде чем сможет нормально войти.
 */
 
-form.addEventListener('submit', async (event) => {
+form.addEventListener(
+  'submit',
+  async (event) => {
 
-  event.preventDefault()
+    event.preventDefault()
 
-  showMessage('Создаем аккаунт...')
+    message.textContent =
+      'Регистрируем...'
 
-  const email =
-    document.getElementById('email').value.trim()
+    message.className =
+      'msg'
 
-  const password =
-    document.getElementById('password').value
+    const email =
+      document.getElementById('email').value.trim()
 
-  /*
-  Создаем пользователя
-  */
+    const password =
+      document.getElementById('password').value
 
-  const { data, error } =
-    await supabase.auth.signUp({
-      email,
-      password
-    })
+    /*
+    ПЫТАЕМСЯ ЗАРЕГИСТРИРОВАТЬСЯ
+    */
 
-  /*
-  Если ошибка — показываем
-  */
+    const { error } =
+      await supabase.auth.signUp({
+        email,
+        password
+      })
 
-  if (error) {
+    /*
+    ЕСЛИ ЯВНАЯ ОШИБКА
+    */
 
-    showMessage(error.message, 'error')
-    return
+    if (error) {
+
+      message.textContent =
+        error.message
+
+      message.className =
+        'msg error'
+
+      return
+
+    }
+
+    /*
+    ВАЖНО:
+    Мы НЕ можем надежно определить,
+    существует ли пользователь.
+
+    Поэтому сообщение нейтральное.
+    */
+
+    message.textContent =
+      'Если этот e-mail можно зарегистрировать, письмо для подтверждения отправлено. Проверьте почту.'
+
+    message.className =
+      'msg success'
+
+    showButtons()
 
   }
+)
 
-  /*
-  При включенном Confirm Email
-  Supabase обычно не дает полноценную сессию,
-  пока пользователь не подтвердит почту.
-  Поэтому здесь просто сообщаем, что письмо отправлено.
-  */
+/*
+================================
+ПЕРЕХОДЫ
+================================
+*/
 
-  showMessage(
-    'Аккаунт создан. Проверьте почту для подтверждения.',
-    'success'
-  )
+toConfirm.addEventListener('click', function () {
 
-  /*
-  Перенаправляем на страницу проверки почты
-  */
+  window.location.href =
+    'mail-confirm.html'
 
-  setTimeout(() => {
+})
 
-    window.location.href =
-      'mail-confirm.html'
+toIndex.addEventListener('click', function () {
 
-  }, 1200)
+  window.location.href =
+    'index.html'
 
 })
 
