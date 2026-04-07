@@ -8,23 +8,30 @@
 
 <body>
 
+<!-- КНОПКА НАЗАД -->
+
 <button onclick="window.location.href='index.html'">
-  Назад
+Назад
 </button>
 
 <h2>
-  Подтверждение почты
+Подтверждение почты
 </h2>
 
 <div>
+
   <p id="status">
     Проверяем подтверждение...
   </p>
+
+  <p id="userData"></p>
+
 </div>
 
 <br>
 
 <div>
+
   <button onclick="checkEmail()">
     Проверить снова
   </button>
@@ -32,9 +39,16 @@
   <button onclick="goMain()">
     На главную
   </button>
+
 </div>
 
 <script type="module">
+
+/*
+================================
+Подключаем Supabase
+================================
+*/
 
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
@@ -46,6 +60,15 @@ const supabase = createClient(
 
 const statusText =
   document.getElementById('status')
+
+const userDataText =
+  document.getElementById('userData')
+
+/*
+================================
+Проверка подтверждения почты
+================================
+*/
 
 async function checkEmail() {
 
@@ -72,17 +95,25 @@ async function checkEmail() {
       'Почта подтверждена'
 
     const userId =
-      encodeURIComponent(user.id)
+      user.id
 
     const userEmail =
-      encodeURIComponent(user.email || '')
+      user.email
+
+    userDataText.textContent =
+      'ID: ' + userId +
+      ' | EMAIL: ' + userEmail
+
+    /*
+    Переход на account.html
+    */
 
     setTimeout(function () {
 
       window.location.href =
-        `account.html?id=${userId}&email=${userEmail}`
+        `account.html?id=${encodeURIComponent(userId)}&email=${encodeURIComponent(userEmail)}`
 
-    }, 1000)
+    }, 3000)
 
   }
   else {
@@ -94,6 +125,12 @@ async function checkEmail() {
 
 }
 
+/*
+================================
+Переход на главную
+================================
+*/
+
 function goMain() {
 
   window.location.href =
@@ -103,6 +140,12 @@ function goMain() {
 
 window.goMain = goMain
 window.checkEmail = checkEmail
+
+/*
+================================
+Проверяем сразу при загрузке
+================================
+*/
 
 checkEmail()
 
