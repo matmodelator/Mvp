@@ -99,13 +99,33 @@ async function checkEmail() {
 
   /*
   Проверяем подтверждение
-  */
+  
 
   if (user.email_confirmed_at) {
 
     statusText.textContent =
-      'Почта подтверждена'
+      'Почта подтверждена'*/
 
+if (user.email_confirmed_at) {
+
+  statusText.textContent =
+    'Почта подтверждена'
+
+  const userId =
+    encodeURIComponent(user.id)
+
+  const userEmail =
+    encodeURIComponent(user.email || '')
+
+  setTimeout(function () {
+
+    window.location.href =
+      `account.html?id=${userId}&email=${userEmail}`
+
+  }, 1000)
+
+}
+    
     /*
     Переход на account.html
     */
