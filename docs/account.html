@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Регистрация</title>
+</head>
+<body>
+
+  <h2>Регистрация</h2>
+
+  <input id="email" type="email" placeholder="Email" />
+  <br><br>
+
+  <input id="password" type="password" placeholder="Пароль" />
+  <br><br>
+
+  <button onclick="signUp()">Зарегистрироваться</button>
+
+  <p id="status"></p>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'ТВОЙ_PUBLISHABLE_KEY'
+    )
+
+    const emailInput = document.getElementById('email')
+    const passwordInput = document.getElementById('password')
+    const statusText = document.getElementById('status')
+
+    async function signUp() {
+      const email = emailInput.value.trim()
+      const password = passwordInput.value.trim()
+
+      if (!email || !password) {
+        statusText.textContent = 'Заполни email и пароль'
+        return
+      }
+
+      statusText.textContent = 'Регистрируем...'
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      })
+
+      if (error) {
+        statusText.textContent = error.message
+        return
+      }
+
+      // Если появилась сессия или хотя бы user — переходим на заполнение аккаунта
+      if (data.session || data.user) {
+        statusText.textContent = 'Регистрация успешна'
+        window.location.href = 'account.html'
+        return
+      }
+
+      // Если сессии нет, значит обычно нужно подтвердить email
+      statusText.textContent = 'Подтверди почту'
+      window.location.href = 'confirm.html'
+    }
+
+    window.signUp = signUp
+  </script>
+
+</body>
+</html>
