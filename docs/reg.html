@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
   <title>Регистрация</title>
 
   <style>
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -34,8 +40,6 @@
     }
 
     input,
-    select,
-    textarea,
     button {
       width: 100%;
       box-sizing: border-box;
@@ -44,11 +48,6 @@
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 14px;
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
     }
 
     button {
@@ -80,8 +79,11 @@
       margin-top: 18px;
       text-align: center;
     }
+
   </style>
+
 </head>
+
 <body>
 
 <header>
@@ -91,6 +93,10 @@
 <div class="container">
 
   <h2>Регистрация</h2>
+
+  <!-- ========================= -->
+  <!-- ФОРМА РЕГИСТРАЦИИ -->
+  <!-- ========================= -->
 
   <form id="registerForm">
 
@@ -108,50 +114,13 @@
       required
     />
 
-    <input
-      id="nickname"
-      type="text"
-      placeholder="Ник"
-      required
-    />
-
-    <input
-      id="age"
-      type="number"
-      placeholder="Возраст"
-      min="18"
-      max="99"
-    />
-
-    <select id="gender">
-      <option value="">Ваш пол</option>
-      <option value="male">Мужчина</option>
-      <option value="female">Женщина</option>
-    </select>
-
-    <select id="looking_for">
-      <option value="">Кого ищете</option>
-      <option value="male">Мужчину</option>
-      <option value="female">Женщину</option>
-      <option value="any">Не важно</option>
-    </select>
-
-    <input
-      id="city"
-      type="text"
-      placeholder="Город"
-    />
-
-    <textarea
-      id="bio"
-      placeholder="О себе"
-    ></textarea>
-
     <button type="submit">
       Зарегистрироваться
     </button>
 
   </form>
+
+  <!-- Сообщения системы -->
 
   <div id="message" class="msg"></div>
 
@@ -165,13 +134,31 @@
 
 <script type="module">
 
+/*
+================================
+ПОДКЛЮЧАЕМ SUPABASE
+================================
+*/
+
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+================================
+СОЕДИНЕНИЕ С ПРОЕКТОМ
+================================
+*/
 
 const supabase = createClient(
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
 )
+
+/*
+================================
+ЭЛЕМЕНТЫ СТРАНИЦЫ
+================================
+*/
 
 const form =
   document.getElementById('registerForm')
@@ -179,100 +166,87 @@ const form =
 const message =
   document.getElementById('message')
 
+/*
+================================
+ПОКАЗ СООБЩЕНИЯ
+================================
+*/
+
 function showMessage(text, type = '') {
+
   message.textContent = text
   message.className = `msg ${type}`
+
 }
 
-form.addEventListener(
-  'submit',
-  async (event) => {
+/*
+================================
+РЕГИСТРАЦИЯ
+================================
 
-    event.preventDefault()
+Важно:
+При Confirm Email = ON
+пользователь должен подтвердить почту,
+прежде чем сможет нормально войти.
+*/
 
-    showMessage('Создаем аккаунт...')
+form.addEventListener('submit', async (event) => {
 
-    const email =
-      document.getElementById('email').value.trim()
+  event.preventDefault()
 
-    const password =
-      document.getElementById('password').value
+  showMessage('Создаем аккаунт...')
 
-    const nickname =
-      document.getElementById('nickname').value.trim()
+  const email =
+    document.getElementById('email').value.trim()
 
-    const age =
-      document.getElementById('age').value
+  const password =
+    document.getElementById('password').value
 
-    const gender =
-      document.getElementById('gender').value
+  /*
+  Создаем пользователя
+  */
 
-    const looking_for =
-      document.getElementById('looking_for').value
+  const { data, error } =
+    await supabase.auth.signUp({
+      email,
+      password
+    })
 
-    const city =
-      document.getElementById('city').value.trim()
+  /*
+  Если ошибка — показываем
+  */
 
-    const bio =
-      document.getElementById('bio').value.trim()
+  if (error) {
 
-    // 1. создаем пользователя
+    showMessage(error.message, 'error')
+    return
 
-    const { data, error } =
-      await supabase.auth.signUp({
-        email,
-        password
-      })
+  }
 
-    if (error) {
-      showMessage(error.message, 'error')
-      return
-    }
+  /*
+  При включенном Confirm Email
+  Supabase обычно не дает полноценную сессию,
+  пока пользователь не подтвердит почту.
+  Поэтому здесь просто сообщаем, что письмо отправлено.
+  */
 
-    const user = data.user
+  showMessage(
+    'Аккаунт создан. Проверьте почту для подтверждения.',
+    'success'
+  )
 
-    if (!user) {
-      showMessage(
-        'Не удалось создать пользователя',
-        'error'
-      )
-      return
-    }
+  /*
+  Перенаправляем на страницу проверки почты
+  */
 
-    // 2. создаем профиль
+  setTimeout(() => {
 
-    const { error: profileError } =
-      await supabase
-        .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email,
-          nickname,
-          age: age ? Number(age) : null,
-          gender,
-          looking_for,
-          city,
-          bio
-        })
+    window.location.href =
+      'mail-confirm.html'
 
-    if (profileError) {
-      showMessage(
-        profileError.message,
-        'error'
-      )
-      return
-    }
+  }, 1200)
 
-    showMessage(
-      'Регистрация успешна',
-      'success'
-    )
-
-    setTimeout(() => {
-      window.location.href = 'log.html'
-    }, 1000)
-
-  })
+})
 
 </script>
 
