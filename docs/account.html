@@ -37,13 +37,12 @@
 <p id="status"></p>
 
 <script type="module">
-
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
 const supabase = createClient(
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-  'ТВОЙ_PUBLISHABLE_KEY'
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
 )
 
 const nameInput =
@@ -58,6 +57,22 @@ const birthdayInput =
 const statusText =
   document.getElementById('status')
 
+const params =
+  new URLSearchParams(window.location.search)
+
+const userId =
+  params.get('id')
+
+const userEmail =
+  params.get('email')
+
+if (!userId || !userEmail) {
+
+  statusText.textContent =
+    'Не передан id или email'
+
+}
+
 async function saveAccount() {
 
   const name =
@@ -68,6 +83,15 @@ async function saveAccount() {
 
   const birthday =
     birthdayInput.value
+
+  if (!userId || !userEmail) {
+
+    statusText.textContent =
+      'Нет данных пользователя'
+
+    return
+
+  }
 
   if (!name || !gender || !birthday) {
 
@@ -81,44 +105,21 @@ async function saveAccount() {
   statusText.textContent =
     'Сохраняем...'
 
-  /*
-  Получаем пользователя
-  */
-
-  const { data, error } =
-    await supabase.auth.getUser()
-
-  if (error || !data.user) {
-
-    statusText.textContent =
-      'Пользователь не найден'
-
-    return
-
-  }
-
-  const user =
-    data.user
-
-  /*
-  Сохраняем в accounts
-  */
-
-  const { error: saveError } =
+  const { error } =
     await supabase
       .from('accounts')
       .upsert({
-        id: user.id,
-        email: user.email,
+        id: userId,
+        email: userEmail,
         name: name,
         gender: gender,
         birthday: birthday
       })
 
-  if (saveError) {
+  if (error) {
 
     statusText.textContent =
-      'Ошибка: ' + saveError.message
+      'Ошибка: ' + error.message
 
     return
 
@@ -127,10 +128,6 @@ async function saveAccount() {
   statusText.textContent =
     'Сохранено'
 
-  /*
-  Переход на main
-  */
-
   window.location.href =
     'main.html'
 
@@ -138,7 +135,6 @@ async function saveAccount() {
 
 window.saveAccount =
   saveAccount
-
 </script>
 
 </body>
