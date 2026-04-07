@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Подтверждение почты</title>
+
+</head>
+
+<body>
+
+<!-- КНОПКА НАЗАД -->
+
+<button onclick="window.location.href='index.html'">
+Назад
+</button>
+
+
+<h2>
+Подтверждение почты
+</h2>
+
+<div>
+
+  <p id="status">
+
+    Проверяем подтверждение...
+
+  </p>
+
+</div>
+
+<br>
+
+<div>
+
+  <button onclick="checkEmail()">
+
+    Проверить снова
+
+  </button>
+
+  <button onclick="goMain()">
+
+    На главную
+
+  </button>
+
+</div>
+
+<script type="module">
+
+/*
+Подключаем Supabase
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+Твой проект
+*/
+
+const supabase = createClient(
+
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+
+)
+
+const statusText =
+  document.getElementById('status')
+
+/*
+Проверка подтверждения почты
+*/
+
+async function checkEmail() {
+
+  statusText.textContent =
+    'Проверяем...'
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  if (error || !data.user) {
+
+    statusText.textContent =
+      'Пользователь не найден'
+
+    return
+
+  }
+
+  const user =
+    data.user
+
+  /*
+  Проверяем подтверждение
+  */
+
+  if (user.email_confirmed_at) {
+
+    statusText.textContent =
+      'Почта подтверждена'
+
+  }
+
+  else {
+
+    statusText.textContent =
+      'Почта еще не подтверждена'
+
+  }
+
+}
+
+/*
+Переход на главную
+*/
+
+function goMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+
+window.goMain = goMain
+
+/*
+Проверяем сразу при загрузке
+*/
+
+checkEmail()
+
+</script>
+
+</body>
+</html>
