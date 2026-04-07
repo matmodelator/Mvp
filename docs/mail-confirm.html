@@ -2,80 +2,50 @@
 <html lang="ru">
 
 <head>
-
   <meta charset="UTF-8">
   <title>Подтверждение почты</title>
-
 </head>
 
 <body>
 
-<!-- КНОПКА НАЗАД -->
-
 <button onclick="window.location.href='index.html'">
-Назад
+  Назад
 </button>
 
-
 <h2>
-Подтверждение почты
+  Подтверждение почты
 </h2>
 
 <div>
-
   <p id="status">
-
     Проверяем подтверждение...
-
   </p>
-
 </div>
 
 <br>
 
 <div>
-
   <button onclick="checkEmail()">
-
     Проверить снова
-
   </button>
 
   <button onclick="goMain()">
-
     На главную
-
   </button>
-
 </div>
 
 <script type="module">
 
-/*
-Подключаем Supabase
-*/
-
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
-/*
-Твой проект
-*/
-
 const supabase = createClient(
-
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-
 )
 
 const statusText =
   document.getElementById('status')
-
-/*
-Проверка подтверждения почты
-*/
 
 async function checkEmail() {
 
@@ -91,54 +61,30 @@ async function checkEmail() {
       'Пользователь не найден'
 
     return
-
   }
 
   const user =
     data.user
 
-  /*
-  Проверяем подтверждение
-  
-
   if (user.email_confirmed_at) {
 
     statusText.textContent =
-      'Почта подтверждена'*/
+      'Почта подтверждена'
 
-if (user.email_confirmed_at) {
+    const userId =
+      encodeURIComponent(user.id)
 
-  statusText.textContent =
-    'Почта подтверждена'
-
-  const userId =
-    encodeURIComponent(user.id)
-
-  const userEmail =
-    encodeURIComponent(user.email || '')
-
-  setTimeout(function () {
-
-    window.location.href =
-      `account.html?id=${userId}&email=${userEmail}`
-
-  }, 1000)
-
-}
-    
-    /*
-    Переход на account.html
-    */
+    const userEmail =
+      encodeURIComponent(user.email || '')
 
     setTimeout(function () {
 
       window.location.href =
-        'account.html'
+        `account.html?id=${userId}&email=${userEmail}`
 
     }, 1000)
 
   }
-
   else {
 
     statusText.textContent =
@@ -148,10 +94,6 @@ if (user.email_confirmed_at) {
 
 }
 
-/*
-Переход на главную
-*/
-
 function goMain() {
 
   window.location.href =
@@ -160,10 +102,7 @@ function goMain() {
 }
 
 window.goMain = goMain
-
-/*
-Проверяем сразу при загрузке
-*/
+window.checkEmail = checkEmail
 
 checkEmail()
 
