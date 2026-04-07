@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Восстановление пароля</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    p {
+      margin: 0 0 24px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #555;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      outline: none;
+      margin-bottom: 16px;
+    }
+
+    input[type="email"]:focus {
+      border-color: #2d6cdf;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #2d6cdf;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1f57b8;
+    }
+
+    .message {
+      margin-top: 16px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .message.success {
+      color: #147a2e;
+    }
+
+    .message.error {
+      color: #b42318;
+    }
+
+    .footer-link {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .footer-link a {
+      color: #2d6cdf;
+      text-decoration: none;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Восстановление пароля</h1>
+    <p>
+      Укажите email, который вы использовали при регистрации.
+      Мы отправим ссылку для сброса пароля.
+    </p>
+
+    <form id="forgotPasswordForm">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="example@mail.com"
+        required
+      />
+
+      <button type="submit">Отправить ссылку</button>
+    </form>
+
+    <div id="successMessage" class="message success">
+      Если такой email найден, инструкция по восстановлению уже отправлена.
+    </div>
+
+    <div id="errorMessage" class="message error">
+      Не удалось отправить запрос. Попробуйте позже.
+    </div>
+
+    <div class="footer-link">
+      <a href="/login.html">Вернуться ко входу</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('forgotPasswordForm');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+
+      try {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+          throw new Error('Request failed');
+        }
+
+        successMessage.style.display = 'block';
+        form.reset();
+      } catch (error) {
+        errorMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
