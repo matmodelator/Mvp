@@ -106,6 +106,17 @@ async function checkEmail() {
     statusText.textContent =
       'Почта подтверждена'
 
+    /*
+    Переход на account.html
+    */
+
+    setTimeout(function () {
+
+      window.location.href =
+        'account.html'
+
+    }, 1000)
+
   }
 
   else {
