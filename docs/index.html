@@ -1,16 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
+  <!-- Кодировка -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Адаптация под мобильные -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <!-- Заголовок страницы -->
   <title>Навигация</title>
 
+  <!-- ========================= -->
+  <!-- СТИЛИ -->
+  <!-- ========================= -->
+
   <style>
+
+    /* общий фон страницы */
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
       margin: 0;
     }
+
+    /* верхняя панель */
 
     header {
       background: #2563eb;
@@ -18,6 +35,8 @@
       padding: 16px;
       text-align: center;
     }
+
+    /* центральный блок */
 
     .container {
       max-width: 600px;
@@ -29,9 +48,7 @@
       text-align: center;
     }
 
-    h2 {
-      margin-top: 0;
-    }
+    /* блок кнопок */
 
     .buttons {
       margin-top: 24px;
@@ -39,6 +56,8 @@
       flex-direction: column;
       gap: 12px;
     }
+
+    /* кнопка */
 
     button {
       padding: 12px;
@@ -54,6 +73,8 @@
       background: #1d4ed8;
     }
 
+    /* кнопка выхода */
+
     .secondary {
       background: #e5e7eb;
       color: #111;
@@ -62,6 +83,8 @@
     .secondary:hover {
       background: #d1d5db;
     }
+
+    /* кнопка подтверждения */
 
     .warning {
       background: #f59e0b;
@@ -72,133 +95,236 @@
       background: #d97706;
     }
 
+    /* сообщение */
+
     .msg {
       margin-top: 16px;
       font-size: 14px;
       color: #555;
     }
+
   </style>
+
 </head>
+
 <body>
 
+<!-- ========================= -->
+<!-- ШАПКА -->
+<!-- ========================= -->
+
 <header>
-  <h1>Dating App MVP</h1>
+
+  <h1>
+    Dating App MVP
+  </h1>
+
 </header>
+
+<!-- ========================= -->
+<!-- ОСНОВНОЙ БЛОК -->
+<!-- ========================= -->
 
 <div class="container">
 
-  <h2>Навигация</h2>
+  <h2>
+    Навигация
+  </h2>
 
-  <!-- здесь показываем текущего пользователя -->
+  <!-- Здесь показывается email пользователя -->
+
   <p id="welcome">
+
     Проверяем сессию...
+
   </p>
+
+  <!-- ========================= -->
+  <!-- КНОПКИ -->
+  <!-- ========================= -->
 
   <div class="buttons">
 
-    <!-- переход на основную главную страницу -->
+    <!-- Переход на основную страницу приложения -->
+
     <button onclick="goMain()">
       Главная
     </button>
 
-    <!-- переход на страницу подтверждения почты -->
-    <button class="warning" onclick="goMail()">
+    <!-- Переход на страницу подтверждения почты -->
+
+    <button class="warning"
+            onclick="goMailConfirm()">
       Подтверждение почты
     </button>
 
-    <!-- выход из системы -->
-    <button class="secondary" onclick="logout()">
+    <!-- Выход из системы -->
+
+    <button class="secondary"
+            onclick="logout()">
       Выход
     </button>
 
   </div>
 
-  <div id="message" class="msg"></div>
+  <!-- Сообщения системы -->
+
+  <div id="message"
+       class="msg">
+  </div>
 
 </div>
 
+<!-- ========================= -->
+<!-- SCRIPT -->
+<!-- ========================= -->
+
 <script type="module">
-  /*
-    Подключаем Supabase
-  */
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+================================
+Подключаем Supabase
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+/*
+================================
+Создаем подключение
+================================
+*/
+
+const supabase = createClient(
+
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+
+)
+
+/*
+================================
+Получаем элементы страницы
+================================
+*/
+
+const welcome =
+  document.getElementById('welcome')
+
+const message =
+  document.getElementById('message')
+
+/*
+================================
+Проверяем пользователя
+================================
+*/
+
+async function checkUser() {
+
+  const { data, error } =
+    await supabase.auth.getUser()
 
   /*
-    Создаем соединение с проектом
+  Если пользователь не найден —
+  отправляем на страницу входа
   */
-  const supabase = createClient(
-    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-  )
 
-  /*
-    Получаем элементы страницы
-  */
-  const welcome = document.getElementById('welcome')
-  const message = document.getElementById('message')
+  if (error || !data.user) {
 
-  /*
-    Проверяем, вошел ли пользователь
-  */
-  async function checkUser() {
-    const { data, error } = await supabase.auth.getUser()
+    window.location.href =
+      'log.html'
 
-    /*
-      Если сессии нет — отправляем на log.html
-    */
-    if (error || !data.user) {
-      window.location.href = 'log.html'
-      return
-    }
+    return
 
-    /*
-      Если пользователь найден — показываем email
-    */
-    const user = data.user
-    welcome.textContent = `Вы вошли как: ${user.email}`
   }
 
   /*
-    Переход на главную страницу приложения
+  Показываем email пользователя
   */
-  function goMain() {
-    window.location.href = 'main.html'
+
+  const user =
+    data.user
+
+  welcome.textContent =
+    `Вы вошли как: ${user.email}`
+
+}
+
+/*
+================================
+Переход на главную страницу
+================================
+*/
+
+function goMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+
+/*
+================================
+Переход на подтверждение почты
+================================
+*/
+
+function goMailConfirm() {
+
+  window.location.href =
+    'mail-confirm.html'
+
+}
+
+/*
+================================
+Выход из системы
+================================
+*/
+
+async function logout() {
+
+  message.textContent =
+    'Выходим...'
+
+  const { error } =
+    await supabase.auth.signOut()
+
+  if (error) {
+
+    message.textContent =
+      error.message
+
+    return
+
   }
 
-  /*
-    Переход на страницу подтверждения почты
-  */
-  function goMail() {
-    window.location.href = 'mail.html'
-  }
+  window.location.href =
+    'log.html'
 
-  /*
-    Выход из системы
-  */
-  async function logout() {
-    message.textContent = 'Выходим...'
+}
 
-    const { error } = await supabase.auth.signOut()
+/*
+================================
+Делаем функции доступными кнопкам
+================================
+*/
 
-    if (error) {
-      message.textContent = error.message
-      return
-    }
+window.goMain = goMain
+window.goMailConfirm = goMailConfirm
+window.logout = logout
 
-    window.location.href = 'log.html'
-  }
+/*
+================================
+Запуск проверки при загрузке
+================================
+*/
 
-  /*
-    Делаем функции доступными кнопкам
-  */
-  window.goMain = goMain
-  window.goMail = goMail
-  window.logout = logout
+checkUser()
 
-  /*
-    Проверяем пользователя при загрузке страницы
-  */
-  checkUser()
 </script>
 
 </body>
