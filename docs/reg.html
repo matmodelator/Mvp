@@ -9,11 +9,6 @@
 
   <title>Регистрация</title>
 
-  <!--
-  ========================================
-  ОБЩИЕ СТИЛИ СТАРТОВЫХ СТРАНИЦ
-  ========================================
-  -->
   <link rel="stylesheet" href="styles/start.css" />
 
 </head>
@@ -28,13 +23,7 @@
 
   <h2>Регистрация</h2>
 
-  <!-- ========================= -->
-  <!-- ФОРМА РЕГИСТРАЦИИ -->
-  <!-- ========================= -->
-
   <form id="registerForm">
-
-    <!-- EMAIL -->
 
     <input
       id="email"
@@ -42,8 +31,6 @@
       placeholder="Email"
       required
     />
-
-    <!-- ПАРОЛЬ -->
 
     <div class="password-row">
 
@@ -65,8 +52,6 @@
 
     </div>
 
-    <!-- КНОПКА РЕГИСТРАЦИИ -->
-
     <button
       type="submit"
       class="submit-button"
@@ -76,19 +61,7 @@
 
   </form>
 
-  <!--
-  ========================================
-  СООБЩЕНИЕ СТАТУСА
-  ========================================
-  -->
-
   <div id="message" class="msg"></div>
-
-  <!--
-  ========================================
-  КНОПКИ ПЕРЕХОДА
-  ========================================
-  -->
 
   <div
     id="actionButtons"
@@ -99,6 +72,7 @@
     <button
       id="toConfirm"
       class="submit-button"
+      type="button"
     >
       Перейти к подтверждению e-mail
     </button>
@@ -106,6 +80,7 @@
     <button
       id="toIndex"
       class="secondary-button"
+      type="button"
     >
       На index
     </button>
@@ -121,12 +96,6 @@
 </div>
 
 <script type="module">
-
-/*
-================================
-ПОДКЛЮЧАЕМ SUPABASE
-================================
-*/
 
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
@@ -176,9 +145,7 @@ function togglePassword() {
     input.type = 'text'
     button.textContent = '🙈'
 
-  }
-
-  else {
+  } else {
 
     input.type = 'password'
     button.textContent = '👁'
@@ -196,9 +163,7 @@ window.togglePassword = togglePassword
 */
 
 function showButtons() {
-
   actionButtons.style.display = 'flex'
-
 }
 
 /*
@@ -209,7 +174,7 @@ function showButtons() {
 
 form.addEventListener(
   'submit',
-  async (event) => {
+  async function (event) {
 
     event.preventDefault()
 
@@ -225,19 +190,11 @@ form.addEventListener(
     const password =
       document.getElementById('password').value
 
-    /*
-    ПЫТАЕМСЯ ЗАРЕГИСТРИРОВАТЬСЯ
-    */
-
     const { error } =
       await supabase.auth.signUp({
         email,
         password
       })
-
-    /*
-    ЕСЛИ ЯВНАЯ ОШИБКА
-    */
 
     if (error) {
 
@@ -250,14 +207,6 @@ form.addEventListener(
       return
 
     }
-
-    /*
-    ВАЖНО:
-    Мы НЕ можем надежно определить,
-    существует ли пользователь.
-
-    Поэтому сообщение нейтральное.
-    */
 
     message.textContent =
       'Если этот e-mail можно зарегистрировать, письмо для подтверждения отправлено. Проверьте почту.'
@@ -276,47 +225,13 @@ form.addEventListener(
 ================================
 */
 
-/*
-Переход после регистрации
-*/
-
-toAccount.addEventListener('click', function () {
-
-  window.location.href =
-    'account.html'
-
-})
-
-/*
-Назад на главную
-*/
-
-toIndex.addEventListener('click', function () {
-
-  window.location.href =
-    'index.html'
-
-})
-  
-/*
-================================
-ПЕРЕХОДЫ
-================================
-
-
 toConfirm.addEventListener('click', function () {
-
-  window.location.href =
-    'mail-confirm.html'
-
+  window.location.href = 'mail-confirm.html'
 })
 
 toIndex.addEventListener('click', function () {
-
-  window.location.href =
-    'index.html'
-
-})*/
+  window.location.href = 'index.html'
+})
 
 </script>
 
