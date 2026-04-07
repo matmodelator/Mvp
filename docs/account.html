@@ -2,69 +2,143 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Регистрация</title>
+  <title>Аккаунт</title>
 </head>
 <body>
 
-  <h2>Регистрация</h2>
+<h2>Заполните аккаунт</h2>
 
-  <input id="email" type="email" placeholder="Email" />
-  <br><br>
+<div>
+  <input id="name" type="text" placeholder="Ваше имя" />
+</div>
 
-  <input id="password" type="password" placeholder="Пароль" />
-  <br><br>
+<br>
 
-  <button onclick="signUp()">Зарегистрироваться</button>
+<div>
+  <select id="gender">
+    <option value="">Выберите пол</option>
+    <option value="male">Мужской</option>
+    <option value="female">Женский</option>
+  </select>
+</div>
 
-  <p id="status"></p>
+<br>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+<div>
+  <input id="birthday" type="date" />
+</div>
 
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'ТВОЙ_PUBLISHABLE_KEY'
-    )
+<br>
 
-    const emailInput = document.getElementById('email')
-    const passwordInput = document.getElementById('password')
-    const statusText = document.getElementById('status')
+<button onclick="saveAccount()">
+Сохранить
+</button>
 
-    async function signUp() {
-      const email = emailInput.value.trim()
-      const password = passwordInput.value.trim()
+<p id="status"></p>
 
-      if (!email || !password) {
-        statusText.textContent = 'Заполни email и пароль'
-        return
-      }
+<script type="module">
 
-      statusText.textContent = 'Регистрируем...'
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'ТВОЙ_PUBLISHABLE_KEY'
+)
+
+const nameInput =
+  document.getElementById('name')
+
+const genderInput =
+  document.getElementById('gender')
+
+const birthdayInput =
+  document.getElementById('birthday')
+
+const statusText =
+  document.getElementById('status')
+
+async function saveAccount() {
+
+  const name =
+    nameInput.value.trim()
+
+  const gender =
+    genderInput.value
+
+  const birthday =
+    birthdayInput.value
+
+  if (!name || !gender || !birthday) {
+
+    statusText.textContent =
+      'Заполни все поля'
+
+    return
+
+  }
+
+  statusText.textContent =
+    'Сохраняем...'
+
+  /*
+  Получаем пользователя
+  */
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  if (error || !data.user) {
+
+    statusText.textContent =
+      'Пользователь не найден'
+
+    return
+
+  }
+
+  const user =
+    data.user
+
+  /*
+  Сохраняем в accounts
+  */
+
+  const { error: saveError } =
+    await supabase
+      .from('accounts')
+      .upsert({
+        id: user.id,
+        name: name,
+        gender: gender,
+        birthday: birthday
       })
 
-      if (error) {
-        statusText.textContent = error.message
-        return
-      }
+  if (saveError) {
 
-      // Если появилась сессия или хотя бы user — переходим на заполнение аккаунта
-      if (data.session || data.user) {
-        statusText.textContent = 'Регистрация успешна'
-        window.location.href = 'account.html'
-        return
-      }
+    statusText.textContent =
+      'Ошибка: ' + saveError.message
 
-      // Если сессии нет, значит обычно нужно подтвердить email
-      statusText.textContent = 'Подтверди почту'
-      window.location.href = 'confirm.html'
-    }
+    return
 
-    window.signUp = signUp
-  </script>
+  }
+
+  statusText.textContent =
+    'Сохранено'
+
+  /*
+  Переход на main
+  */
+
+  window.location.href =
+    'main.html'
+
+}
+
+window.saveAccount =
+  saveAccount
+
+</script>
 
 </body>
 </html>
