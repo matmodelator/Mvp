@@ -102,7 +102,7 @@
         placeholder="Email"
         required
       />
-      <button type="submit">Отправить ссылку</button>
+      <button type="submit">Отправить код</button>
     </form>
 
     <div id="status"></div>
@@ -110,6 +110,49 @@
     <a class="link-back" href="index.html">Назад</a>
   </div>
 
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+  const SUPABASE_URL = 'https://fnodbpiwkkrdgqvmyanq.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  const form = document.getElementById('recoveryForm')
+  const emailInput = document.getElementById('email')
+  const statusEl = document.getElementById('status')
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault()
+
+    statusEl.textContent = 'Отправляем код...'
+    statusEl.className = ''
+
+    const email = emailInput.value.trim()
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email)
+
+    if (error) {
+      statusEl.textContent = 'Ошибка: ' + error.message
+      statusEl.className = 'error'
+      return
+    }
+
+    statusEl.textContent = 'Если это правильный адрес, то код отправлен. Переходим к смене пароля...'
+    statusEl.className = 'success'
+
+    setTimeout(function () {
+      window.location.href =
+        'up-pass.html?email=' + encodeURIComponent(email)
+    }, 700)
+  })
+</script>
+
+  
+
+
+<!--  
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -145,5 +188,7 @@
       statusEl.className = 'success'
     })
   </script>
+-->
+  
 </body>
 </html>
