@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
+    }
+
+    .links {
+      margin-top: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Регистрация</h2>
+
+  <form id="registerForm">
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+      required
+    />
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Пароль"
+      required
+    />
+
+    <input
+      id="nickname"
+      type="text"
+      placeholder="Ник"
+      required
+    />
+
+    <input
+      id="age"
+      type="number"
+      placeholder="Возраст"
+      min="18"
+      max="99"
+    />
+
+    <select id="gender">
+      <option value="">Ваш пол</option>
+      <option value="male">Мужчина</option>
+      <option value="female">Женщина</option>
+    </select>
+
+    <select id="looking_for">
+      <option value="">Кого ищете</option>
+      <option value="male">Мужчину</option>
+      <option value="female">Женщину</option>
+      <option value="any">Не важно</option>
+    </select>
+
+    <input
+      id="city"
+      type="text"
+      placeholder="Город"
+    />
+
+    <textarea
+      id="bio"
+      placeholder="О себе"
+    ></textarea>
+
+    <button type="submit">
+      Зарегистрироваться
+    </button>
+
+  </form>
+
+  <div id="message" class="msg"></div>
+
+  <div class="links">
+    <a href="log.html">
+      Уже есть аккаунт? Войти
+    </a>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+const form =
+  document.getElementById('registerForm')
+
+const message =
+  document.getElementById('message')
+
+function showMessage(text, type = '') {
+  message.textContent = text
+  message.className = `msg ${type}`
+}
+
+form.addEventListener(
+  'submit',
+  async (event) => {
+
+    event.preventDefault()
+
+    showMessage('Создаем аккаунт...')
+
+    const email =
+      document.getElementById('email').value.trim()
+
+    const password =
+      document.getElementById('password').value
+
+    const nickname =
+      document.getElementById('nickname').value.trim()
+
+    const age =
+      document.getElementById('age').value
+
+    const gender =
+      document.getElementById('gender').value
+
+    const looking_for =
+      document.getElementById('looking_for').value
+
+    const city =
+      document.getElementById('city').value.trim()
+
+    const bio =
+      document.getElementById('bio').value.trim()
+
+    // 1. создаем пользователя
+
+    const { data, error } =
+      await supabase.auth.signUp({
+        email,
+        password
+      })
+
+    if (error) {
+      showMessage(error.message, 'error')
+      return
+    }
+
+    const user = data.user
+
+    if (!user) {
+      showMessage(
+        'Не удалось создать пользователя',
+        'error'
+      )
+      return
+    }
+
+    // 2. создаем профиль
+
+    const { error: profileError } =
+      await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          nickname,
+          age: age ? Number(age) : null,
+          gender,
+          looking_for,
+          city,
+          bio
+        })
+
+    if (profileError) {
+      showMessage(
+        profileError.message,
+        'error'
+      )
+      return
+    }
+
+    showMessage(
+      'Регистрация успешна',
+      'success'
+    )
+
+    setTimeout(() => {
+      window.location.href = 'log.html'
+    }, 1000)
+
+  })
+
+</script>
+
+</body>
+</html>
