@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Подтверждение почты</title>
+  <title>Вход по коду</title>
 
   <style>
     body {
@@ -28,8 +28,7 @@
     }
 
     h2 {
-      margin-top: 0;
-      margin-bottom: 18px;
+      margin: 0 0 18px 0;
       text-align: center;
     }
 
@@ -71,6 +70,7 @@
       text-align: center;
       font-size: 15px;
       min-height: 22px;
+      line-height: 1.4;
     }
 
     .user-data {
@@ -80,6 +80,7 @@
       word-break: break-word;
       text-align: center;
       min-height: 18px;
+      line-height: 1.4;
     }
 
     .buttons-row {
@@ -98,11 +99,11 @@
 
   <div class="box">
 
-    <button class="secondary" onclick="goMain()">
+    <button class="secondary" onclick="goBack()">
       Назад
     </button>
 
-    <h2>Подтверждение почты</h2>
+    <h2>Вход по коду из email</h2>
 
     <div class="field">
       <input
@@ -113,10 +114,15 @@
       />
     </div>
 
-    <div class="field">
+    <button class="primary" onclick="sendCode()">
+      Отправить код
+    </button>
+
+    <div class="field" style="margin-top: 14px;">
       <input
         id="code"
         type="text"
+        inputmode="numeric"
         placeholder="Введите код из письма"
         autocomplete="one-time-code"
       />
@@ -127,8 +133,8 @@
     </button>
 
     <div class="buttons-row">
-      <button class="secondary" onclick="checkEmail()">
-        Проверить снова
+      <button class="secondary" onclick="checkSession()">
+        Проверить сессию
       </button>
 
       <button class="secondary" onclick="goHome()">
@@ -136,10 +142,7 @@
       </button>
     </div>
 
-    <div id="status" class="status">
-      Проверяем подтверждение...
-    </div>
-
+    <div id="status" class="status"></div>
     <div id="userData" class="user-data"></div>
 
   </div>
@@ -153,17 +156,17 @@
       'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
     )
 
-    const statusText = document.getElementById('status')
-    const userDataText = document.getElementById('userData')
     const emailInput = document.getElementById('email')
     const codeInput = document.getElementById('code')
+    const statusText = document.getElementById('status')
+    const userDataText = document.getElementById('userData')
 
     function getEmailFromUrl() {
       const params = new URLSearchParams(window.location.search)
       return (params.get('email') || '').trim()
     }
 
-    function getStoredEmail() {
+    function getSavedEmail() {
       return (
         localStorage.getItem('email') ||
         sessionStorage.getItem('email') ||
@@ -175,17 +178,52 @@
       return (
         emailInput.value.trim() ||
         getEmailFromUrl() ||
-        getStoredEmail()
+        getSavedEmail()
       )
     }
 
-    function fillEmailIfPossible() {
-      const email =
-        getEmailFromUrl() ||
-        getStoredEmail()
-
+    function fillEmail() {
+      const email = getEmailFromUrl() || getSavedEmail()
       if (email) {
         emailInput.value = email
+      }
+    }
+
+    async function sendCode() {
+      const email = resolveEmail()
+
+      statusText.textContent = ''
+      userDataText.textContent = ''
+
+      if (!email) {
+        statusText.textContent = 'Ошибка: введите email'
+        return
+      }
+
+      statusText.textContent = 'Отправляем код...'
+
+      try {
+        const { data, error } = await supabase.auth.signInWithOtp({
+          email: email,
+          options: {
+            shouldCreateUser: false
+          }
+        })
+
+        if (error) {
+          statusText.textContent = 'Ошибка: ' + error.message
+          return
+        }
+
+        localStorage.setItem('email', email)
+        sessionStorage.setItem('email', email)
+
+        statusText.textContent =
+          'Код отправлен на почту. Проверьте inbox.'
+        userDataText.textContent =
+          'data.user = null, data.session = null — это нормально до ввода кода.'
+      } catch (err) {
+        statusText.textContent = 'Ошибка: ' + err.message
       }
     }
 
@@ -193,6 +231,7 @@
       const email = resolveEmail()
       const code = codeInput.value.trim()
 
+      statusText.textContent = ''
       userDataText.textContent = ''
 
       if (!email) {
@@ -205,63 +244,41 @@
         return
       }
 
-      statusText.textContent = 'Подтверждаем почту...'
+      statusText.textContent = 'Проверяем код...'
 
       try {
-        const { data, error } =
-          await supabase.auth.verifyOtp({
-            email: email,
-            token: String(code),
-            type: 'email'
-          })
+        const {
+          data: { session },
+          error
+        } = await supabase.auth.verifyOtp({
+          email: email,
+          token: code,
+          type: 'email'
+        })
 
         if (error) {
           statusText.textContent = 'Ошибка: ' + error.message
           return
         }
 
-        statusText.textContent = 'Почта подтверждена'
-
-        const user =
-          data?.user ||
-          data?.session?.user ||
-          null
-
-        if (user) {
-          userDataText.textContent =
-            'ID: ' + user.id + ' | EMAIL: ' + user.email
-
-          setTimeout(function () {
-            window.location.href =
-              'account.html?id=' +
-              encodeURIComponent(user.id) +
-              '&email=' +
-              encodeURIComponent(user.email)
-          }, 1000)
-
+        if (!session || !session.user) {
+          statusText.textContent =
+            'Код принят, но сессия не получена'
           return
         }
 
-        const { data: currentUserData, error: currentUserError } =
-          await supabase.auth.getUser()
+        const user = session.user
 
-        if (currentUserError || !currentUserData.user) {
-          userDataText.textContent =
-            'Код принят, но пользователь пока не найден в сессии'
-          return
-        }
-
-        const currentUser = currentUserData.user
-
+        statusText.textContent = 'Вход выполнен'
         userDataText.textContent =
-          'ID: ' + currentUser.id + ' | EMAIL: ' + currentUser.email
+          'ID: ' + user.id + ' | EMAIL: ' + user.email
 
         setTimeout(function () {
           window.location.href =
             'account.html?id=' +
-            encodeURIComponent(currentUser.id) +
+            encodeURIComponent(user.id) +
             '&email=' +
-            encodeURIComponent(currentUser.email)
+            encodeURIComponent(user.email)
         }, 1000)
 
       } catch (err) {
@@ -269,46 +286,30 @@
       }
     }
 
-    async function checkEmail() {
-      statusText.textContent = 'Проверяем...'
+    async function checkSession() {
+      statusText.textContent = 'Проверяем сессию...'
       userDataText.textContent = ''
 
       try {
-        const { data, error } =
-          await supabase.auth.getUser()
+        const { data, error } = await supabase.auth.getUser()
 
         if (error || !data.user) {
-          statusText.textContent =
-            'Сессия не найдена. Введите email и код из письма.'
+          statusText.textContent = 'Сессия не найдена'
           return
         }
 
         const user = data.user
 
-        if (user.email_confirmed_at) {
-          statusText.textContent = 'Почта подтверждена'
-          userDataText.textContent =
-            'ID: ' + user.id + ' | EMAIL: ' + user.email
-
-          setTimeout(function () {
-            window.location.href =
-              'account.html?id=' +
-              encodeURIComponent(user.id) +
-              '&email=' +
-              encodeURIComponent(user.email)
-          }, 1000)
-        } else {
-          statusText.textContent = 'Почта еще не подтверждена'
-          userDataText.textContent =
-            'EMAIL: ' + (user.email || '')
-        }
+        statusText.textContent = 'Пользователь уже вошел'
+        userDataText.textContent =
+          'ID: ' + user.id + ' | EMAIL: ' + user.email
 
       } catch (err) {
         statusText.textContent = 'Ошибка: ' + err.message
       }
     }
 
-    function goMain() {
+    function goBack() {
       window.location.href = 'index.html'
     }
 
@@ -316,13 +317,13 @@
       window.location.href = 'main.html'
     }
 
+    window.sendCode = sendCode
     window.confirmCode = confirmCode
-    window.checkEmail = checkEmail
-    window.goMain = goMain
+    window.checkSession = checkSession
+    window.goBack = goBack
     window.goHome = goHome
 
-    fillEmailIfPossible()
-    checkEmail()
+    fillEmail()
   </script>
 
 </body>
