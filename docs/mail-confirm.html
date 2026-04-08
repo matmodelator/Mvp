@@ -38,7 +38,7 @@
 
 <br><br>
 
-<!--  <input
+<input
   id="code"
   type="text"
   placeholder="Введите 8-значный код"
@@ -48,7 +48,7 @@
   autocomplete="one-time-code"
 />
 
-<br><br>-->
+<br><br>
 
 <button onclick="confirmCode()">
 Подтвердить код
@@ -100,8 +100,8 @@ async function confirmCode() {
   const email =
   new URLSearchParams(window.location.search).get('email') || ''
 
-  /*const code =
-    document.getElementById('code').value.trim()*/
+  const code =
+    document.getElementById('code').value.trim()
 
   if (!code) {
 
@@ -121,8 +121,8 @@ async function confirmCode() {
       await supabase.auth.verifyOtp({
 
     email: email,
-   // token: code,
-    type: 'email'
+    token: code,
+    type: 'signup'
 
       })
 
