@@ -89,6 +89,9 @@ const userDataText =
 
 async function confirmCode() {
 
+  const email =
+  new URLSearchParams(window.location.search).get('email') || ''
+
   const code =
     document.getElementById('code').value.trim()
 
@@ -109,8 +112,9 @@ async function confirmCode() {
     const { data, error } =
       await supabase.auth.verifyOtp({
 
-        token: code,
-        type: 'email'
+    email: email,
+    token: code,
+    type: 'email'
 
       })
 
