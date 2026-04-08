@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Подтверждение почты</title>
+</head>
+
+<body>
+
+<!-- КНОПКА НАЗАД -->
+
+<button onclick="window.location.href='index.html'">
+Назад
+</button>
+
+<h2>
+Подтверждение почты
+</h2>
+
+<div>
+
+  <p id="status">
+    Проверяем подтверждение...
+  </p>
+
+  <p id="userData"></p>
+
+</div>
+
+<br>
+
+<!-- ВВОД КОДА -->
+
+<input
+  id="code"
+  type="text"
+  placeholder="Введите 8-значный код"
+  maxlength="8"
+/>
+
+<br><br>
+
+<button onclick="confirmCode()">
+Подтвердить код
+</button>
+
+<br><br>
+
+<div>
+
+  <button onclick="checkEmail()">
+    Проверить снова
+  </button>
+
+  <button onclick="goMain()">
+    На главную
+  </button>
+
+</div>
+
+<script type="module">
+
+/*
+================================
+Подключаем Supabase
+================================
+*/
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+)
+
+const statusText =
+  document.getElementById('status')
+
+const userDataText =
+  document.getElementById('userData')
+
+/*
+================================
+Подтверждение через код
+================================
+*/
+
+async function confirmCode() {
+
+  const code =
+    document.getElementById('code').value.trim()
+
+  if (!code) {
+
+    statusText.textContent =
+      'Введите код'
+
+    return
+
+  }
+
+  statusText.textContent =
+    'Проверяем код...'
+
+  try {
+
+    const { data, error } =
+      await supabase.auth.verifyOtp({
+
+        token: code,
+        type: 'email'
+
+      })
+
+    if (error) {
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+
+    }
+
+    statusText.textContent =
+      'Код подтвержден'
+
+    /*
+    после подтверждения сразу проверяем пользователя
+    */
+
+    setTimeout(function () {
+
+      checkEmail()
+
+    }, 500)
+
+  }
+
+  catch (err) {
+
+    statusText.textContent =
+      'Ошибка: ' + err.message
+
+  }
+
+}
+
+window.confirmCode = confirmCode
+
+/*
+================================
+Проверка подтверждения почты
+================================
+*/
+
+async function checkEmail() {
+
+  statusText.textContent =
+    'Проверяем...'
+
+  const { data, error } =
+    await supabase.auth.getUser()
+
+  if (error || !data.user) {
+
+    statusText.textContent =
+      'Пользователь не найден'
+
+    return
+  }
+
+  const user =
+    data.user
+
+  if (user.email_confirmed_at) {
+
+    statusText.textContent =
+      'Почта подтверждена'
+
+    const userId =
+      user.id
+
+    const userEmail =
+      user.email
+
+    userDataText.textContent =
+      'ID: ' + userId +
+      ' | EMAIL: ' + userEmail
+
+    /*
+    Переход на account.html
+    */
+
+    setTimeout(function () {
+
+      window.location.href =
+        `account.html?id=${encodeURIComponent(userId)}&email=${encodeURIComponent(userEmail)}`
+
+    }, 3000)
+
+  }
+  else {
+
+    statusText.textContent =
+      'Почта еще не подтверждена'
+
+  }
+
+}
+
+/*
+================================
+Переход на главную
+================================
+*/
+
+function goMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+
+window.goMain = goMain
+window.checkEmail = checkEmail
+
+/*
+================================
+Проверяем сразу при загрузке
+================================
+*/
+
+checkEmail()
+
+</script>
+
+</body>
+</html>
