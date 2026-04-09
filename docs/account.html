@@ -45,7 +45,8 @@
       font-weight: bold;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 10px;
       box-sizing: border-box;
@@ -107,18 +108,45 @@
   </div>
 
   <div class="row">
-    <label for="fullName">Full name</label>
-    <input id="fullName" type="text" />
+    <label for="name">
+      Name
+    </label>
+    <input
+      id="name"
+      type="text"
+    >
   </div>
 
   <div class="row">
-    <label for="username">Username</label>
-    <input id="username" type="text" />
+    <label for="gender">
+      Gender
+    </label>
+    <select id="gender">
+      <option value="">Select</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
   </div>
 
   <div class="row">
-    <label for="website">Website</label>
-    <input id="website" type="text" />
+    <label for="birthday">
+      Birthday
+    </label>
+    <input
+      id="birthday"
+      type="date"
+    >
+  </div>
+
+  <div class="row">
+    <label for="telNumber">
+      Phone number
+    </label>
+    <input
+      id="telNumber"
+      type="text"
+      placeholder="+972501234567"
+    >
   </div>
 
   <div class="buttons">
@@ -126,7 +154,7 @@
       class="save-btn"
       onclick="saveProfile()"
     >
-      Save profile
+      Save account
     </button>
 
     <button
@@ -150,14 +178,17 @@
   const userEmailText =
     document.getElementById('userEmail')
 
-  const fullNameInput =
-    document.getElementById('fullName')
+  const nameInput =
+    document.getElementById('name')
 
-  const usernameInput =
-    document.getElementById('username')
+  const genderInput =
+    document.getElementById('gender')
 
-  const websiteInput =
-    document.getElementById('website')
+  const birthdayInput =
+    document.getElementById('birthday')
+
+  const telNumberInput =
+    document.getElementById('telNumber')
 
   const statusText =
     document.getElementById('status')
@@ -198,66 +229,72 @@
     if (!currentUser) return
 
     statusText.textContent =
-      'Загружаем профиль...'
+      'Loading account...'
 
     const { data, error, status } =
       await supabase
-        .from('profiles')
-        .select('full_name, username, website')
+        .from('accounts')
+        .select(
+          'name, gender, birthday, tel_number'
+        )
         .eq('id', currentUser.id)
         .single()
 
     if (error && status !== 406) {
       statusText.textContent =
-        'Ошибка профиля: ' + error.message
+        'Error: ' + error.message
       return
     }
 
     if (data) {
-      fullNameInput.value =
-        data.full_name || ''
+      nameInput.value =
+        data.name || ''
 
-      usernameInput.value =
-        data.username || ''
+      genderInput.value =
+        data.gender || ''
 
-      websiteInput.value =
-        data.website || ''
+      birthdayInput.value =
+        data.birthday || ''
+
+      telNumberInput.value =
+        data.tel_number || ''
     }
 
     statusText.textContent =
-      'Профиль загружен'
+      'Account loaded'
   }
 
   async function saveProfile() {
     if (!currentUser) {
       statusText.textContent =
-        'Нет пользователя'
+        'No user'
       return
     }
 
     statusText.textContent =
-      'Сохраняем профиль...'
+      'Saving account...'
 
     const { error } =
       await supabase
-        .from('profiles')
+        .from('accounts')
         .upsert({
           id: currentUser.id,
-          full_name: fullNameInput.value.trim() || null,
-          username: usernameInput.value.trim() || null,
-          website: websiteInput.value.trim() || null,
+          name: nameInput.value.trim() || null,
+          gender: genderInput.value || null,
+          birthday: birthdayInput.value || null,
+          tel_number: telNumberInput.value.trim() || null,
           updated_at: new Date().toISOString()
         })
 
     if (error) {
       statusText.textContent =
-        'Ошибка: ' + error.message
+        'Error: ' + error.message
       return
     }
 
     statusText.textContent =
-      'Профиль сохранён'
-  }
+      'Account saved'
+    }
 
   async function logout() {
     await supabase.auth.signOut()
