@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+  <title>Подтверждение email</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin: 8px;
+    }
+
+    #status {
+      min-height: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Подтверждение email</h2>
+
+  <p id="status">
+    Проверяем подтверждение...
+  </p>
+
+  <button onclick="checkUser()">
+    Проверить снова
+  </button>
+
+  <button onclick="window.location.href='index.html'">
+    На главную
+  </button>
+
+</div>
+
+<script type="module">
+  import { supabase } from './supabase-config.js'
+
+  const statusText =
+    document.getElementById('status')
+
+  async function checkUser() {
+    statusText.textContent =
+      'Проверяем сессию...'
+
+    const { data, error } =
+      await supabase.auth.getUser()
+
+    if (error) {
+      statusText.textContent =
+        'Ошибка: ' + error.message
+      return
+    }
+
+    if (!data.user) {
+      statusText.textContent =
+        'Пользователь пока не найден. Если ты только что нажал ссылку в письме, подожди пару секунд и нажми "Проверить снова".'
+      return
+    }
+
+    statusText.textContent =
+      'Почта подтверждена: ' + data.user.email
+
+    setTimeout(function () {
+      window.location.href =
+        'account.html'
+    }, 1000)
+  }
+
+  window.checkUser = checkUser
+
+  checkUser()
+</script>
+
+</body>
+</html>
