@@ -1,3 +1,239 @@
+<script type="module">
+  import { supabase } from './supabase-config.js'
+
+  /*
+  ========================================
+  ПОЛЯ ФОРМЫ
+  ========================================
+  */
+
+  const emailInput =
+    document.getElementById('email')
+
+  const passwordInput =
+    document.getElementById('password')
+
+  const statusText =
+    document.getElementById('status')
+
+  /*
+  ========================================
+  LOGIN
+  ========================================
+  Логика:
+
+  1. Пытаемся выполнить вход
+  2. Если email не подтвержден
+        → check-email.html
+  3. Если другая ошибка
+        → показать сообщение
+  4. Если вход успешен
+        → main.html
+  ========================================
+  */
+
+  async function login() {
+
+    /*
+    Получаем данные из формы
+    */
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    statusText.textContent =
+      'Выполняется вход...'
+
+    /*
+    Выполняем вход через Supabase
+    */
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    /*
+    ========================================
+    ОБРАБОТКА ОШИБКИ
+    ========================================
+    */
+
+    if (error) {
+
+      /* добавлен сценарный блок
+      СПЕЦИАЛЬНЫЙ СЛУЧАЙ:
+
+      Email существует,
+      но НЕ подтвержден
+
+      → отправляем пользователя
+        на страницу проверки почты
+      */
+
+      if (
+        error.message &&
+        error.message.includes(
+          'Email not confirmed'
+        )
+      ) {
+
+        statusText.textContent =
+          'Почта не подтверждена'
+
+        setTimeout(function () {
+
+          window.location.href =
+            'check-email.html'
+
+        }, 500)
+
+        return
+      }
+
+      /* то что было в оригинале
+      Любая другая ошибка:
+
+      - неправильный пароль
+      - пользователь не найден
+      - сеть
+      - rate limit
+      */
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    /*
+    ========================================
+    ВХОД УСПЕШЕН
+    ========================================
+
+    Условия:
+
+    email подтвержден
+    пароль корректный
+    сессия создана
+
+    → переходим в main.html
+    */
+
+    statusText.textContent =
+      'Успешный вход'
+
+    setTimeout(function () {
+  /* то что было в оригинале - переход на аккаунт
+      window.location.href =
+       'account.html' */
+      
+      window.location.href =
+        'main.html'
+
+    }, 300)
+  }
+
+  /*
+  ========================================
+  SIGNUP
+  ========================================
+
+  Логика:
+
+  1. Создаем пользователя
+  2. Supabase отправляет email
+  3. Пользователь идет на
+        check-email.html
+  ========================================
+  */
+
+  async function signup() {
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    statusText.textContent =
+      'Регистрация...'
+
+    /*
+    Создаем пользователя
+
+    emailRedirectTo —
+    куда вернется пользователь
+    после подтверждения email
+    */
+
+    const { error } =
+      await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo:
+            'https://matmodelator.github.io/Mvp/confirm.html'
+        }
+      })
+
+    /*
+    Ошибка регистрации
+    */
+
+    if (error) {
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    /*
+    Регистрация успешна
+
+    Письмо отправлено
+    */
+
+    statusText.textContent =
+      'Письмо отправлено. Проверь почту.'
+
+    /*
+    Переход на страницу ожидания
+    подтверждения email
+    */
+
+    setTimeout(function () {
+
+      window.location.href =
+        'check-email.html'
+
+    }, 800)
+  }
+
+  /*
+  Делаем функции доступными
+  для кнопок onclick
+  */
+
+  window.login = login
+  window.signup = signup
+
+</script>
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
