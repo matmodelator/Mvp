@@ -8,12 +8,6 @@
   <title>Вход / Регистрация</title>
 
   <style>
-    /*
-    ========================================
-    БАЗОВЫЕ СТИЛИ СТРАНИЦЫ
-    ========================================
-    */
-
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -55,6 +49,26 @@
       margin-bottom: 16px;
     }
 
+    /* >>> NEW
+       Обертка для размещения кнопки глаза поверх input
+    */
+    .password-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    /* <<< NEW */
+
     .buttons {
       display: flex;
       gap: 12px;
@@ -88,33 +102,6 @@
 </head>
 <body>
 
-<!--
-========================================
-СИСТЕМНЫЙ FLOW АВТОРИЗАЦИИ
-========================================
-
-index.html
-   ↓
-login.html
-   ↓
-Log in:
-
-если Email not confirmed
-        → check-email.html
-
-если вход успешен
-        → main.html
-
-Sign up:
-
-создаем пользователя
-отправляем письмо
-        → check-email.html
-
-после подтверждения email
-        → confirm.html
--->
-
 <header>
   <h1>Dating App MVP</h1>
 </header>
@@ -123,38 +110,73 @@ Sign up:
 
   <h2>Вход / Регистрация</h2>
 
-  <!--
-  ========================================
-  ФОРМА АВТОРИЗАЦИИ
-  ========================================
-  -->
-
   <form id="authForm">
 
-    <!-- EMAIL -->
+    <label>Email:</label>
 
-    <label for="email">Email:</label>
     <input
       id="email"
       type="email"
       required
     />
 
-    <!-- PASSWORD -->
+    <label>Password:</label>
 
-    <label for="password">Password:</label>
-    <input
-      id="password"
-      type="password"
-      required
-      minlength="6"
-    />
+    <!-- >>> CHANGED
+         Теперь password находится внутри wrapper,
+         чтобы можно было разместить кнопку глаза
+    -->
+    <div class="password-wrapper">
 
-    <!-- КНОПКИ -->
+      <input
+        id="password"
+        type="password"
+        required
+        minlength="6"
+      />
+
+      <!--
+      👁 пароль скрыт
+      🙈 пароль показан
+      -->
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('password', this)"
+      >
+        👁
+      </button>
+
+    </div>
+    <!-- <<< CHANGED -->
+
+    <!-- >>> NEW
+         Новое поле Confirm Password
+         Используется только при регистрации
+    -->
+    <label>Confirm password:</label>
+
+    <div class="password-wrapper">
+
+      <input
+        id="confirmPassword"
+        type="password"
+        minlength="6"
+      />
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('confirmPassword', this)"
+      >
+        👁
+      </button>
+
+    </div>
+    <!-- <<< NEW -->
 
     <div class="buttons">
-
-      <!-- LOGIN -->
 
       <button
         type="button"
@@ -163,8 +185,6 @@ Sign up:
       >
         Log in
       </button>
-
-      <!-- SIGNUP -->
 
       <button
         type="button"
@@ -178,290 +198,68 @@ Sign up:
 
   </form>
 
-  <!-- СТАТУС -->
-
   <p id="status"></p>
 
 </div>
-<script type="module">
-  import { supabase } from './supabase-config.js'
-
-  /*
-  ========================================
-  ПОЛЯ ФОРМЫ
-  ========================================
-  */
-
-  const emailInput =
-    document.getElementById('email')
-
-  const passwordInput =
-    document.getElementById('password')
-
-  const statusText =
-    document.getElementById('status')
-
-  /*
-  ========================================
-  LOGIN
-  ========================================
-  Логика:
-
-  1. Пытаемся выполнить вход
-  2. Если email не подтвержден
-        → check-email.html
-  3. Если другая ошибка
-        → показать сообщение
-  4. Если вход успешен
-        → main.html
-  ========================================
-  */
-
-  async function login() {
-
-    /*
-    Получаем данные из формы
-    */
-
-    const email =
-      emailInput.value.trim()
-
-    const password =
-      passwordInput.value
-
-    statusText.textContent =
-      'Выполняется вход...'
-
-    /*
-    Выполняем вход через Supabase
-    */
-
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-
-    /*
-    ========================================
-    ОБРАБОТКА ОШИБКИ
-    ========================================
-    */
-
-    if (error) {
-
-      /* добавлен сценарный блок
-      СПЕЦИАЛЬНЫЙ СЛУЧАЙ:
-
-      Email существует,
-      но НЕ подтвержден
-
-      → отправляем пользователя
-        на страницу проверки почты
-      */
-
-      if (
-        error.message &&
-        error.message.includes(
-          'Email not confirmed'
-        )
-      ) {
-
-        statusText.textContent =
-          'Почта не подтверждена'
-
-        setTimeout(function () {
-
-          /* то что было в оригинале - переход на аккаунт
-      window.location.href =
-       'account.html' */
-          
-          window.location.href =
-            'check-email.html'
-
-        }, 500)
-
-        return
-      }
-
-      /* то что было в оригинале
-      Любая другая ошибка:
-
-      - неправильный пароль
-      - пользователь не найден
-      - сеть
-      - rate limit
-      */
-
-      statusText.textContent =
-        'Ошибка: ' + error.message
-
-      return
-    }
-
-    /*
-    ========================================
-    ВХОД УСПЕШЕН
-    ========================================
-
-    Условия:
-
-    email подтвержден
-    пароль корректный
-    сессия создана
-
-    → переходим в main.html
-    */
-
-    statusText.textContent =
-      'Успешный вход'
-
-    setTimeout(function () {
-  /* то что было в оригинале - переход на аккаунт
-      window.location.href =
-       'account.html' */
-      
-      window.location.href =
-        'main.html'
-
-    }, 300)
-  }
-
-  /*
-  ========================================
-  SIGNUP
-  ========================================
-
-  Логика:
-
-  1. Создаем пользователя
-  2. Supabase отправляет email
-  3. Пользователь идет на
-        check-email.html
-  ========================================
-  */
-
-  async function signup() {
-
-    const email =
-      emailInput.value.trim()
-
-    const password =
-      passwordInput.value
-
-    statusText.textContent =
-      'Регистрация...'
-
-    /*
-    Создаем пользователя
-
-    emailRedirectTo —
-    куда вернется пользователь
-    после подтверждения email
-    */
-
-    const { error } =
-      await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo:
-            'https://matmodelator.github.io/Mvp/confirm.html'
-        }
-      })
-
-    /*
-    Ошибка регистрации
-    */
-
-    if (error) {
-
-      statusText.textContent =
-        'Ошибка: ' + error.message
-
-      return
-    }
-
-    /*
-    Регистрация успешна
-
-    Письмо отправлено
-    */
-
-    statusText.textContent =
-      'Письмо отправлено. Проверь почту.'
-
-    /*
-    Переход на страницу ожидания
-    подтверждения email
-    */
-
-    setTimeout(function () {
-
-      window.location.href =
-        'check-email.html'
-
-    }, 800)
-  }
-
-  /*
-  Делаем функции доступными
-  для кнопок onclick
-  */
-
-  window.login = login
-  window.signup = signup
-
-</script>
 
 <script type="module">
-
-  /*
-  ========================================
-  ПОДКЛЮЧЕНИЕ SUPABASE
-  ========================================
-  */
 
   import { supabase }
   from './supabase-config.js'
 
-  /*
-  ========================================
-  DOM ЭЛЕМЕНТЫ
-  ========================================
-  */
-
   const emailInput =
     document.getElementById('email')
 
   const passwordInput =
     document.getElementById('password')
 
+  /* >>> NEW
+     Получаем поле confirm password
+  */
+  const confirmPasswordInput =
+    document.getElementById('confirmPassword')
+  /* <<< NEW */
+
   const statusText =
     document.getElementById('status')
 
-  /*
-  ========================================
-  LOGIN
-  ========================================
+  /* >>> NEW
+     Функция переключения видимости пароля
 
-  Логика:
-
-  1. Получаем email и password
-  2. Пытаемся выполнить вход
-  3. Если email не подтвержден
-         → check-email.html
-  4. Если другая ошибка
-         → показать сообщение
-  5. Если вход успешен
-         → main.html
+     👁 — пароль скрыт
+     🙈 — пароль показан
   */
+  function togglePassword(id, btn) {
+
+    const field =
+      document.getElementById(id)
+
+    if (field.type === 'password') {
+
+      field.type =
+        'text'
+
+      btn.textContent =
+        '🙈'
+
+    }
+    else {
+
+      field.type =
+        'password'
+
+      btn.textContent =
+        '👁'
+
+    }
+
+  }
+
+  window.togglePassword =
+    togglePassword
+  /* <<< NEW */
 
   async function login() {
-
-    /*
-    ЧИТАЕМ ДАННЫЕ ФОРМЫ
-    */
 
     const email =
       emailInput.value.trim()
@@ -472,33 +270,13 @@ Sign up:
     statusText.textContent =
       'Выполняется вход...'
 
-    /*
-    ВЫПОЛНЯЕМ LOGIN
-    */
-
     const { error } =
       await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-    /*
-    ========================================
-    ОБРАБОТКА ОШИБКИ
-    ========================================
-    */
-
     if (error) {
-
-      /* добавлен сценарный блок
-      СПЕЦИАЛЬНЫЙ СЛУЧАЙ:
-
-      Email существует,
-      но НЕ подтвержден
-
-      → отправляем пользователя
-        на страницу проверки почты
-      */
 
       if (
         error.message &&
@@ -520,35 +298,14 @@ Sign up:
         return
       }
 
-      /* то что было в оригинале
-      Любая другая ошибка:
-
-      - неправильный пароль
-      - пользователь не найден
-      - сеть
-      - rate limit
-      */
-
       statusText.textContent =
         'Ошибка: ' + error.message
 
       return
     }
 
-    /*
-    ========================================
-    LOGIN УСПЕШЕН
-    ========================================
-    */
-
     statusText.textContent =
       'Успешный вход'
-
-    /*
-    ПЕРЕХОД:
-
-    → main.html
-    */
 
     setTimeout(function () {
 
@@ -558,19 +315,8 @@ Sign up:
     }, 300)
   }
 
-  /*
-  ========================================
-  SIGNUP
-  ========================================
-
-  Логика:
-
-  1. Создаем пользователя
-  2. Supabase отправляет email
-  3. Пользователь идет на
-
-         → check-email.html
-  */
+  window.login =
+    login
 
   async function signup() {
 
@@ -580,12 +326,24 @@ Sign up:
     const password =
       passwordInput.value
 
+    /* >>> NEW
+       Проверка совпадения паролей
+       Выполняется только при регистрации
+    */
+    const confirmPassword =
+      confirmPasswordInput.value
+
+    if (password !== confirmPassword) {
+
+      statusText.textContent =
+        'Пароли не совпадают'
+
+      return
+    }
+    /* <<< NEW */
+
     statusText.textContent =
       'Регистрация...'
-
-    /*
-    СОЗДАЕМ ПОЛЬЗОВАТЕЛЯ
-    */
 
     const { error } =
       await supabase.auth.signUp({
@@ -594,22 +352,11 @@ Sign up:
         password,
 
         options: {
-
-          /*
-          КУДА ВЕРНЕТСЯ ПОЛЬЗОВАТЕЛЬ
-          ПОСЛЕ ПОДТВЕРЖДЕНИЯ EMAIL
-          */
-
           emailRedirectTo:
             'https://matmodelator.github.io/Mvp/confirm.html'
-
         }
 
       })
-
-    /*
-    ОШИБКА REGISTRATION
-    */
 
     if (error) {
 
@@ -619,18 +366,8 @@ Sign up:
       return
     }
 
-    /*
-    REGISTRATION УСПЕШНА
-    */
-
     statusText.textContent =
       'Письмо отправлено. Проверь почту.'
-
-    /*
-    ПЕРЕХОД:
-
-    → check-email.html
-    */
 
     setTimeout(function () {
 
@@ -639,14 +376,6 @@ Sign up:
 
     }, 800)
   }
-
-  /*
-  ДЕЛАЕМ ФУНКЦИИ ДОСТУПНЫМИ
-  ДЛЯ onclick
-  */
-
-  window.login =
-    login
 
   window.signup =
     signup
