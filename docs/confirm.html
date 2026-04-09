@@ -1,121 +1,114 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
   <title>Подтверждение email</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin: 8px;
+    }
+
+    #status {
+      min-height: 24px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>Подтверждение email...</h2>
-  <p id="status">Проверяем код подтверждения...</p>
- 
-  <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  const client = createClient(
-    "https://fnodbpiwkkrdgqvmyanq.supabase.co",
-    "АНОН_КЛЮЧ"
-  );
+<header>
+  <h1>Dating App MVP</h1>
+</header>
 
-  async function run() {
-    document.body.innerHTML = "<h2>Подтверждение email...</h2>";
+<div class="container">
 
-    // 1. Пробуем query
-    const params = new URLSearchParams(window.location.search);
-    let token = params.get("access_token");
+  <h2>Подтверждение email</h2>
 
-    // 2. Пробуем hash
-    if (!token) {
-      const hash = new URLSearchParams(window.location.hash.substring(1));
-      token = hash.get("access_token");
-    }
+  <p id="status">
+    Проверяем подтверждение...
+  </p>
 
-    if (!token) {
-      document.body.innerHTML += "<p>Ошибка: код подтверждения не найден.</p>";
-      return;
-    }
+  <button onclick="checkUser()">
+    Проверить снова
+  </button>
 
-    const { data, error } = await client.auth.exchangeCodeForSession(token);
+  <button onclick="window.location.href='index.html'">
+    На главную
+  </button>
 
-    if (error) {
-      document.body.innerHTML += "<p>Ошибка: " + error.message + "</p>";
-    } else {
-      document.body.innerHTML += "<p>Email успешно подтверждён!</p>";
-    }
-  }
+</div>
 
-  run();
-</script>
+<script type="module">
+  import { supabase } from './supabase-config.js'
 
-  
-  
-  <!--
-  <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  const statusText =
+    document.getElementById('status')
 
-  const client = createClient(
-    "https://fnodbpiwkkrdgqvmyanq.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I"
-  );
+  async function checkUser() {
+    statusText.textContent =
+      'Проверяем сессию...'
 
-  async function run() {
-    document.body.innerHTML = "<h2>Подтверждение email...</h2>";
-
-    // 1. Пробуем query
-    const params = new URLSearchParams(window.location.search);
-    let token = params.get("access_token");
-
-    // 2. Пробуем hash
-    if (!token) {
-      const hash = new URLSearchParams(window.location.hash.substring(1));
-      token = hash.get("access_token");
-    }
-
-    if (!token) {
-      document.body.innerHTML += "<p>Ошибка: код подтверждения не найден.</p>";
-      return;
-    }
-
-    const { data, error } = await client.auth.exchangeCodeForSession(token);
+    const { data, error } =
+      await supabase.auth.getUser()
 
     if (error) {
-      document.body.innerHTML += "<p>Ошибка: " + error.message + "</p>";
-    } else {
-      document.body.innerHTML += "<p>Email успешно подтверждён!</p>";
+      statusText.textContent =
+        'Ошибка: ' + error.message
+      return
     }
+
+    if (!data.user) {
+      statusText.textContent =
+        'Пользователь пока не найден. Если ты только что нажал ссылку в письме, подожди пару секунд и нажми "Проверить снова".'
+      return
+    }
+
+    statusText.textContent =
+      'Почта подтверждена: ' + data.user.email
+
+    setTimeout(function () {
+      window.location.href =
+        'account.html'
+    }, 1000)
   }
 
-  run();
+  window.checkUser = checkUser
+
+  checkUser()
 </script>
-  
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js';
-
-    // Подключение к Supabase
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
-    );
-
-    // Получаем код из URL
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get('code');
-
-    if (!code) {
-      document.getElementById('status').textContent =
-        'Ошибка: код подтверждения не найден.';
-    } else {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (error) {
-        document.getElementById('status').textContent =
-          'Ошибка подтверждения: ' + error.message;
-      } else {
-        document.getElementById('status').textContent =
-          'Email успешно подтверждён! Теперь вы можете войти.';
-      }
-    }
-  </script>
-  -->
 </body>
 </html>
