@@ -23,10 +23,6 @@
     <h1>Общий чат</h1>
   </header>
 
-  <div class="top-actions">
-    <button onclick="goBack()">Назад</button>
-  </div>
-
   <div class="chat-box">
     <p id="status">Проверяем сессию...</p>
 
@@ -141,6 +137,8 @@ input.addEventListener(
 )
 
 let currentUser = null
+let currentMask = ''
+let currentInkColor = '#111111'
 
 /*
 ===========================================================
@@ -165,6 +163,21 @@ async function loadUser() {
   }
 
   currentUser = data.user
+
+  const { data: chatUser } =
+    await supabase
+      .from('public_chat_users')
+      .select('mask, ink_color')
+      .eq('user_id', currentUser.id)
+      .single()
+
+  if (chatUser) {
+    currentMask =
+      chatUser.mask || ''
+
+    currentInkColor =
+      chatUser.ink_color || '#111111'
+  }
 
 }
 
@@ -226,11 +239,14 @@ function renderMessage(row) {
   */
 
   div.textContent =
-    row.user_email +
+    row.mask +
     ' • ' +
     time +
     ': ' +
     row.message
+
+  div.style.color =
+    row.ink_color || '#111111'
 
   /*
   Добавляем сообщение в чат
@@ -271,6 +287,12 @@ async function sendMessage(event) {
 
       user_email:
         currentUser.email,
+
+      mask:
+        currentMask,
+
+      ink_color:
+        currentInkColor,
 
       message:
         text
@@ -370,7 +392,11 @@ window.goMain = goMain
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-  ✅ рабочий исходник с консолью | v1.0.0
+  ✅ row.name → row.mask_name || row.mask || ''
+✅ row.email → убрать
+✅ в тег с сообщением добавить style="color: ${row.ink_color || '#111'}"
+✅ кнопку Назад удалить
+✅ кнопку Назад на главную оставить | v1.2.0
 
   </div>
 
