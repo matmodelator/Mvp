@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0" />
+
   <title>Аккаунт</title>
 
+  <!-- СТИЛИ СТРАНИЦЫ -->
+
   <style>
+
     /*
     ========================================
     БАЗОВЫЕ СТИЛИ СТРАНИЦЫ
@@ -108,12 +114,15 @@
       color: white;
     }
 
-    .exit-btn {
-      background: #6b7280;
-      color: white;
-    }
   </style>
+
+  <!-- СТИЛЬ КОНСОЛИ -->
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+
 </head>
+
 <body>
 
 <header>
@@ -124,70 +133,84 @@
 
   <h2>Аккаунт</h2>
 
-  <!--
-  ========================================
-  ИНФОРМАЦИЯ О ТЕКУЩЕМ ПОЛЬЗОВАТЕЛЕ
-  ========================================
-  Показываем id и email из auth-пользователя
-  -->
+  <!-- ========================================
+       ИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ
+  ======================================== -->
 
   <div class="meta-box">
-    <div><strong>ID:</strong> <span id="userId">...</span></div>
-    <div><strong>Email:</strong> <span id="userEmail">...</span></div>
+
+    <div>
+      <strong>ID:</strong>
+      <span id="userId">...</span>
+    </div>
+
+    <div>
+      <strong>Email:</strong>
+      <span id="userEmail">...</span>
+    </div>
+
   </div>
 
-  <!--
-  ========================================
-  ПОЛЯ ПРОФИЛЯ
-  ========================================
-  -->
+  <!-- ========================================
+       ПОЛЯ ПРОФИЛЯ
+  ======================================== -->
 
   <div class="row">
+
     <label for="name">
       Name
     </label>
+
     <input
       id="name"
       type="text"
     >
+
   </div>
 
   <div class="row">
+
     <label for="gender">
       Gender
     </label>
+
     <select id="gender">
-      <option value="">Select</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
+
+      <option value="">
+        Select
+      </option>
+
+      <option value="male">
+        Male
+      </option>
+
+      <option value="female">
+        Female
+      </option>
+
     </select>
+
   </div>
 
   <div class="row">
+
     <label for="birthday">
       Birthday
     </label>
+
     <input
       id="birthday"
       type="date"
     >
+
   </div>
 
-  <!-- >>> CHANGED
-       Поле Phone number полностью удалено из формы,
-       потому что tel_number больше не используется в accounts.
-  -->
-  <!-- <<< CHANGED -->
-
-  <!--
-  ========================================
-  ОСНОВНЫЕ КНОПКИ
-  ========================================
-  Save account — сохранить / обновить профиль
-  Sign out     — выйти из аккаунта
-  -->
+  <!-- ========================================
+       ОСНОВНЫЕ КНОПКИ
+  ======================================== -->
 
   <div class="buttons">
+
     <button
       class="save-btn"
       onclick="saveProfile()"
@@ -201,14 +224,20 @@
     >
       Sign out
     </button>
+
   </div>
 
   <p id="status"></p>
+
+  <!-- ========================================
+       КНОПКА ПОСЛЕ СОХРАНЕНИЯ
+  ======================================== -->
 
   <div
     id="afterSaveButtons"
     class="after-save-buttons"
   >
+
     <button
       class="start-btn"
       onclick="goMain()"
@@ -216,306 +245,242 @@
       Start
     </button>
 
-    <button
-      class="exit-btn"
-      onclick="goIndex()"
-    >
-      Exit
-    </button>
   </div>
 
 </div>
 
+<!-- ========================================
+     SCRIPT
+======================================== -->
+
 <script type="module">
-  import { supabase } from './supabase-config.js'
 
-  /*
-  ========================================
-  DOM-ЭЛЕМЕНТЫ
-  ========================================
-  */
+import { supabase }
+from './supabase-config.js'
 
-  const userIdText =
-    document.getElementById('userId')
+let currentUser = null
 
-  const userEmailText =
-    document.getElementById('userEmail')
+const userIdText =
+  document.getElementById('userId')
 
-  const nameInput =
-    document.getElementById('name')
+const userEmailText =
+  document.getElementById('userEmail')
 
-  const genderInput =
-    document.getElementById('gender')
+const nameInput =
+  document.getElementById('name')
 
-  const birthdayInput =
-    document.getElementById('birthday')
+const genderInput =
+  document.getElementById('gender')
 
-  /* >>> CHANGED
-     telNumberInput удалён,
-     потому что поля telNumber больше нет в HTML.
-  */
-  /* <<< CHANGED */
+const birthdayInput =
+  document.getElementById('birthday')
 
-  const statusText =
-    document.getElementById('status')
+const statusText =
+  document.getElementById('status')
 
-  const afterSaveButtons =
-    document.getElementById('afterSaveButtons')
+const afterSaveButtons =
+  document.getElementById('afterSaveButtons')
 
-  /*
-  ========================================
-  ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
-  ========================================
-  Здесь будет храниться объект пользователя
-  из Supabase Auth
-  */
+async function loadAccount() {
 
-  let currentUser = null
+  statusText.textContent =
+    'Checking user...'
 
-  /*
-  ========================================
-  ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ
-  ========================================
-  1. Проверяем, кто вошел в систему
-  2. Если пользователя нет → index.html
-  3. Если есть → показываем id/email
-  4. Потом грузим профиль из accounts
-  */
+  const { data, error } =
+    await supabase.auth.getUser()
 
-  async function loadAccount() {
+  if (error) {
+
     statusText.textContent =
-      'Проверяем пользователя...'
+      'Error: ' + error.message
 
-    const { data, error } =
-      await supabase.auth.getUser()
-
-    if (error) {
-      statusText.textContent =
-        'Ошибка: ' + error.message
-      return
-    }
-
-    if (!data.user) {
-      window.location.href =
-        'index.html'
-      return
-    }
-
-    currentUser = data.user
-
-    userIdText.textContent =
-      currentUser.id
-
-    userEmailText.textContent =
-      currentUser.email
-
-    await loadProfile()
+    return
   }
 
-  /*
-  ========================================
-  ЗАГРУЗКА ПРОФИЛЯ ИЗ accounts
-  ========================================
-  Ищем запись по id текущего пользователя.
-  Если запись есть — подставляем значения в поля.
-  */
-
-  async function loadProfile() {
-    if (!currentUser) return
-
-    statusText.textContent =
-      'Loading account...'
-
-    const { data, error, status } =
-      await supabase
-        .from('accounts')
-        .select(
-          /* >>> CHANGED
-             tel_number удалён из select,
-             загружаем только реально используемые поля.
-          */
-          'name, gender, birthday'
-          /* <<< CHANGED */
-        )
-        .eq('id', currentUser.id)
-        .single()
-
-    /*
-    406 здесь допустим:
-    он означает, что строки может не быть.
-    В этом случае просто оставляем пустую форму.
-    */
-
-    if (error && status !== 406) {
-      statusText.textContent =
-        'Error: ' + error.message
-      return
-    }
-
-    if (data) {
-      nameInput.value =
-        data.name || ''
-
-      genderInput.value =
-        data.gender || ''
-
-      birthdayInput.value =
-        data.birthday || ''
-
-      /* >>> CHANGED
-         Заполнение telNumberInput удалено,
-         потому что такого поля больше нет.
-      */
-      /* <<< CHANGED */
-    }
-
-    statusText.textContent =
-      'Account loaded'
-  }
-
-  /*
-  ========================================
-  СОХРАНЕНИЕ ПРОФИЛЯ
-  ========================================
-  1. Берем значения из формы
-  2. Делаем upsert в accounts
-  3. Если сохранение успешно —
-     показываем Start / Exit
-  */
-
-  async function saveProfile() {
-    if (!currentUser) {
-      statusText.textContent =
-        'No user'
-      return
-    }
-
-    statusText.textContent =
-      'Saving account...'
-
-    afterSaveButtons.style.display =
-      'none'
-
-    const { error } =
-      await supabase
-        .from('accounts')
-        .upsert({
-          id: currentUser.id,
-
-          /*
-          Сохраняем email из auth.users
-          в таблицу accounts.
-          */
-
-          email: currentUser.email,
-
-          name: nameInput.value.trim() || null,
-          gender: genderInput.value || null,
-          birthday: birthdayInput.value || null,
-
-          /* >>> CHANGED
-             tel_number удалён из upsert,
-             поэтому телефон больше не пишется в accounts.
-          */
-          /* <<< CHANGED */
-
-          updated_at: new Date().toISOString()
-        })
-
-    if (error) {
-      statusText.textContent =
-        'Error: ' + error.message
-      return
-    }
-
-    statusText.textContent =
-      'Account saved'
-
-    afterSaveButtons.style.display =
-      'flex'
-  }
-
-  /*
-  ========================================
-  ВЫХОД ИЗ АККАУНТА
-  ========================================
-  Полный sign out из Supabase,
-  затем возврат на index.html
-  */
-
-  async function logout() {
-    await supabase.auth.signOut()
+  if (!data.user) {
 
     window.location.href =
       'index.html'
+
+    return
   }
 
-  /*
-  Переход в основное приложение
-  */
+  currentUser =
+    data.user
 
-  function goMain() {
-    window.location.href =
-      'main.html'
+  userIdText.textContent =
+    currentUser.id
+
+  userEmailText.textContent =
+    currentUser.email
+
+  await loadProfile()
+
+}
+
+async function loadProfile() {
+
+  if (!currentUser)
+    return
+
+  statusText.textContent =
+    'Loading account...'
+
+  const { data, error, status } =
+    await supabase
+      .from('accounts')
+      .select(
+        'name, gender, birthday'
+      )
+      .eq(
+        'id',
+        currentUser.id
+      )
+      .single()
+
+  if (error && status !== 406) {
+
+    statusText.textContent =
+      'Error: ' + error.message
+
+    return
   }
 
-  /*
-  Выход на стартовую страницу
-  без отдельного signOut
-  */
+  if (data) {
 
-  function goIndex() {
-    window.location.href =
-      'index.html'
+    nameInput.value =
+      data.name || ''
+
+    genderInput.value =
+      data.gender || ''
+
+    birthdayInput.value =
+      data.birthday || ''
+
   }
 
-  window.saveProfile = saveProfile
-  window.logout = logout
-  window.goMain = goMain
-  window.goIndex = goIndex
+  statusText.textContent =
+    'Account loaded'
 
-  /*
-  ========================================
-  СТАРТ СТРАНИЦЫ
-  ========================================
-  Сразу проверяем пользователя
-  и загружаем его аккаунт
-  */
+}
 
-  loadAccount()
+async function saveProfile() {
+
+  if (!currentUser) {
+
+    statusText.textContent =
+      'No user'
+
+    return
+  }
+
+  statusText.textContent =
+    'Saving account...'
+
+  afterSaveButtons.style.display =
+    'none'
+
+  const { error } =
+    await supabase
+      .from('accounts')
+      .upsert({
+
+        id:
+          currentUser.id,
+
+        email:
+          currentUser.email,
+
+        name:
+          nameInput.value
+            .trim()
+          || null,
+
+        gender:
+          genderInput.value
+          || null,
+
+        birthday:
+          birthdayInput.value
+          || null,
+
+        updated_at:
+          new Date()
+            .toISOString()
+
+      })
+
+  if (error) {
+
+    statusText.textContent =
+      'Error: ' + error.message
+
+    return
+  }
+
+  statusText.textContent =
+    'Account saved'
+
+  afterSaveButtons.style.display =
+    'flex'
+
+}
+
+async function logout() {
+
+  await supabase
+    .auth
+    .signOut()
+
+  window.location.href =
+    'index.html'
+
+}
+
+function goMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+
+window.saveProfile =
+  saveProfile
+
+window.logout =
+  logout
+
+window.goMain =
+  goMain
+
+loadAccount()
+
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- ========================================
      SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
 ======================================== -->
 
 <div id="service-console">
 
-  <div class="row" id="build-top">
+  <div
+    class="row"
+    id="build-top"
+  >
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-    без ввода телефона. 2 кнопки | v1.1.0
+    кнопка Exit удалена
+функция goIndex() удалена
+стиль консоли вынесен во внешний файл
+подключён styles/console.css
+осталась одна кнопка Start
+сервисная консоль внизу страницы | v1.2.0
 
   </div>
 
-  <div class="row" id="build-down">
+  <div
+    class="row"
+    id="build-down"
+  >
 
     deploy: --
 
@@ -523,106 +488,43 @@
 
 </div>
 
-<!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
-======================================== -->
-
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
+  const now =
+    new Date()
 
-  const now = new Date();
-
-  /* Добавляет ведущий ноль */
-
-  const pad = n =>
-    String(n).padStart(2, '0');
-
-  /* Формат даты */
+  const pad =
+    n =>
+      String(n)
+        .padStart(2, '0')
 
   const date =
       pad(now.getDate())
     + '.'
     + pad(now.getMonth() + 1)
     + '.'
-    + now.getFullYear();
-
-  /* Формат времени */
+    + now.getFullYear()
 
   const time =
       pad(now.getHours())
     + ':'
-    + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
+    + pad(now.getMinutes())
 
   document
-    .getElementById('build-down')
+    .getElementById(
+      'build-down'
+    )
     .textContent =
       'deploy: '
       + date
       + ' '
-      + time;
+      + time
 
 })();
 
 </script>
 
 </body>
-
- /* ========================================
-   SERVICE CONSOLE
-   Показывает версию и время деплоя
-   Всегда закреплена внизу экрана
-======================================== */
-
-#service-console {
-
-  /* Приклеено к низу экрана */
-
-  position: fixed;
-  left: 0;
-  bottom: 0;
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  /* Внешний вид как консоль */
-
-  padding: 6px 10px;
-
-  background: #111;
-  color: #8cff8c;
-
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 1.35;
-
-  border-top: 1px solid #333;
-
-  /* Поверх всех элементов */
-
-  z-index: 9999;
-
-  /* Легкая прозрачность */
-
-  opacity: 0.9;
-}
-
-/* Каждая строка консоли */
-
-#service-console .row {
-
-  display: block;
-
-}
-
-  
 </html>
