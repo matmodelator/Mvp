@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -123,8 +122,8 @@
     <label>Password:</label>
 
     <!-- >>> CHANGED
-         Теперь password находится внутри wrapper,
-         чтобы можно было разместить кнопку глаза
+         Password помещен в wrapper,
+         чтобы добавить кнопку показа/скрытия
     -->
     <div class="password-wrapper">
 
@@ -136,8 +135,8 @@
       />
 
       <!--
-      👁 пароль скрыт
-      🙈 пароль показан
+      👁 — пароль скрыт
+      🙈 — пароль показан
       -->
 
       <button
@@ -152,8 +151,9 @@
     <!-- <<< CHANGED -->
 
     <!-- >>> NEW
-         Новое поле Confirm Password
-         Используется только при регистрации
+         Confirm Password остается в общей форме,
+         но нужен только для Sign up.
+         Поэтому required здесь НЕ ставим.
     -->
     <label>Confirm password:</label>
 
@@ -163,6 +163,7 @@
         id="confirmPassword"
         type="password"
         minlength="6"
+        placeholder="Only for sign up"
       />
 
       <button
@@ -214,7 +215,8 @@
     document.getElementById('password')
 
   /* >>> NEW
-     Получаем поле confirm password
+     Поле confirm password.
+     Используется только в signup()
   */
   const confirmPasswordInput =
     document.getElementById('confirmPassword')
@@ -223,11 +225,12 @@
   const statusText =
     document.getElementById('status')
 
-  /* >>> NEW
-     Функция переключения видимости пароля
+  /* >>> CHANGED
+     togglePassword меняет и тип поля,
+     и символ на кнопке:
 
-     👁 — пароль скрыт
-     🙈 — пароль показан
+     👁 — скрыто
+     🙈 — показано
   */
   function togglePassword(id, btn) {
 
@@ -257,7 +260,7 @@
 
   window.togglePassword =
     togglePassword
-  /* <<< NEW */
+  /* <<< CHANGED */
 
   async function login() {
 
@@ -327,11 +330,19 @@
       passwordInput.value
 
     /* >>> NEW
-       Проверка совпадения паролей
-       Выполняется только при регистрации
+       Confirm password обязателен
+       только для Sign up
     */
     const confirmPassword =
-      confirmPasswordInput.value
+      confirmPasswordInput.value.trim()
+
+    if (!confirmPassword) {
+
+      statusText.textContent =
+        'Заполните Confirm password'
+
+      return
+    }
 
     if (password !== confirmPassword) {
 
