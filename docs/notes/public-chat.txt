@@ -427,6 +427,42 @@ User пропал
 → color освобождён
 → слот свободен
 
+можно полностью обойтись без waiting_room table.
+Решение — использовать поле status в той же таблице public_chat_users. Это нормальная архитектура.
 
+Как использовать status вместо отдельной таблицы
+
+В одной таблице будут все пользователи:
+
+active
+пользователь в чате
+
+waiting
+ждет свободное место
+
+disconnected
+пропал / вышел
+
+Структура логики
+
+В таблице public_chat_users:
+
+user_id
+mask_id
+color_id
+status
+updated_at
+
+Значения status
+
+Рекомендую именно эти:
+
+active
+waiting
+disconnected
+Главный принцип
+
+active users ≤ 100
+waiting users — любое количество
 
 
