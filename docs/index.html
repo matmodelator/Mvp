@@ -139,11 +139,6 @@
         minlength="6"
       />
 
-      <!--
-      👁 — пароль скрыт
-      🙈 — пароль показан
-      -->
-
       <button
         type="button"
         class="eye-btn"
@@ -154,10 +149,9 @@
 
     </div>
 
-    <!--
-    >>> CHANGED
-    Поле Confirm password:
-    запрещено копирование / вставка / drag / автозаполнение
+    <!-- >>> CHANGED
+         Confirm password:
+         вставка / копирование будут блокироваться через JS
     -->
 
     <label>Confirm password:</label>
@@ -169,13 +163,7 @@
         type="password"
         minlength="6"
         placeholder="Only for sign up"
-
         autocomplete="new-password"
-
-        onpaste="return false"
-        oncopy="return false"
-        oncut="return false"
-        ondrop="return false"
       />
 
       <button
@@ -247,9 +235,48 @@
 
   /*
   >>> NEW
-  Дополнительная защита:
-  блокируем Ctrl+V / Cmd+V
+  Полная блокировка вставки / копирования
+  в поле Confirm password
   */
+
+  function showConfirmBlockedMessage() {
+
+    statusText.textContent =
+      'Введите пароль вручную'
+
+  }
+
+  confirmPasswordInput.addEventListener(
+    'paste',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'copy',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'cut',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'drop',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
 
   confirmPasswordInput.addEventListener(
     'keydown',
@@ -257,9 +284,12 @@
 
       if (
         (event.ctrlKey || event.metaKey) &&
-        event.key === 'v'
+        ['v', 'c', 'x'].includes(
+          event.key.toLowerCase()
+        )
       ) {
         event.preventDefault()
+        showConfirmBlockedMessage()
       }
 
     }
