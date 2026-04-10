@@ -7,6 +7,56 @@
   <title>Вход / Регистрация</title>
 
   <style>
+
+/* ========================================
+   SERVICE CONSOLE
+   Показывает версию и время деплоя
+   Всегда закреплена внизу экрана
+======================================== */
+
+#service-console {
+
+  /* Приклеено к низу экрана */
+
+  position: fixed;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  /* Внешний вид как консоль */
+
+  padding: 6px 10px;
+
+  background: #111;
+  color: #8cff8c;
+
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.35;
+
+  border-top: 1px solid #333;
+
+  /* Поверх всех элементов */
+
+  z-index: 9999;
+
+  /* Легкая прозрачность */
+
+  opacity: 0.9;
+}
+
+/* Каждая строка консоли */
+
+#service-console .row {
+
+  display: block;
+
+}
+
+    
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -393,5 +443,83 @@
 
 </script>
 
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+    рабочий вход с обезьянкой и повтором пароля | v1.1.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
+
+  
 </body>
 </html>
