@@ -3,350 +3,414 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Общий чат</title>
-  
-  
+  <title>Public Chat</title>
 
-  <link rel="stylesheet" href="styles/chat.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .home-btn {
+      background: white;
+      color: #2563eb;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .home-btn:hover {
+      opacity: 0.92;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px 24px;
+    }
+
+    .chat-box {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 16px;
+    }
+
+    .chat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .msg {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fafafa;
+    }
+
+    .msg-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .mask-emoji {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .mask-name {
+      color: #111827;
+    }
+
+    .msg-text {
+      font-size: 16px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+
+    .msg-time {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .composer {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      font: inherit;
+      box-sizing: border-box;
+    }
+
+    .send-btn {
+      width: 180px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .send-btn:hover {
+      opacity: 0.92;
+    }
+
+    .status {
+      min-height: 20px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    @media (max-width: 700px) {
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .topbar h1 {
+        text-align: center;
+      }
+
+      .home-btn {
+        justify-self: center;
+      }
+
+      .send-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <button onclick="goMain()">
-  Назад на главную
-</button>
-  
   <header>
-    <h1>Общий чат</h1>
+    <div class="topbar">
+      <button class="home-btn" onclick="goHome()">Назад на главную</button>
+      <h1>Public Chat</h1>
+      <div></div>
+    </div>
   </header>
 
-  <div class="top-actions">
-    <button onclick="goBack()">Назад</button>
-  </div>
+  <main class="page">
+    <div class="chat-box">
+      <div id="chatList" class="chat-list"></div>
 
-  <div class="chat-box">
-    <p id="status">Проверяем сессию...</p>
+      <div class="composer">
+        <textarea
+          id="messageInput"
+          placeholder="Введите сообщение"
+        ></textarea>
 
-    <div id="messages" class="messages"></div>
-    
-<!-- Ограничение длины сообщения -->
+        <button id="sendBtn" class="send-btn">
+          Отправить
+        </button>
 
-  <form id="chatForm">
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+  </main>
 
-    <input
-      id="messageInput"
-      type="text"
-      placeholder="Напишите сообщение..."
-      maxlength="150"
-      required
-    >
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    <button type="submit">
-      Отправить
-    </button>
+    const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL'
+    const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY'
 
-  </form>
-   
-  </div>
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    const chatList = document.getElementById('chatList')
+    const messageInput = document.getElementById('messageInput')
+    const sendBtn = document.getElementById('sendBtn')
+    const statusBox = document.getElementById('status')
 
-
-  
-<!--
-===========================================================
-SCRIPT: PUBLIC CHAT REALTIME
-===========================================================
-
-1. Проверяет, вошел ли пользователь
-2. Загружает сообщения из таблицы public_chat_messages
-3. Позволяет отправлять новые сообщения
-4. Слушает новые сообщения в реальном времени (Realtime)
-5. Показывает сообщения на странице
-
-Таблица:
-
-public_chat_messages
-
-Поля:
-
-id
-user_id
-user_email
-message
-created_at
-
-Требования:
-
-- таблица создана
-- RLS включен
-- Realtime включен
-- пользователь авторизован
-===========================================================
--->
-
-<script type="module">
-
-/*
-===========================================================
-ПОДКЛЮЧЕНИЕ SUPABASE
-===========================================================
-*/
-
-import { createClient }
-from 'https://esm.sh/@supabase/supabase-js@2'
-
-/*
-Создаем соединение с проектом Supabase
-*/
-
-const supabase = createClient(
-  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-  'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-)
-
-/*
-===========================================================
-ПОЛУЧАЕМ ЭЛЕМЕНТЫ СТРАНИЦЫ
-===========================================================
-*/
-
-const messages =
-  document.getElementById('messages')
-
-const form =
-  document.getElementById('chatForm')
-
-const input =
-  document.getElementById('messageInput')
-
-  /*
-Если пользователь нажимает Enter —
-форма отправляется
-*/
-
-input.addEventListener(
-  'keydown',
-  (event) => {
-
-    if (event.key === 'Enter') {
-
-      form.requestSubmit()
-
+    function goHome() {
+      window.location.href = 'index.html'
     }
 
-  }
-)
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;')
+    }
 
-let currentUser = null
+    function formatTime(dateString) {
+      if (!dateString) return ''
+      const d = new Date(dateString)
+      if (isNaN(d.getTime())) return ''
+      return d.toLocaleString('ru-RU')
+    }
 
-/*
-===========================================================
-ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
-===========================================================
+    function renderMessages(rows) {
+      chatList.innerHTML = ''
 
-Если пользователь не вошел —
-перенаправляем на страницу входа
-*/
-
-async function loadUser() {
-
-  const { data, error } =
-    await supabase.auth.getUser()
-
-  if (error || !data.user) {
-
-    window.location.href =
-      'log.html'
-
-    return
-  }
-
-  currentUser = data.user
-
-}
-
-/*
-===========================================================
-ЗАГРУЗКА СООБЩЕНИЙ ИЗ БАЗЫ
-===========================================================
-
-Берем последние сообщения
-и выводим их на экран
-*/
-
-async function loadMessages() {
-
-  const { data, error } =
-    await supabase
-      .from('public_chat_messages')
-      .select('*')
-      .order('created_at')
-
-  if (error) {
-
-    console.log(error.message)
-    return
-
-  }
-
-  messages.innerHTML = ''
-
-  data.forEach(renderMessage)
-
-}
-
-/*
-===========================================================
-ОТОБРАЖЕНИЕ СООБЩЕНИЯ
-===========================================================
-*/
-
-function renderMessage(row) {
-
-  /*
-  Получаем время сообщения
-  */
-
-  const time =
-    new Date(row.created_at)
-      .toLocaleTimeString()
-
-  /*
-  Создаем элемент сообщения
-  */
-
-  const div =
-    document.createElement('div')
-
-  /*
-  Формируем текст сообщения
-  */
-
-  div.textContent =
-    row.user_email +
-    ' • ' +
-    time +
-    ': ' +
-    row.message
-
-  /*
-  Добавляем сообщение в чат
-  */
-
-  messages.appendChild(div)
-
-  /*
-  Автоскролл вниз
-  */
-
-  messages.scrollTop =
-    messages.scrollHeight
-
-}
-
-/*
-===========================================================
-ОТПРАВКА СООБЩЕНИЯ
-===========================================================
-*/
-
-async function sendMessage(event) {
-
-  event.preventDefault()
-
-  const text =
-    input.value.trim()
-
-  if (!text) return
-
-  await supabase
-    .from('public_chat_messages')
-    .insert({
-
-      user_id:
-        currentUser.id,
-
-      user_email:
-        currentUser.email,
-
-      message:
-        text
-
-    })
-
-  input.value = ''
-
-}
-
-/*
-===========================================================
-REALTIME ПОДПИСКА
-===========================================================
-
-Слушаем новые сообщения
-без обновления страницы
-*/
-
-function subscribeRealtime() {
-
-  supabase
-    .channel('public-chat')
-
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'public_chat_messages'
-      },
-
-      (payload) => {
-
-        renderMessage(
-          payload.new
-        )
-
+      if (!rows || rows.length === 0) {
+        chatList.innerHTML = '<div class="msg">Сообщений пока нет</div>'
+        return
       }
 
-    )
+      for (const row of rows) {
+        const wrap = document.createElement('div')
+        wrap.className = 'msg'
 
-    .subscribe()
+        const maskEmoji =
+          row.mask_emoji ||
+          row.mask_icon ||
+          ''
 
-}
+        const maskName =
+          row.mask_label ||
+          row.mask_name ||
+          row.mask ||
+          'Маска'
 
-/*
-===========================================================
-СОБЫТИЕ ОТПРАВКИ ФОРМЫ
-===========================================================
-*/
+        const inkColor =
+          row.ink_color ||
+          row.text_color ||
+          '#111111'
 
-form.addEventListener(
-  'submit',
-  sendMessage
-)
+        const messageText =
+          row.message ||
+          row.text ||
+          ''
 
-/*
-===========================================================
-ЗАПУСК ЧАТА
-===========================================================
-*/
+        const timeText = formatTime(row.created_at)
 
-await loadUser()
+        wrap.innerHTML = `
+          <div class="msg-head">
+            <span class="mask-emoji">${escapeHtml(maskEmoji)}</span>
+            <span class="mask-name">${escapeHtml(maskName)}</span>
+          </div>
 
-await loadMessages()
+          <p class="msg-text" style="color: ${escapeHtml(inkColor)};">
+            ${escapeHtml(messageText)}
+          </p>
 
-subscribeRealtime()
+          <div class="msg-time">${escapeHtml(timeText)}</div>
+        `
 
-  /*
-Кнопка "Назад на главную"
-*/
+        chatList.appendChild(wrap)
+      }
 
-function goMain() {
-  window.location.href = 'main.html'
-}
+      chatList.scrollTop = chatList.scrollHeight
+    }
 
-window.goMain = goMain
+    async function loadMessages() {
+      statusBox.textContent = 'Загрузка сообщений...'
 
-</script>
+      const { data, error } = await supabase
+        .from('public_chat_messages')
+        .select(`
+          id,
+          mask,
+          mask_name,
+          mask_label,
+          mask_emoji,
+          mask_icon,
+          ink_color,
+          text_color,
+          message,
+          text,
+          created_at
+        `)
+        .order('created_at', { ascending: true })
 
+      if (error) {
+        statusBox.textContent = 'Ошибка загрузки: ' + error.message
+        return
+      }
+
+      renderMessages(data)
+      statusBox.textContent = ''
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim()
+
+      if (!text) {
+        statusBox.textContent = 'Введите сообщение'
+        return
+      }
+
+      statusBox.textContent = 'Отправка...'
+      sendBtn.disabled = true
+
+      const {
+        data: { user }
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        statusBox.textContent = 'Пользователь не найден'
+        sendBtn.disabled = false
+        return
+      }
+
+      const { data: chatUser, error: chatUserError } = await supabase
+        .from('public_chat_users')
+        .select(`
+          mask,
+          mask_name,
+          mask_label,
+          mask_emoji,
+          mask_icon,
+          ink_color,
+          text_color
+        `)
+        .eq('user_id', user.id)
+        .single()
+
+      if (chatUserError || !chatUser) {
+        statusBox.textContent = 'Не найдены маска и цвет пользователя'
+        sendBtn.disabled = false
+        return
+      }
+
+      const insertPayload = {
+        user_id: user.id,
+        message: text,
+        mask: chatUser.mask || null,
+        mask_name: chatUser.mask_name || null,
+        mask_label: chatUser.mask_label || null,
+        mask_emoji: chatUser.mask_emoji || chatUser.mask_icon || null,
+        ink_color: chatUser.ink_color || chatUser.text_color || null
+      }
+
+      const { error: insertError } = await supabase
+        .from('public_chat_messages')
+        .insert(insertPayload)
+
+      if (insertError) {
+        statusBox.textContent = 'Ошибка отправки: ' + insertError.message
+        sendBtn.disabled = false
+        return
+      }
+
+      messageInput.value = ''
+      statusBox.textContent = ''
+      sendBtn.disabled = false
+
+      await loadMessages()
+    }
+
+    sendBtn.addEventListener('click', sendMessage)
+
+    messageInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault()
+        sendMessage()
+      }
+    })
+
+    await loadMessages()
+
+    supabase
+      .channel('public-chat-live')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'public_chat_messages'
+        },
+        async function () {
+          await loadMessages()
+        }
+      )
+      .subscribe()
+  </script>
 </body>
 </html>
