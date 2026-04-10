@@ -48,6 +48,9 @@
       margin-bottom: 16px;
     }
 
+    /* >>> NEW
+       Обертка для размещения кнопки глаза поверх input
+    */
     .password-wrapper {
       position: relative;
       margin-bottom: 16px;
@@ -63,6 +66,7 @@
       cursor: pointer;
       font-size: 16px;
     }
+    /* <<< NEW */
 
     .buttons {
       display: flex;
@@ -86,24 +90,6 @@
       background: #16a34a;
       color: white;
     }
-
-    /* >>> NEW
-       Большая кнопка перехода к подтверждению.
-       Показывается только при необходимости.
-    */
-    .confirm-link-btn {
-      width: 100%;
-      margin-top: 12px;
-      padding: 12px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      display: none;
-    }
-    /* <<< NEW */
 
     #status {
       margin-top: 16px;
@@ -135,6 +121,10 @@
 
     <label>Password:</label>
 
+    <!-- >>> CHANGED
+         Password помещен в wrapper,
+         чтобы добавить кнопку показа/скрытия
+    -->
     <div class="password-wrapper">
 
       <input
@@ -158,9 +148,13 @@
       </button>
 
     </div>
+    <!-- <<< CHANGED -->
 
-    <!-- Confirm password -->
-
+    <!-- >>> NEW
+         Confirm Password остается в общей форме,
+         но нужен только для Sign up.
+         Поэтому required здесь НЕ ставим.
+    -->
     <label>Confirm password:</label>
 
     <div class="password-wrapper">
@@ -181,6 +175,7 @@
       </button>
 
     </div>
+    <!-- <<< NEW -->
 
     <div class="buttons">
 
@@ -206,21 +201,6 @@
 
   <p id="status"></p>
 
-  <!-- >>> NEW
-       Одна кнопка для перехода к подтверждению.
-       Используется и после signup,
-       и при Email not confirmed.
-  -->
-  <button
-    id="goConfirmBtn"
-    class="confirm-link-btn"
-    type="button"
-    onclick="goToConfirmation()"
-  >
-    Перейти к подтверждению
-  </button>
-  <!-- <<< NEW -->
-
 </div>
 
 <script type="module">
@@ -234,41 +214,24 @@
   const passwordInput =
     document.getElementById('password')
 
+  /* >>> NEW
+     Поле confirm password.
+     Используется только в signup()
+  */
   const confirmPasswordInput =
     document.getElementById('confirmPassword')
+  /* <<< NEW */
 
   const statusText =
     document.getElementById('status')
 
-  const goConfirmBtn =
-    document.getElementById('goConfirmBtn')
+  /* >>> CHANGED
+     togglePassword меняет и тип поля,
+     и символ на кнопке:
 
-  /*
-  ========================================
-  ПЕРЕХОД К ПОДТВЕРЖДЕНИЮ EMAIL
-  ========================================
-  Используем простой относительный путь:
-  check-email.html
+     👁 — скрыто
+     🙈 — показано
   */
-
-  /* >>> CHANGED */
-  function goToConfirmation() {
-
-    window.location.href =
-      'check-email.html'
-
-  }
-
-  window.goToConfirmation =
-    goToConfirmation
-  /* <<< CHANGED */
-
-  /*
-  ========================================
-  ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
-  ========================================
-  */
-
   function togglePassword(id, btn) {
 
     const field =
@@ -276,14 +239,20 @@
 
     if (field.type === 'password') {
 
-      field.type = 'text'
-      btn.textContent = '🙈'
+      field.type =
+        'text'
+
+      btn.textContent =
+        '🙈'
 
     }
     else {
 
-      field.type = 'password'
-      btn.textContent = '👁'
+      field.type =
+        'password'
+
+      btn.textContent =
+        '👁'
 
     }
 
@@ -291,12 +260,7 @@
 
   window.togglePassword =
     togglePassword
-
-  /*
-  ========================================
-  LOGIN
-  ========================================
-  */
+  /* <<< CHANGED */
 
   async function login() {
 
@@ -308,9 +272,6 @@
 
     statusText.textContent =
       'Выполняется вход...'
-
-    goConfirmBtn.style.display =
-      'none'
 
     const { error } =
       await supabase.auth.signInWithPassword({
@@ -330,12 +291,12 @@
         statusText.textContent =
           'Почта не подтверждена'
 
-        /* >>> CHANGED
-           Показываем кнопку вместо перехода
-        */
-        goConfirmBtn.style.display =
-          'block'
-        /* <<< CHANGED */
+        setTimeout(function () {
+
+          window.location.href =
+            'check-email.html'
+
+        }, 500)
 
         return
       }
@@ -349,18 +310,16 @@
     statusText.textContent =
       'Успешный вход'
 
-    window.location.href =
-      'main.html'
+    setTimeout(function () {
+
+      window.location.href =
+        'main.html'
+
+    }, 300)
   }
 
   window.login =
     login
-
-  /*
-  ========================================
-  SIGNUP
-  ========================================
-  */
 
   async function signup() {
 
@@ -370,6 +329,10 @@
     const password =
       passwordInput.value
 
+    /* >>> NEW
+       Confirm password обязателен
+       только для Sign up
+    */
     const confirmPassword =
       confirmPasswordInput.value.trim()
 
@@ -388,9 +351,7 @@
 
       return
     }
-
-    goConfirmBtn.style.display =
-      'none'
+    /* <<< NEW */
 
     statusText.textContent =
       'Регистрация...'
@@ -403,7 +364,7 @@
 
         options: {
           emailRedirectTo:
-            'confirm.html'
+            'https://matmodelator.github.io/Mvp/confirm.html'
         }
 
       })
@@ -419,14 +380,12 @@
     statusText.textContent =
       'Письмо отправлено. Проверь почту.'
 
-    /* >>> CHANGED
-       Теперь НЕ переходим автоматически,
-       а показываем кнопку.
-    */
-    goConfirmBtn.style.display =
-      'block'
-    /* <<< CHANGED */
+    setTimeout(function () {
 
+      window.location.href =
+        'check-email.html'
+
+    }, 800)
   }
 
   window.signup =
