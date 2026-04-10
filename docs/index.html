@@ -453,5 +453,70 @@
 
 </script>
 
+<!-- ========================================
+     SERVICE CONSOLE
+======================================== -->
+
+<div id="service-console">
+
+  <div
+    class="row"
+    id="build-top"
+  >
+
+   ✅ M.V.P. with all updates | v1.2.0
+
+  </div>
+
+  <div
+    class="row"
+    id="build-down"
+  >
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<script>
+
+(function () {
+
+  const now =
+    new Date()
+
+  const pad =
+    n =>
+      String(n)
+        .padStart(2, '0')
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear()
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes())
+
+  document
+    .getElementById(
+      'build-down'
+    )
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time
+
+})();
+
+</script>
+
+  
 </body>
 </html>
