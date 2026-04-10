@@ -1,0 +1,47 @@
+/* ========================================
+   SERVICE CONSOLE
+   Показывает версию и время деплоя
+   Всегда закреплена внизу экрана
+======================================== */
+
+#service-console {
+
+  /* Приклеено к низу экрана */
+
+  position: fixed;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  /* Внешний вид как консоль */
+
+  padding: 6px 10px;
+
+  background: #111;
+  color: #8cff8c;
+
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.35;
+
+  border-top: 1px solid #333;
+
+  /* Поверх всех элементов */
+
+  z-index: 9999;
+
+  /* Легкая прозрачность */
+
+  opacity: 0.9;
+}
+
+/* Каждая строка консоли */
+
+#service-console .row {
+
+  display: block;
+
+}
