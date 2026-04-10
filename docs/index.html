@@ -87,10 +87,6 @@
       color: white;
     }
 
-    /* >>> NEW
-       Большая кнопка перехода к подтверждению.
-       Показывается только при необходимости.
-    */
     .confirm-link-btn {
       width: 100%;
       margin-top: 12px;
@@ -103,7 +99,6 @@
       font-size: 16px;
       display: none;
     }
-    /* <<< NEW */
 
     #status {
       margin-top: 16px;
@@ -159,7 +154,11 @@
 
     </div>
 
-    <!-- Confirm password -->
+    <!--
+    >>> CHANGED
+    Поле Confirm password:
+    запрещено копирование / вставка / drag / автозаполнение
+    -->
 
     <label>Confirm password:</label>
 
@@ -170,6 +169,13 @@
         type="password"
         minlength="6"
         placeholder="Only for sign up"
+
+        autocomplete="new-password"
+
+        onpaste="return false"
+        oncopy="return false"
+        oncut="return false"
+        ondrop="return false"
       />
 
       <button
@@ -181,6 +187,8 @@
       </button>
 
     </div>
+
+    <!-- <<< CHANGED -->
 
     <div class="buttons">
 
@@ -206,11 +214,6 @@
 
   <p id="status"></p>
 
-  <!-- >>> NEW
-       Одна кнопка для перехода к подтверждению.
-       Используется и после signup,
-       и при Email not confirmed.
-  -->
   <button
     id="goConfirmBtn"
     class="confirm-link-btn"
@@ -219,7 +222,6 @@
   >
     Перейти к подтверждению
   </button>
-  <!-- <<< NEW -->
 
 </div>
 
@@ -244,14 +246,29 @@
     document.getElementById('goConfirmBtn')
 
   /*
-  ========================================
-  ПЕРЕХОД К ПОДТВЕРЖДЕНИЮ EMAIL
-  ========================================
-  Используем простой относительный путь:
-  check-email.html
+  >>> NEW
+  Дополнительная защита:
+  блокируем Ctrl+V / Cmd+V
   */
 
-  /* >>> CHANGED */
+  confirmPasswordInput.addEventListener(
+    'keydown',
+    function (event) {
+
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === 'v'
+      ) {
+        event.preventDefault()
+      }
+
+    }
+  )
+
+  /*
+  <<< NEW
+  */
+
   function goToConfirmation() {
 
     window.location.href =
@@ -261,13 +278,6 @@
 
   window.goToConfirmation =
     goToConfirmation
-  /* <<< CHANGED */
-
-  /*
-  ========================================
-  ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
-  ========================================
-  */
 
   function togglePassword(id, btn) {
 
@@ -291,12 +301,6 @@
 
   window.togglePassword =
     togglePassword
-
-  /*
-  ========================================
-  LOGIN
-  ========================================
-  */
 
   async function login() {
 
@@ -330,12 +334,8 @@
         statusText.textContent =
           'Почта не подтверждена'
 
-        /* >>> CHANGED
-           Показываем кнопку вместо перехода
-        */
         goConfirmBtn.style.display =
           'block'
-        /* <<< CHANGED */
 
         return
       }
@@ -355,12 +355,6 @@
 
   window.login =
     login
-
-  /*
-  ========================================
-  SIGNUP
-  ========================================
-  */
 
   async function signup() {
 
@@ -419,13 +413,8 @@
     statusText.textContent =
       'Письмо отправлено. Проверь почту.'
 
-    /* >>> CHANGED
-       Теперь НЕ переходим автоматически,
-       а показываем кнопку.
-    */
     goConfirmBtn.style.display =
       'block'
-    /* <<< CHANGED */
 
   }
 
