@@ -1,1 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+  <title>Вход / Регистрация</title>
 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+    }
+
+    .password-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .login-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .signup-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    .confirm-link-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+    }
+
+    #status {
+      margin-top: 16px;
+      text-align: center;
+      font-weight: bold;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>M.V.P.</h1>
+</header>
+
+<div class="container">
+
+  <h2>Вход / Регистрация</h2>
+
+  <form id="authForm">
+
+    <label>Email:</label>
+
+    <input
+      id="email"
+      type="email"
+      required
+    />
+
+    <label>Password:</label>
+
+    <div class="password-wrapper">
+
+      <input
+        id="password"
+        type="password"
+        required
+        minlength="6"
+      />
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('password', this)"
+      >
+        👁
+      </button>
+
+    </div>
+
+    <!-- >>> CHANGED
+         Confirm password:
+         вставка / копирование будут блокироваться через JS
+    -->
+
+    <label>Confirm password:</label>
+
+    <div class="password-wrapper">
+
+      <input
+        id="confirmPassword"
+        type="password"
+        minlength="6"
+        placeholder="Only for sign up"
+        autocomplete="new-password"
+      />
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('confirmPassword', this)"
+      >
+        👁
+      </button>
+
+    </div>
+
+    <!-- <<< CHANGED -->
+
+    <div class="buttons">
+
+      <button
+        type="button"
+        class="login-btn"
+        onclick="login()"
+      >
+        Log in
+      </button>
+
+      <button
+        type="button"
+        class="signup-btn"
+        onclick="signup()"
+      >
+        Sign up
+      </button>
+
+    </div>
+
+  </form>
+
+  <p id="status"></p>
+
+  <button
+    id="goConfirmBtn"
+    class="confirm-link-btn"
+    type="button"
+    onclick="goToConfirmation()"
+  >
+    Перейти к подтверждению
+  </button>
+
+</div>
+
+<script type="module">
+
+  import { supabase }
+  from './supabase-config.js'
+
+  const emailInput =
+    document.getElementById('email')
+
+  const passwordInput =
+    document.getElementById('password')
+
+  const confirmPasswordInput =
+    document.getElementById('confirmPassword')
+
+  const statusText =
+    document.getElementById('status')
+
+  const goConfirmBtn =
+    document.getElementById('goConfirmBtn')
+
+  /*
+  >>> NEW
+  Полная блокировка вставки / копирования
+  в поле Confirm password
+  */
+
+  function showConfirmBlockedMessage() {
+
+    statusText.textContent =
+      'Введите пароль вручную'
+
+  }
+
+  confirmPasswordInput.addEventListener(
+    'paste',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'copy',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'cut',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'drop',
+    function (event) {
+      event.preventDefault()
+      showConfirmBlockedMessage()
+    }
+  )
+
+  confirmPasswordInput.addEventListener(
+    'keydown',
+    function (event) {
+
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        ['v', 'c', 'x'].includes(
+          event.key.toLowerCase()
+        )
+      ) {
+        event.preventDefault()
+        showConfirmBlockedMessage()
+      }
+
+    }
+  )
+
+  /*
+  <<< NEW
+  */
+
+  function goToConfirmation() {
+
+    window.location.href =
+      'check-email.html'
+
+  }
+
+  window.goToConfirmation =
+    goToConfirmation
+
+  function togglePassword(id, btn) {
+
+    const field =
+      document.getElementById(id)
+
+    if (field.type === 'password') {
+
+      field.type = 'text'
+      btn.textContent = '🙈'
+
+    }
+    else {
+
+      field.type = 'password'
+      btn.textContent = '👁'
+
+    }
+
+  }
+
+  window.togglePassword =
+    togglePassword
+
+  async function login() {
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    statusText.textContent =
+      'Выполняется вход...'
+
+    goConfirmBtn.style.display =
+      'none'
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    if (error) {
+
+      if (
+        error.message &&
+        error.message.includes(
+          'Email not confirmed'
+        )
+      ) {
+
+        statusText.textContent =
+          'Почта не подтверждена'
+
+        goConfirmBtn.style.display =
+          'block'
+
+        return
+      }
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    statusText.textContent =
+      'Успешный вход'
+
+    window.location.href =
+      'main.html'
+  }
+
+  window.login =
+    login
+
+  async function signup() {
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    const confirmPassword =
+      confirmPasswordInput.value.trim()
+
+    if (!confirmPassword) {
+
+      statusText.textContent =
+        'Заполните Confirm password'
+
+      return
+    }
+
+    if (password !== confirmPassword) {
+
+      statusText.textContent =
+        'Пароли не совпадают'
+
+      return
+    }
+
+    goConfirmBtn.style.display =
+      'none'
+
+    statusText.textContent =
+      'Регистрация...'
+
+    const { error } =
+      await supabase.auth.signUp({
+
+        email,
+        password,
+
+        options: {
+          emailRedirectTo:
+            'confirm.html'
+        }
+
+      })
+
+    if (error) {
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    statusText.textContent =
+      'Письмо отправлено. Проверь почту.'
+
+    goConfirmBtn.style.display =
+      'block'
+
+  }
+
+  window.signup =
+    signup
+
+</script>
+
+</body>
+</html>
