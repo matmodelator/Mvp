@@ -87,6 +87,10 @@
       color: white;
     }
 
+    /* >>> NEW
+       Большая кнопка перехода к подтверждению.
+       Показывается только при необходимости.
+    */
     .confirm-link-btn {
       width: 100%;
       margin-top: 12px;
@@ -99,6 +103,7 @@
       font-size: 16px;
       display: none;
     }
+    /* <<< NEW */
 
     #status {
       margin-top: 16px;
@@ -111,7 +116,7 @@
 <body>
 
 <header>
-  <h1>M.V.P.</h1>
+  <h1>Dating App MVP</h1>
 </header>
 
 <div class="container">
@@ -139,6 +144,11 @@
         minlength="6"
       />
 
+      <!--
+      👁 — пароль скрыт
+      🙈 — пароль показан
+      -->
+
       <button
         type="button"
         class="eye-btn"
@@ -149,10 +159,7 @@
 
     </div>
 
-    <!-- >>> CHANGED
-         Confirm password:
-         вставка / копирование будут блокироваться через JS
-    -->
+    <!-- Confirm password -->
 
     <label>Confirm password:</label>
 
@@ -163,7 +170,6 @@
         type="password"
         minlength="6"
         placeholder="Only for sign up"
-        autocomplete="new-password"
       />
 
       <button
@@ -175,8 +181,6 @@
       </button>
 
     </div>
-
-    <!-- <<< CHANGED -->
 
     <div class="buttons">
 
@@ -202,6 +206,11 @@
 
   <p id="status"></p>
 
+  <!-- >>> NEW
+       Одна кнопка для перехода к подтверждению.
+       Используется и после signup,
+       и при Email not confirmed.
+  -->
   <button
     id="goConfirmBtn"
     class="confirm-link-btn"
@@ -210,6 +219,7 @@
   >
     Перейти к подтверждению
   </button>
+  <!-- <<< NEW -->
 
 </div>
 
@@ -234,71 +244,14 @@
     document.getElementById('goConfirmBtn')
 
   /*
-  >>> NEW
-  Полная блокировка вставки / копирования
-  в поле Confirm password
+  ========================================
+  ПЕРЕХОД К ПОДТВЕРЖДЕНИЮ EMAIL
+  ========================================
+  Используем простой относительный путь:
+  check-email.html
   */
 
-  function showConfirmBlockedMessage() {
-
-    statusText.textContent =
-      'Введите пароль вручную'
-
-  }
-
-  confirmPasswordInput.addEventListener(
-    'paste',
-    function (event) {
-      event.preventDefault()
-      showConfirmBlockedMessage()
-    }
-  )
-
-  confirmPasswordInput.addEventListener(
-    'copy',
-    function (event) {
-      event.preventDefault()
-      showConfirmBlockedMessage()
-    }
-  )
-
-  confirmPasswordInput.addEventListener(
-    'cut',
-    function (event) {
-      event.preventDefault()
-      showConfirmBlockedMessage()
-    }
-  )
-
-  confirmPasswordInput.addEventListener(
-    'drop',
-    function (event) {
-      event.preventDefault()
-      showConfirmBlockedMessage()
-    }
-  )
-
-  confirmPasswordInput.addEventListener(
-    'keydown',
-    function (event) {
-
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        ['v', 'c', 'x'].includes(
-          event.key.toLowerCase()
-        )
-      ) {
-        event.preventDefault()
-        showConfirmBlockedMessage()
-      }
-
-    }
-  )
-
-  /*
-  <<< NEW
-  */
-
+  /* >>> CHANGED */
   function goToConfirmation() {
 
     window.location.href =
@@ -308,6 +261,13 @@
 
   window.goToConfirmation =
     goToConfirmation
+  /* <<< CHANGED */
+
+  /*
+  ========================================
+  ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
+  ========================================
+  */
 
   function togglePassword(id, btn) {
 
@@ -331,6 +291,12 @@
 
   window.togglePassword =
     togglePassword
+
+  /*
+  ========================================
+  LOGIN
+  ========================================
+  */
 
   async function login() {
 
@@ -364,8 +330,12 @@
         statusText.textContent =
           'Почта не подтверждена'
 
+        /* >>> CHANGED
+           Показываем кнопку вместо перехода
+        */
         goConfirmBtn.style.display =
           'block'
+        /* <<< CHANGED */
 
         return
       }
@@ -385,6 +355,12 @@
 
   window.login =
     login
+
+  /*
+  ========================================
+  SIGNUP
+  ========================================
+  */
 
   async function signup() {
 
@@ -443,8 +419,13 @@
     statusText.textContent =
       'Письмо отправлено. Проверь почту.'
 
+    /* >>> CHANGED
+       Теперь НЕ переходим автоматически,
+       а показываем кнопку.
+    */
     goConfirmBtn.style.display =
       'block'
+    /* <<< CHANGED */
 
   }
 
