@@ -7,6 +7,12 @@
   <title>Аккаунт</title>
 
   <style>
+    /*
+    ========================================
+    БАЗОВЫЕ СТИЛИ СТРАНИЦЫ
+    ========================================
+    */
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -90,6 +96,27 @@
       margin-bottom: 18px;
       word-break: break-word;
     }
+
+    /* >>> NEW
+       Блок кнопок после успешного сохранения аккаунта.
+       По умолчанию скрыт.
+    */
+    .after-save-buttons {
+      display: none;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .start-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .exit-btn {
+      background: #6b7280;
+      color: white;
+    }
+    /* <<< NEW */
   </style>
 </head>
 <body>
@@ -102,10 +129,23 @@
 
   <h2>Аккаунт</h2>
 
+  <!--
+  ========================================
+  ИНФОРМАЦИЯ О ТЕКУЩЕМ ПОЛЬЗОВАТЕЛЕ
+  ========================================
+  Показываем id и email из auth-пользователя
+  -->
+
   <div class="meta-box">
     <div><strong>ID:</strong> <span id="userId">...</span></div>
     <div><strong>Email:</strong> <span id="userEmail">...</span></div>
   </div>
+
+  <!--
+  ========================================
+  ПОЛЯ ПРОФИЛЯ
+  ========================================
+  -->
 
   <div class="row">
     <label for="name">
@@ -149,6 +189,14 @@
     >
   </div>
 
+  <!--
+  ========================================
+  ОСНОВНЫЕ КНОПКИ
+  ========================================
+  Save account — сохранить / обновить профиль
+  Sign out     — выйти из аккаунта
+  -->
+
   <div class="buttons">
     <button
       class="save-btn"
@@ -167,10 +215,43 @@
 
   <p id="status"></p>
 
+  <!-- >>> NEW
+       Эти кнопки появляются только после
+       успешного сохранения аккаунта.
+
+       Start → main.html
+       Exit  → index.html
+  -->
+  <div
+    id="afterSaveButtons"
+    class="after-save-buttons"
+  >
+    <button
+      class="start-btn"
+      onclick="goMain()"
+    >
+      Start
+    </button>
+
+    <button
+      class="exit-btn"
+      onclick="goIndex()"
+    >
+      Exit
+    </button>
+  </div>
+  <!-- <<< NEW -->
+
 </div>
 
 <script type="module">
   import { supabase } from './supabase-config.js'
+
+  /*
+  ========================================
+  DOM-ЭЛЕМЕНТЫ
+  ========================================
+  */
 
   const userIdText =
     document.getElementById('userId')
@@ -193,7 +274,33 @@
   const statusText =
     document.getElementById('status')
 
+  /* >>> NEW
+     Блок кнопок, который показывается
+     только после успешного сохранения.
+  */
+  const afterSaveButtons =
+    document.getElementById('afterSaveButtons')
+  /* <<< NEW */
+
+  /*
+  ========================================
+  ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+  ========================================
+  Здесь будет храниться объект пользователя
+  из Supabase Auth
+  */
+
   let currentUser = null
+
+  /*
+  ========================================
+  ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ
+  ========================================
+  1. Проверяем, кто вошел в систему
+  2. Если пользователя нет → index.html
+  3. Если есть → показываем id/email
+  4. Потом грузим профиль из accounts
+  */
 
   async function loadAccount() {
     statusText.textContent =
@@ -225,6 +332,14 @@
     await loadProfile()
   }
 
+  /*
+  ========================================
+  ЗАГРУЗКА ПРОФИЛЯ ИЗ accounts
+  ========================================
+  Ищем запись по id текущего пользователя.
+  Если запись есть — подставляем значения в поля.
+  */
+
   async function loadProfile() {
     if (!currentUser) return
 
@@ -239,6 +354,12 @@
         )
         .eq('id', currentUser.id)
         .single()
+
+    /*
+    406 здесь допустим:
+    он означает, что строки может не быть.
+    В этом случае просто оставляем пустую форму.
+    */
 
     if (error && status !== 406) {
       statusText.textContent =
@@ -264,6 +385,16 @@
       'Account loaded'
   }
 
+  /*
+  ========================================
+  СОХРАНЕНИЕ ПРОФИЛЯ
+  ========================================
+  1. Берем значения из формы
+  2. Делаем upsert в accounts
+  3. Если сохранение успешно —
+     показываем Start / Exit
+  */
+
   async function saveProfile() {
     if (!currentUser) {
       statusText.textContent =
@@ -274,11 +405,30 @@
     statusText.textContent =
       'Saving account...'
 
+    /* >>> NEW
+       Перед новой попыткой сохранения
+       скрываем кнопки Start / Exit,
+       чтобы они не висели от прошлого success.
+    */
+    afterSaveButtons.style.display =
+      'none'
+    /* <<< NEW */
+
     const { error } =
       await supabase
         .from('accounts')
         .upsert({
           id: currentUser.id,
+
+          /* >>> NEW
+             Сохраняем email из auth.users
+             в таблицу accounts.
+             Это как раз перенос email
+             из пользователя в профиль.
+          */
+          email: currentUser.email,
+          /* <<< NEW */
+
           name: nameInput.value.trim() || null,
           gender: genderInput.value || null,
           birthday: birthdayInput.value || null,
@@ -294,7 +444,25 @@
 
     statusText.textContent =
       'Account saved'
-    }
+
+    /* >>> NEW
+       После успешного сохранения показываем
+       кнопки перехода:
+       Start → main.html
+       Exit  → index.html
+    */
+    afterSaveButtons.style.display =
+      'flex'
+    /* <<< NEW */
+  }
+
+  /*
+  ========================================
+  ВЫХОД ИЗ АККАУНТА
+  ========================================
+  Полный sign out из Supabase,
+  затем возврат на index.html
+  */
 
   async function logout() {
     await supabase.auth.signOut()
@@ -303,8 +471,43 @@
       'index.html'
   }
 
+  /* >>> NEW
+     Переход в основное приложение
+  */
+  function goMain() {
+    window.location.href =
+      'main.html'
+  }
+  /* <<< NEW */
+
+  /* >>> NEW
+     Выход на стартовую страницу
+     без отдельного signOut
+  */
+  function goIndex() {
+    window.location.href =
+      'index.html'
+  }
+  /* <<< NEW */
+
   window.saveProfile = saveProfile
   window.logout = logout
+
+  /* >>> NEW
+     Делаем функции доступными из onclick
+     для новых кнопок Start / Exit
+  */
+  window.goMain = goMain
+  window.goIndex = goIndex
+  /* <<< NEW */
+
+  /*
+  ========================================
+  СТАРТ СТРАНИЦЫ
+  ========================================
+  Сразу проверяем пользователя
+  и загружаем его аккаунт
+  */
 
   loadAccount()
 </script>
