@@ -12,7 +12,6 @@
 
   <link rel="stylesheet"
         href="styles/console.css" />
-  
 
 </head>
 
@@ -21,98 +20,59 @@
 <h2>Вход в чат</h2>
 
 <!-- ========================= -->
-<!-- ВЫБОР МАСКИ -->
+<!-- ИНФОРМАЦИЯ -->
 <!-- ========================= -->
 
 <div class="group">
 
   <label>
-    Выберите маску:
+    Статус входа:
   </label>
 
   <br><br>
 
-  <select id="maskSelect">
-
-    <option>🦊 Лис</option>
-    <option>🐺 Волк</option>
-    <option>🐼 Панда</option>
-    <option>🦉 Сова</option>
-    <option>🐬 Дельфин</option>
-    <option>🦁 Лев</option>
-    <option>🐯 Тигр</option>
-    <option>🦅 Орел</option>
-    <option>🐉 Дракон</option>
-    <option>🦄 Единорог</option>
-
-  </select>
+  <div id="statusText">
+    Нажмите «Войти в чат»
+  </div>
 
 </div>
 
 <br>
 
 <!-- ========================= -->
-<!-- ВЫБОР ЦВЕТА -->
+<!-- ИНФОРМАЦИЯ О МАСКЕ -->
 <!-- ========================= -->
 
 <div class="group">
 
   <label>
-    Выберите цвет:
+    Маска:
   </label>
 
   <br><br>
 
-  <!-- Цвета -->
-
-  <div style="color:#FF0000; cursor:pointer;"
-       onclick="selectColor('#FF0000')">
-    Red — #FF0000
+  <div id="maskInfo">
+    будет назначена автоматически
   </div>
 
-  <div style="color:#FFA500; cursor:pointer;"
-       onclick="selectColor('#FFA500')">
-    Orange — #FFA500
-  </div>
+</div>
 
-  <div style="color:#FFD700; cursor:pointer;"
-       onclick="selectColor('#FFD700')">
-    Gold — #FFD700
-  </div>
+<br>
 
-  <div style="color:#FFFF00; cursor:pointer;"
-       onclick="selectColor('#FFFF00')">
-    Yellow — #FFFF00
-  </div>
+<!-- ========================= -->
+<!-- ИНФОРМАЦИЯ О ЦВЕТЕ -->
+<!-- ========================= -->
 
-  <div style="color:#00FF00; cursor:pointer;"
-       onclick="selectColor('#00FF00')">
-    Lime — #00FF00
-  </div>
+<div class="group">
 
-  <div style="color:#00FFFF; cursor:pointer;"
-       onclick="selectColor('#00FFFF')">
-    Cyan — #00FFFF
-  </div>
+  <label>
+    Цвет:
+  </label>
 
-  <div style="color:#1E90FF; cursor:pointer;"
-       onclick="selectColor('#1E90FF')">
-    Blue — #1E90FF
-  </div>
+  <br><br>
 
-  <div style="color:#FF00FF; cursor:pointer;"
-       onclick="selectColor('#FF00FF')">
-    Magenta — #FF00FF
-  </div>
-
-  <div style="color:#FF69B4; cursor:pointer;"
-       onclick="selectColor('#FF69B4')">
-    HotPink — #FF69B4
-  </div>
-
-  <div style="color:#FFFFFF; cursor:pointer;"
-       onclick="selectColor('#FFFFFF')">
-    White — #FFFFFF
+  <div id="colorInfo">
+    будет назначен автоматически
   </div>
 
 </div>
@@ -125,7 +85,7 @@
 
 <div class="group">
 
-  <button onclick="enterChat()">
+  <button id="enterButton">
     Войти в чат
   </button>
 
@@ -135,67 +95,260 @@
 <!-- SCRIPT -->
 <!-- ========================= -->
 
-<script>
+<script type="module">
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+  'PASTE_YOUR_SUPABASE_ANON_KEY_HERE'
+)
 
 /*
-выбранный цвет
+================================
+ЭЛЕМЕНТЫ
+================================
 */
 
-let selectedColor = null
+const statusText =
+  document.getElementById(
+    'statusText'
+  )
 
-function selectColor(color) {
+const maskInfo =
+  document.getElementById(
+    'maskInfo'
+  )
 
-  selectedColor = color
+const colorInfo =
+  document.getElementById(
+    'colorInfo'
+  )
 
-  console.log(
-    'Выбран цвет:',
-    color
+const enterButton =
+  document.getElementById(
+    'enterButton'
+  )
+
+/*
+================================
+СЛОВАРИ ДЛЯ ОТОБРАЖЕНИЯ
+================================
+*/
+
+const maskMap = {
+  1: '🦊 Лис',
+  2: '🐺 Волк',
+  3: '🐼 Панда',
+  4: '🦉 Сова',
+  5: '🐬 Дельфин',
+  6: '🦁 Лев',
+  7: '🐯 Тигр',
+  8: '🦅 Орел',
+  9: '🐉 Дракон',
+  10: '🦄 Единорог'
+}
+
+/*
+если id нет в словаре,
+показываем универсально
+*/
+function getMaskLabel(maskId) {
+
+  if (!maskId) {
+    return 'не назначена'
+  }
+
+  return maskMap[maskId]
+    || `Маска #${maskId}`
+
+}
+
+function getColorLabel(colorId) {
+
+  if (!colorId) {
+    return 'не назначен'
+  }
+
+  return `Цвет #${colorId}`
+
+}
+
+/*
+================================
+СОХРАНЕНИЕ СЕССИИ
+================================
+*/
+
+function saveChatSession(user) {
+
+  localStorage.setItem(
+    'chatStatus',
+    user.status
+  )
+
+  localStorage.setItem(
+    'chatMaskId',
+    user.mask_id ?? ''
+  )
+
+  localStorage.setItem(
+    'chatColorId',
+    user.color_id ?? ''
+  )
+
+  localStorage.setItem(
+    'chatUserId',
+    user.user_id
   )
 
 }
 
 /*
-вход в чат
+================================
+ОТОБРАЖЕНИЕ ДАННЫХ
+================================
 */
 
-function enterChat() {
+function showAssignedData(user) {
 
-  const mask =
-    document.getElementById(
-      'maskSelect'
-    ).value
+  maskInfo.textContent =
+    getMaskLabel(user.mask_id)
 
-  if (!selectedColor) {
+  colorInfo.textContent =
+    getColorLabel(user.color_id)
 
-    alert(
-      'Выберите цвет'
+}
+
+function showWaitingState() {
+
+  statusText.textContent =
+    'Все места заняты. Вы помещены в очередь ожидания.'
+
+  maskInfo.textContent =
+    'не назначена'
+
+  colorInfo.textContent =
+    'не назначен'
+
+}
+
+function showActiveState(user) {
+
+  statusText.textContent =
+    'Вход разрешен. Переход в чат...'
+
+  showAssignedData(user)
+
+}
+
+/*
+================================
+ВХОД В ЧАТ
+================================
+*/
+
+async function enterChat() {
+
+  enterButton.disabled = true
+
+  statusText.textContent =
+    'Проверяем доступ к чату...'
+
+  try {
+
+    const {
+      data: authData,
+      error: authError
+    } = await supabase.auth.getUser()
+
+    if (authError) {
+      throw authError
+    }
+
+    if (!authData.user) {
+
+      statusText.textContent =
+        'Ошибка: пользователь не авторизован.'
+
+      enterButton.disabled = false
+      return
+
+    }
+
+    const {
+      data,
+      error
+    } = await supabase.rpc(
+      'assign_public_chat_identity'
     )
 
-    return
+    if (error) {
+      throw error
+    }
+
+    if (!data || !data.length) {
+
+      statusText.textContent =
+        'Ошибка: база не вернула данные входа.'
+
+      enterButton.disabled = false
+      return
+
+    }
+
+    const user = data[0]
+
+    saveChatSession(user)
+
+    if (user.status === 'waiting') {
+
+      showWaitingState()
+      enterButton.disabled = false
+      return
+
+    }
+
+    if (user.status === 'active') {
+
+      showActiveState(user)
+
+      setTimeout(function () {
+        window.location.href =
+          'public-chat.html'
+      }, 800)
+
+      return
+
+    }
+
+    statusText.textContent =
+      'Неизвестный статус пользователя.'
+
+    enterButton.disabled = false
+
+  }
+  catch (err) {
+
+    console.error(err)
+
+    statusText.textContent =
+      'Ошибка входа в чат: '
+      + (err.message || 'неизвестная ошибка')
+
+    enterButton.disabled = false
 
   }
 
-  localStorage.setItem(
-    'chatMask',
-    mask
-  )
-
-  localStorage.setItem(
-    'chatColor',
-    selectedColor
-  )
-
-  window.location.href =
-    'public-chat.html'
-
 }
 
+enterButton.addEventListener(
+  'click',
+  enterChat
+)
+
 </script>
-
-
-
-
-
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -208,7 +361,14 @@ function enterChat() {
     id="build-top"
   >
 
-   ✅ рабочий вход в чат | v1.0.0
+    ✅ ВХОД В ЧАт ЧЕРЕЗ Supabase.
+    ✅ маска и цвет больше не выбираются вручную.
+✅ при нажатии Войти в чат страница обращается к базе.
+✅ вызывается assign_public_chat_identity().
+✅ если пришел active — сохраняются данные сессии и идет переход в public-chat.html.
+✅ если пришел waiting — показывается сообщение ожидания и перехода нет.
+✅ общий вид страницы, заголовок, groups и service console сохранены.
+    | v2.0.0
 
   </div>
 
@@ -259,6 +419,7 @@ function enterChat() {
 
 })();
 
-</script>  
+</script>
+
 </body>
 </html>
