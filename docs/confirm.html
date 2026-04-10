@@ -45,6 +45,16 @@
       min-height: 24px;
       font-weight: bold;
     }
+
+    /* >>> NEW
+       Кнопка перехода после подтверждения.
+       По умолчанию скрыта.
+    */
+    .next-btn {
+      display: none;
+      margin-top: 12px;
+    }
+    /* <<< NEW */
   </style>
 </head>
 <body>
@@ -61,6 +71,10 @@
     Проверяем подтверждение...
   </p>
 
+  <!--
+  Оставляем кнопку ручной проверки
+  -->
+
   <button onclick="checkUser()">
     Проверить снова
   </button>
@@ -68,6 +82,20 @@
   <button onclick="window.location.href='index.html'">
     На главную
   </button>
+
+  <!-- >>> NEW
+       Кнопка появляется только после успешного подтверждения
+  -->
+
+  <button
+    id="goAccountBtn"
+    class="next-btn"
+    onclick="goToAccount()"
+  >
+    Перейти к заполнению аккаунта
+  </button>
+
+  <!-- <<< NEW -->
 
 </div>
 
@@ -77,9 +105,22 @@
   const statusText =
     document.getElementById('status')
 
+  /* >>> NEW */
+  const goAccountBtn =
+    document.getElementById('goAccountBtn')
+  /* <<< NEW */
+
   async function checkUser() {
+
     statusText.textContent =
       'Проверяем сессию...'
+
+    /* >>> NEW
+       При новой проверке скрываем кнопку
+    */
+    goAccountBtn.style.display =
+      'none'
+    /* <<< NEW */
 
     const { data, error } =
       await supabase.auth.getUser()
@@ -92,22 +133,47 @@
 
     if (!data.user) {
       statusText.textContent =
-        'Пользователь пока не найден. Если ты только что нажал ссылку в письме, подожди пару секунд и нажми "Проверить снова".'
+        'Пользователь пока не найден. Нажми "Проверить снова".'
       return
     }
 
     statusText.textContent =
-      'Почта подтверждена: ' + data.user.email
+      'Почта подтверждена: ' +
+      data.user.email
 
-    setTimeout(function () {
-      window.location.href =
-        'account.html'
-    }, 1000)
+    /* >>> CHANGED
+       Убрали setTimeout.
+       Теперь показываем кнопку.
+    */
+    goAccountBtn.style.display =
+      'inline-block'
+    /* <<< CHANGED */
+
   }
 
-  window.checkUser = checkUser
+  /* >>> NEW
+     Переход на страницу заполнения аккаунта
+  */
+  function goToAccount() {
+
+    window.location.href =
+      'account.html'
+
+  }
+
+  window.goToAccount =
+    goToAccount
+  /* <<< NEW */
+
+  window.checkUser =
+    checkUser
+
+  /*
+  Автоматическая первая проверка
+  */
 
   checkUser()
+
 </script>
 
 </body>
