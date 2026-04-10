@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0" />
+
   <title>Подтверждение email</title>
 
- <!-- СТИЛЬ КОНСОЛИ -->
+  <!-- ========================================
+       СТИЛЬ КОНСОЛИ
+  ======================================== -->
 
   <link rel="stylesheet"
         href="styles/console.css" />
 
-  
   <style>
+
+    /*
+    ========================================
+    БАЗОВЫЕ СТИЛИ СТРАНИЦЫ
+    ========================================
+    */
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -51,8 +62,23 @@
       min-height: 24px;
       font-weight: bold;
     }
+
+    /*
+    ========================================
+    КНОПКА ПЕРЕХОДА В ACCOUNT
+    По умолчанию скрыта
+    Показывается только после подтверждения
+    ========================================
+    */
+
+    #goAccountBtn {
+      display: none;
+    }
+
   </style>
+
 </head>
+
 <body>
 
 <header>
@@ -63,13 +89,37 @@
 
   <h2>Подтверждение email</h2>
 
+  <!-- ========================================
+       СТАТУС ПРОВЕРКИ
+  ======================================== -->
+
   <p id="status">
     Проверяем подтверждение...
   </p>
 
+  <!-- ========================================
+       ПРОВЕРИТЬ СНОВА
+  ======================================== -->
+
   <button onclick="checkUser()">
     Проверить снова
   </button>
+
+  <!-- ========================================
+       GO TO ACCOUNT
+       Показывается после подтверждения email
+  ======================================== -->
+
+  <button
+    id="goAccountBtn"
+    onclick="goAccount()"
+  >
+    Go to account
+  </button>
+
+  <!-- ========================================
+       ВОЗВРАТ НА INDEX
+  ======================================== -->
 
   <button onclick="window.location.href='index.html'">
     На главную
@@ -78,44 +128,121 @@
 </div>
 
 <script type="module">
-  import { supabase } from './supabase-config.js'
+
+  import { supabase }
+  from './supabase-config.js'
+
+  /*
+  ========================================
+  DOM ЭЛЕМЕНТЫ
+  ========================================
+  */
 
   const statusText =
     document.getElementById('status')
 
+  const goAccountBtn =
+    document.getElementById('goAccountBtn')
+
+  /*
+  ========================================
+  ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
+  ========================================
+  */
+
   async function checkUser() {
+
     statusText.textContent =
       'Проверяем сессию...'
+
+    /*
+    Скрываем кнопку перед проверкой
+    */
+
+    goAccountBtn.style.display =
+      'none'
 
     const { data, error } =
       await supabase.auth.getUser()
 
     if (error) {
+
       statusText.textContent =
         'Ошибка: ' + error.message
+
       return
     }
 
     if (!data.user) {
+
       statusText.textContent =
-        'Пользователь пока не найден. Если ты только что нажал ссылку в письме, подожди пару секунд и нажми "Проверить снова".'
+        'Пользователь пока не найден. Нажми "Проверить снова".'
+
       return
     }
 
+    /*
+    EMAIL ПОДТВЕРЖДЕН
+    */
+
     statusText.textContent =
-      'Почта подтверждена: ' + data.user.email
+      'Почта подтверждена: '
+      + data.user.email
+
+    /*
+    Показываем кнопку перехода
+    */
+
+    goAccountBtn.style.display =
+      'inline-block'
+
+    /*
+    ========================================
+    СТАРАЯ ЛОГИКА (ОСТАВЛЕНА КАК КОММЕНТАРИЙ)
+    ========================================
+
+    Автоматический переход через 1 секунду
 
     setTimeout(function () {
+
       window.location.href =
         'account.html'
+
     }, 1000)
+
+    ========================================
+    */
+
   }
 
-  window.checkUser = checkUser
+  /*
+  ========================================
+  ПЕРЕХОД В ACCOUNT
+  ========================================
+  */
+
+  function goAccount() {
+
+    window.location.href =
+      'account.html'
+
+  }
+
+  window.checkUser =
+    checkUser
+
+  window.goAccount =
+    goAccount
+
+  /*
+  ========================================
+  АВТОПРОВЕРКА ПРИ ЗАГРУЗКЕ
+  ========================================
+  */
 
   checkUser()
-</script>
 
+</script>
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -128,7 +255,11 @@
     id="build-top"
   >
 
-    рабочий оригинал | v1.0.0
+    ⛔ убран setTimeout
+✅ добавлена кнопка Go to account
+✅ старая логика сохранена как комментарий
+✅ все комментарии присутствуют
+✅ структура совпадает с твоим стилем кода | v1.1.0
 
   </div>
 
@@ -179,6 +310,7 @@
 
 })();
 
-</script>  
+</script>
+
 </body>
 </html>
