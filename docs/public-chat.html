@@ -253,6 +253,30 @@ function renderMessage(row) {
   const div =
     document.createElement('div')
 
+const wrap =
+  document.createElement('div')
+
+const replyBtn =
+  document.createElement('button')
+
+replyBtn.type =
+  'button'
+
+replyBtn.textContent =
+  'Ответить'
+
+replyBtn.style.marginLeft =
+  '10px'
+
+replyBtn.onclick =
+  function () {
+
+    startReply(row)
+
+  }
+
+  
+
   const maskRow =
     Array.isArray(row.masks)
       ? row.masks[0]
@@ -277,7 +301,11 @@ function renderMessage(row) {
   div.style.color =
     colorRow?.hex || '#111111'
 
-  messages.appendChild(div)
+  wrap.appendChild(div)
+
+wrap.appendChild(replyBtn)
+
+messages.appendChild(wrap)
 
   messages.scrollTop =
     messages.scrollHeight
@@ -409,7 +437,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-      перенос вверх блока данных о юзере в console  | v1.2.10
+      Ответы в чате | v1.3.0
     </span>
 
     <span id="build-user" style="float: right;">
