@@ -174,14 +174,15 @@ async function loadMessages() {
     await supabase
       .from('public_chat_messages')
       .select(`
-        *,
-        masks (
-          mask
-        ),
-        colors (
-          color
-        )
-      `)
+  *,
+  masks (
+    name,
+    icon
+  ),
+  colors (
+    color
+  )
+`)
       .order('created_at')
 
   if (error) {
@@ -212,11 +213,11 @@ function renderMessage(row) {
     document.createElement('div')
 
   div.textContent =
-    (row.masks?.mask || row.mask_id) +
-    ' • ' +
-    time +
-    ': ' +
-    row.message
+    ((row.masks?.icon || '') + ' ' + (row.masks?.name || row.mask_id)) +
+  ' • ' +
+  time +
+  ': ' +
+  row.message
 
   div.style.color =
     row.colors?.color || '#111111'
@@ -352,7 +353,7 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-    исправление отправки public chat им самим | v1.2.2
+    точечные правки соотношения имен с базой | v1.2.3
 
   </div>
 
