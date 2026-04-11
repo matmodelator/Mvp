@@ -174,29 +174,29 @@ async function loadMessages() {
     await supabase
       .from('public_chat_messages')
       .select(`
-  *,
-  masks (
-    name,
-    icon
-  ),
-  colors (
-    hex
-  )
-`)
+        *,
+        mask:masks!public_chat_messages_mask_id_fkey (
+          name,
+          icon
+        ),
+        ink:colors!public_chat_messages_color_id_fkey (
+          hex
+        )
+      `)
       .order('created_at')
 
   if (error) {
-    console.log('Ошибка загрузки сообщений:', error.message)
-    status.textContent =
-      'Ошибка загрузки сообщений: ' + error.message
+
+    console.log(error.message)
     return
+
   }
 
   messages.innerHTML = ''
 
   data.forEach(renderMessage)
-}
 
+}
 /*
 ===========================================================
 ОТОБРАЖЕНИЕ СООБЩЕНИЯ
@@ -213,21 +213,21 @@ function renderMessage(row) {
     document.createElement('div')
 
   div.textContent =
-    ((row.masks?.icon || '') + ' ' + (row.masks?.name || row.mask_id)) +
-  ' • ' +
-  time +
-  ': ' +
-  row.message
+    ((row.mask?.icon || '') + ' ' + (row.mask?.name || row.mask_id)) +
+    ' • ' +
+    time +
+    ': ' +
+    row.message
 
   div.style.color =
-    row.colors?.hex || '#111111'
+    row.ink?.hex || '#111111'
 
   messages.appendChild(div)
 
   messages.scrollTop =
     messages.scrollHeight
-}
 
+}
 /*
 ===========================================================
 ОТПРАВКА СООБЩЕНИЯ
@@ -353,7 +353,7 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-    точечные правки соотношения имен с базой | v1.2.3
+   замена функций Message  | v1.2.4
 
   </div>
 
