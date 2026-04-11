@@ -9,16 +9,14 @@
   <link rel="stylesheet"
         href="styles/console.css" />
 
-
-  
   <link rel="stylesheet" href="styles/chat.css">
 </head>
 <body>
 
   <button onclick="goMain()">
-  Назад на главную
-</button>
-  
+    Назад на главную
+  </button>
+
   <header>
     <h1>Общий чат</h1>
   </header>
@@ -27,30 +25,25 @@
     <p id="status">Проверяем сессию...</p>
 
     <div id="messages" class="messages"></div>
-    
-<!-- Ограничение длины сообщения -->
 
-  <form id="chatForm">
+    <!-- Ограничение длины сообщения -->
+    <form id="chatForm">
 
-    <input
-      id="messageInput"
-      type="text"
-      placeholder="Напишите сообщение..."
-      maxlength="150"
-      required
-    >
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Напишите сообщение..."
+        maxlength="150"
+        required
+      >
 
-    <button type="submit">
-      Отправить
-    </button>
+      <button type="submit">
+        Отправить
+      </button>
 
-  </form>
-   
+    </form>
   </div>
 
-
-
-  
 <!--
 ===========================================================
 SCRIPT: PUBLIC CHAT REALTIME
@@ -61,25 +54,6 @@ SCRIPT: PUBLIC CHAT REALTIME
 3. Позволяет отправлять новые сообщения
 4. Слушает новые сообщения в реальном времени (Realtime)
 5. Показывает сообщения на странице
-
-Таблица:
-
-public_chat_messages
-
-Поля:
-
-id
-user_id
-user_email
-message
-created_at
-
-Требования:
-
-- таблица создана
-- RLS включен
-- Realtime включен
-- пользователь авторизован
 ===========================================================
 -->
 
@@ -94,10 +68,6 @@ created_at
 import { createClient }
 from 'https://esm.sh/@supabase/supabase-js@2'
 
-/*
-Создаем соединение с проектом Supabase
-*/
-
 const supabase = createClient(
   'https://fnodbpiwkkrdgqvmyanq.supabase.co',
   'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
@@ -109,6 +79,9 @@ const supabase = createClient(
 ===========================================================
 */
 
+const status =
+  document.getElementById('status')
+
 const messages =
   document.getElementById('messages')
 
@@ -118,19 +91,12 @@ const form =
 const input =
   document.getElementById('messageInput')
 
-  /*
-Если пользователь нажимает Enter —
-форма отправляется
-*/
-
 input.addEventListener(
   'keydown',
   (event) => {
 
     if (event.key === 'Enter') {
-
       form.requestSubmit()
-
     }
 
   }
@@ -144,9 +110,6 @@ let currentColorId = null
 ===========================================================
 ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
 ===========================================================
-
-Если пользователь не вошел —
-перенаправляем на страницу входа
 */
 
 async function loadUser() {
@@ -164,31 +127,45 @@ async function loadUser() {
 
   currentUser = data.user
 
-  const { data: chatUser } =
+  const { data: chatUser, error: chatUserError } =
     await supabase
       .from('public_chat_users')
       .select('mask_id, color_id')
       .eq('user_id', currentUser.id)
       .single()
 
+  if (chatUserError) {
+    console.log('Ошибка загрузки public_chat_users:', chatUserError.message)
+    status.textContent =
+      'Ошибка загрузки данных чата: ' + chatUserError.message
+    return
+  }
 
-    if (chatUser) {
+  if (!chatUser) {
+    status.textContent =
+      'Для пользователя не найдены mask_id и color_id'
+    return
+  }
+
   currentMaskId =
     chatUser.mask_id || null
 
   currentColorId =
     chatUser.color_id || null
+
+  if (!currentMaskId || !currentColorId) {
+    status.textContent =
+      'У пользователя не заданы mask_id или color_id'
+    return
   }
 
+  status.textContent = ''
 }
 
 /*
 ===========================================================
 ЗАГРУЗКА СООБЩЕНИЙ ИЗ БАЗЫ
 ===========================================================
-
-Берем последние сообщения
-и выводим их на экран
 */
 
 async function loadMessages() {
@@ -196,25 +173,27 @@ async function loadMessages() {
   const { data, error } =
     await supabase
       .from('public_chat_messages')
-     .select(`
-  *,
-  colors (
-    color
-  )
-`)
+      .select(`
+        *,
+        masks (
+          mask
+        ),
+        colors (
+          color
+        )
+      `)
       .order('created_at')
 
   if (error) {
-
-    console.log(error.message)
+    console.log('Ошибка загрузки сообщений:', error.message)
+    status.textContent =
+      'Ошибка загрузки сообщений: ' + error.message
     return
-
   }
 
   messages.innerHTML = ''
 
   data.forEach(renderMessage)
-
 }
 
 /*
@@ -225,27 +204,15 @@ async function loadMessages() {
 
 function renderMessage(row) {
 
-  /*
-  Получаем время сообщения
-  */
-
   const time =
     new Date(row.created_at)
       .toLocaleTimeString()
 
-  /*
-  Создаем элемент сообщения
-  */
-
   const div =
     document.createElement('div')
 
-  /*
-  Формируем текст сообщения
-  */
-
   div.textContent =
-    row.mask_id +
+    (row.masks?.mask || row.mask_id) +
     ' • ' +
     time +
     ': ' +
@@ -254,19 +221,10 @@ function renderMessage(row) {
   div.style.color =
     row.colors?.color || '#111111'
 
-  /*
-  Добавляем сообщение в чат
-  */
-
   messages.appendChild(div)
-
-  /*
-  Автоскролл вниз
-  */
 
   messages.scrollTop =
     messages.scrollHeight
-
 }
 
 /*
@@ -284,45 +242,61 @@ async function sendMessage(event) {
 
   if (!text) return
 
-  await supabase
-    .from('public_chat_messages')
-    .insert({
+  if (!currentUser) {
+    status.textContent =
+      'Пользователь не загружен'
+    return
+  }
 
-      user_id:
-        currentUser.id,
+  if (!currentMaskId || !currentColorId) {
+    status.textContent =
+      'Не найдены mask_id или color_id'
+    return
+  }
 
-      user_email:
-        currentUser.email,
+  const { error } =
+    await supabase
+      .from('public_chat_messages')
+      .insert({
 
-     mask_id:
-  currentMaskId,
+        user_id:
+          currentUser.id,
 
-color_id:
-  currentColorId,
+        user_email:
+          currentUser.email,
 
-      message:
-        text
+        mask_id:
+          currentMaskId,
 
-    })
+        color_id:
+          currentColorId,
+
+        message:
+          text
+
+      })
+
+  if (error) {
+    console.log('Ошибка отправки:', error.message)
+    status.textContent =
+      'Ошибка отправки: ' + error.message
+    return
+  }
 
   input.value = ''
-
+  status.textContent = ''
 }
 
 /*
 ===========================================================
 REALTIME ПОДПИСКА
 ===========================================================
-
-Слушаем новые сообщения
-без обновления страницы
 */
 
 function subscribeRealtime() {
 
   supabase
     .channel('public-chat')
-
     .on(
       'postgres_changes',
       {
@@ -330,19 +304,11 @@ function subscribeRealtime() {
         schema: 'public',
         table: 'public_chat_messages'
       },
-
-      (payload) => {
-
-        renderMessage(
-          payload.new
-        )
-
+      async () => {
+        await loadMessages()
       }
-
     )
-
     .subscribe()
-
 }
 
 /*
@@ -363,12 +329,10 @@ form.addEventListener(
 */
 
 await loadUser()
-
 await loadMessages()
-
 subscribeRealtime()
 
-  /*
+/*
 Кнопка "Назад на главную"
 */
 
@@ -380,25 +344,15 @@ window.goMain = goMain
 
 </script>
 
-
-
-
-
 <!-- ========================================
      SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
 ======================================== -->
 
 <div id="service-console">
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-Исправление косяков, которые намутил этот долбоеб | v1.2.1
+    исправление отправки public chat им самим | v1.2.2
 
   </div>
 
@@ -412,26 +366,16 @@ window.goMain = goMain
 
 <!-- ========================================
      SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
 ======================================== -->
 
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
-
   const now = new Date();
-
-  /* Добавляет ведущий ноль */
 
   const pad = n =>
     String(n).padStart(2, '0');
-
-  /* Формат даты */
 
   const date =
       pad(now.getDate())
@@ -440,14 +384,10 @@ window.goMain = goMain
     + '.'
     + now.getFullYear();
 
-  /* Формат времени */
-
   const time =
       pad(now.getHours())
     + ':'
     + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
 
   document
     .getElementById('build-down')
@@ -461,7 +401,5 @@ window.goMain = goMain
 
 </script>
 
-
-  
 </body>
 </html>
