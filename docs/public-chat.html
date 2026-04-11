@@ -137,8 +137,8 @@ input.addEventListener(
 )
 
 let currentUser = null
-let currentMask = ''
-let currentInkColor = '#111111'
+let currentMaskId = null
+let currentColorId = null
 
 /*
 ===========================================================
@@ -157,7 +157,7 @@ async function loadUser() {
   if (error || !data.user) {
 
     window.location.href =
-      'log.html'
+      'index.html'
 
     return
   }
@@ -167,16 +167,17 @@ async function loadUser() {
   const { data: chatUser } =
     await supabase
       .from('public_chat_users')
-      .select('mask, ink_color')
+      .select('mask_id, color_id')
       .eq('user_id', currentUser.id)
       .single()
 
-  if (chatUser) {
-    currentMask =
-      chatUser.mask || ''
 
-    currentInkColor =
-      chatUser.ink_color || '#111111'
+    if (chatUser) {
+  currentMaskId =
+    chatUser.mask_id || null
+
+  currentColorId =
+    chatUser.color_id || null
   }
 
 }
@@ -195,7 +196,12 @@ async function loadMessages() {
   const { data, error } =
     await supabase
       .from('public_chat_messages')
-      .select('*')
+     .select(`
+  *,
+  colors (
+    color
+  )
+`)
       .order('created_at')
 
   if (error) {
@@ -239,14 +245,14 @@ function renderMessage(row) {
   */
 
   div.textContent =
-    row.mask +
+    row.mask_id +
     ' • ' +
     time +
     ': ' +
     row.message
 
   div.style.color =
-    row.ink_color || '#111111'
+    row.colors?.color || '#111111'
 
   /*
   Добавляем сообщение в чат
@@ -288,11 +294,11 @@ async function sendMessage(event) {
       user_email:
         currentUser.email,
 
-      mask:
-        currentMask,
+     mask_id:
+  currentMaskId,
 
-      ink_color:
-        currentInkColor,
+color_id:
+  currentColorId,
 
       message:
         text
@@ -392,11 +398,7 @@ window.goMain = goMain
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-  ✅ row.name → row.mask_name || row.mask || ''
-✅ row.email → убрать
-✅ в тег с сообщением добавить style="color: ${row.ink_color || '#111'}"
-✅ кнопку Назад удалить
-✅ кнопку Назад на главную оставить | v1.2.0
+Исправление косяков, которые намутил этот долбоеб | v1.2.1
 
   </div>
 
