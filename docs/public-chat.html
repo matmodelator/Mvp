@@ -183,7 +183,7 @@ function startReply(row) {
     'block'
 }
 
- <!-- Отмена ответа -->
+ // Отмена ответа 
 cancelReply.addEventListener(
   'click',
   function () {
@@ -411,7 +411,7 @@ async function sendMessage(event) {
           currentColorId,
 
         message:
-          text
+          text,
   
         reply_to_id:
           currentReplyId
@@ -504,7 +504,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-     Функция: Ответы в чате | v1.3.1
+     Функция: Ответы в чате fix errsyntax | v1.3.2
     </span>
 
     <span id="build-user" style="float: right;">
