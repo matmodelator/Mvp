@@ -26,6 +26,13 @@
 
     <div id="messages" class="messages"></div>
 
+
+     <!-- Диапазон: ответы -->
+    <div id="replyBox" style="display:none; margin-bottom:10px;">
+  <span id="replyPreview"></span>
+  <button type="button" id="cancelReply">×</button>
+</div>
+    
     <!-- Ограничение длины сообщения -->
     <form id="chatForm">
 
@@ -91,6 +98,15 @@ const form =
 const input =
   document.getElementById('messageInput')
 
+const replyBox =
+  document.getElementById('replyBox')
+
+const replyPreview =
+  document.getElementById('replyPreview')
+
+const cancelReply =
+  document.getElementById('cancelReply')
+
 input.addEventListener(
   'keydown',
   (event) => {
@@ -106,6 +122,8 @@ input.addEventListener(
 let currentUser = null
 let currentMaskId = null
 let currentColorId = null
+  let currentReplyId = null
+  let currentReplyText = ''
 
 /* ========================================
    UPDATE USER INFO (RIGHT SIDE)
@@ -142,6 +160,43 @@ function updateServiceUser(user) {
       text;
 
 }
+
+/*
+===========================================================
+ФУНКЦИЯ ОТВЕТА НА СООБЩЕНИЕ
+===========================================================
+*/
+
+function startReply(row) {
+
+  currentReplyId =
+    row.id
+
+  currentReplyText =
+    row.message || ''
+
+  replyPreview.textContent =
+    'Ответ на: ' +
+    currentReplyText.substring(0, 50)
+
+  replyBox.style.display =
+    'block'
+}
+
+ <!-- Отмена ответа -->
+cancelReply.addEventListener(
+  'click',
+  function () {
+
+    currentReplyId = null
+    currentReplyText = ''
+
+    replyPreview.textContent = ''
+
+    replyBox.style.display =
+      'none'
+  }
+)
   
 /*
 ===========================================================
@@ -357,6 +412,9 @@ async function sendMessage(event) {
 
         message:
           text
+  
+        reply_to_id:
+          currentReplyId
 
       })
 
@@ -369,6 +427,15 @@ async function sendMessage(event) {
 
   input.value = ''
   status.textContent = ''
+
+currentReplyId = null
+currentReplyText = ''
+
+replyPreview.textContent = ''
+
+replyBox.style.display =
+  'none'
+  
 }
 
 /*
@@ -437,7 +504,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-      Ответы в чате | v1.3.0
+     Функция: Ответы в чате | v1.3.1
     </span>
 
     <span id="build-user" style="float: right;">
