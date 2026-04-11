@@ -67,7 +67,7 @@ body {
 }
 
 /* ========================= */
-/* КОНТЕЙНЕР КАРТИНОК */
+/* КОНТЕЙНЕР */
 /* ========================= */
 
 .images {
@@ -83,7 +83,7 @@ body {
 }
 
 /* ========================= */
-/* ЛЕВАЯ / ПРАВАЯ */
+/* БЛОК КАРТИНКИ */
 /* ========================= */
 
 .image {
@@ -92,16 +92,62 @@ body {
 
   height: 100%;
 
+  position: relative;
+
   background-size: contain;
 
   background-position: top center;
 
   background-repeat: no-repeat;
 
+  cursor: pointer;
+
 }
 
 /* ========================= */
-/* ЛЕВАЯ КАРТИНКА */
+/* ТЕКСТ НАД КАРТИНКОЙ */
+/* ========================= */
+
+.hover-text {
+
+  position: absolute;
+
+  top: 10px;
+
+  left: 20px;
+
+  font-size: 26px;
+
+  font-weight: bold;
+
+  color: black;
+
+  background: rgba(255,255,255,0.8);
+
+  padding: 6px 12px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  width: 0;
+
+  transition: width 0.4s ease;
+
+}
+
+/* ========================= */
+/* HOVER ЭФФЕКТ */
+/* ========================= */
+
+.image:hover .hover-text {
+
+  width: 100%;
+
+}
+
+/* ========================= */
+/* ЛЕВАЯ */
 /* ========================= */
 
 .left {
@@ -111,7 +157,7 @@ body {
 }
 
 /* ========================= */
-/* ПРАВАЯ КАРТИНКА */
+/* ПРАВАЯ */
 /* ========================= */
 
 .right {
@@ -143,89 +189,10 @@ body {
   }
 
 }
-
- /* ========================= */
-/* ТИТР-КОНТЕЙНЕР */
-/* ========================= */
-
-.header {
-
-  position: relative;
-
-  width: 100%;
-
-  text-align: center;
-
-  padding: 20px;
-
-  font-size: 36px;
-
-  font-weight: bold;
-
-  background: white;
-
-  z-index: 10;
-
-  cursor: pointer;
-
-}
-
-/* ========================= */
-/* ВЫПАДАЮЩИЙ БЛОК */
-/* ========================= */
-
-.mvp-lines {
-
-  position: absolute;
-
-  top: 100%;
-
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  opacity: 0;
-
-  transform-origin: top;
-
-  transition: all 0.3s ease;
-
-  pointer-events: none;
-
-}
-
-/* ========================= */
-/* СТРОКИ */
-/* ========================= */
-
-.mvp-lines span {
-
-  font-size: 22px;
-
-  font-weight: normal;
-
-  color: #333;
-
-}
-
-/* ========================= */
-/* HOVER */
-/* ========================= */
-
-.header:hover .mvp-lines {
-
-  opacity: 1;
-
-  transform: translateX(-50%) translateY(8px);
-
-}     
+      
 </style>
+
+      
 
 </head>
 
@@ -245,9 +212,17 @@ M.V.P
 
 <div class="images">
 
-<div class="image left"></div>
+<div class="image left">
+  <div class="hover-text">
+    Most Valuable Partner
+  </div>
+</div>
 
-<div class="image right"></div>      
+<div class="image right">
+  <div class="hover-text">
+    Most Valuable Player
+  </div>
+</div>    
 
 </div>
 
@@ -269,7 +244,7 @@ M.V.P
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    central hover | v1.1.0
+    side hover | v1.2.0
 
   </div>
 
