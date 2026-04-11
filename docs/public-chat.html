@@ -370,7 +370,13 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-   вставка console.log  | v1.2.7
+    <span id="build-left">
+      вставка данных о юзере в console.log | v1.2.8
+    </span>
+
+    <span id="build-user" style="float: right;">
+      user: --
+    </span>
 
   </div>
 
@@ -416,6 +422,36 @@ window.goMain = goMain
       + time;
 
 })();
+
+/* ========================================
+   UPDATE USER INFO (RIGHT SIDE)
+======================================== */
+
+function updateServiceUser(user) {
+
+  const joined =
+    user.joined_at
+      ? user.joined_at.substring(0, 20)
+      : '--';
+
+  const text =
+      'email: ' + (user.email ?? '--')
+    + ' | status: ' + (user.status ?? '--')
+    + ' | mask_id: ' + (user.mask_id ?? '--')
+    + ' | color_id: ' + (user.color_id ?? '--')
+    + ' | joined_at: ' + joined;
+
+  const el =
+    document.getElementById('build-user');
+
+  if (el) {
+
+    el.textContent =
+      text;
+
+  }
+
+}
 
 </script>
 
