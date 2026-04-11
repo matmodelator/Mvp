@@ -107,6 +107,42 @@ let currentUser = null
 let currentMaskId = null
 let currentColorId = null
 
+/* ========================================
+   UPDATE USER INFO (RIGHT SIDE)
+======================================== */
+
+function updateServiceUser(user) {
+
+  if (!user) {
+
+    document
+      .getElementById('build-user')
+      .textContent =
+        'user: not found';
+
+    return;
+
+  }
+
+  const joined =
+    user.joined_at
+      ? user.joined_at.substring(0, 20)
+      : '--';
+
+  const text =
+      'email: ' + (user.email ?? '--')
+    + ' | status: ' + (user.status ?? '--')
+    + ' | mask_id: ' + (user.mask_id ?? '--')
+    + ' | color_id: ' + (user.color_id ?? '--')
+    + ' | joined_at: ' + joined;
+
+  document
+    .getElementById('build-user')
+    .textContent =
+      text;
+
+}
+  
 /*
 ===========================================================
 ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
@@ -131,7 +167,7 @@ async function loadUser() {
   const { data: chatUser, error: chatUserError } =
     await supabase
       .from('public_chat_users')
-      .select('mask_id, color_id')
+      .select('email, status, mask_id, color_id, joined_at')
       .eq('user_id', currentUser.id)
       .single()
 
@@ -154,6 +190,8 @@ async function loadUser() {
   currentColorId =
     chatUser.color_id || null
 
+updateServiceUser(chatUser)
+  
   if (!currentMaskId || !currentColorId) {
     status.textContent =
       'У пользователя не заданы mask_id или color_id'
@@ -371,7 +409,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-      вставка данных о юзере в console.log с проверкой | v1.2.9
+      перенос вверх блока данных о юзере в console  | v1.2.10
     </span>
 
     <span id="build-user" style="float: right;">
@@ -423,41 +461,7 @@ window.goMain = goMain
 
 })();
 
-/* ========================================
-   UPDATE USER INFO (RIGHT SIDE)
-======================================== */
 
-function updateServiceUser(user) {
-
-  if (!user) {
-
-    document
-      .getElementById('build-user')
-      .textContent =
-        'user: not found';
-
-    return;
-
-  }
-
-  const joined =
-    user.joined_at
-      ? user.joined_at.substring(0, 20)
-      : '--';
-
-  const text =
-      'email: ' + (user.email ?? '--')
-    + ' | status: ' + (user.status ?? '--')
-    + ' | mask_id: ' + (user.mask_id ?? '--')
-    + ' | color_id: ' + (user.color_id ?? '--')
-    + ' | joined_at: ' + joined;
-
-  document
-    .getElementById('build-user')
-    .textContent =
-      text;
-
-}
 
 </script>
 </body>
