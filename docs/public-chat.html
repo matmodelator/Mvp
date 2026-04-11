@@ -194,7 +194,7 @@ async function loadMessages() {
     return
 
   }
-
+console.log('LOAD MESSAGES DATA:', data)
   messages.innerHTML = ''
 
   data.forEach(renderMessage)
@@ -370,7 +370,7 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-   замена render  | v1.2.6
+   вставка console.log  | v1.2.7
 
   </div>
 
