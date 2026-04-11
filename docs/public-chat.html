@@ -215,8 +215,18 @@ function renderMessage(row) {
   const div =
     document.createElement('div')
 
+  const maskRow =
+    Array.isArray(row.masks)
+      ? row.masks[0]
+      : row.masks
+
+  const colorRow =
+    Array.isArray(row.colors)
+      ? row.colors[0]
+      : row.colors
+
   const maskText =
-    ((row.masks?.icon || '') + ' ' + (row.masks?.name || '')).trim()
+    ((maskRow?.icon || '') + ' ' + (maskRow?.name || '')).trim()
     || String(row.mask_id || '')
 
   div.textContent =
@@ -227,7 +237,7 @@ function renderMessage(row) {
     row.message
 
   div.style.color =
-    row.colors?.hex || '#111111'
+    colorRow?.hex || '#111111'
 
   messages.appendChild(div)
 
@@ -360,7 +370,7 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-   замена какщй то херни  | v1.2.5
+   замена render  | v1.2.6
 
   </div>
 
