@@ -180,7 +180,7 @@ async function loadMessages() {
     icon
   ),
   colors (
-    color
+    hex
   )
 `)
       .order('created_at')
@@ -220,7 +220,7 @@ function renderMessage(row) {
   row.message
 
   div.style.color =
-    row.colors?.color || '#111111'
+    row.colors?.hex || '#111111'
 
   messages.appendChild(div)
 
