@@ -268,15 +268,22 @@ async function loadMessages() {
     await supabase
       .from('public_chat_messages')
       .select(`
-        *,
-        masks!public_chat_messages_mask_id_fkey (
-          name,
-          icon
-        ),
-        colors!public_chat_messages_color_id_fkey (
-          hex
-        )
-      `)
+  *,
+  masks!public_chat_messages_mask_id_fkey (
+    name,
+    icon
+  ),
+  colors!public_chat_messages_color_id_fkey (
+    hex
+  ),
+  parent:reply_to_id (
+    mask_id,
+    masks (
+      name,
+      icon
+    )
+  )
+`)
       .order('created_at')
 
   if (error) {
@@ -345,8 +352,23 @@ function renderMessage(row) {
     const replyDiv =
       document.createElement('div')
 
-    replyDiv.textContent =
-      '↳ Ответ на сообщение #' + row.reply_to_id
+   
+    
+    let parentMask = 'сообщение'
+
+if (row.parent && row.parent.masks) {
+
+  parentMask =
+    ((row.parent.masks.icon || '') +
+     ' ' +
+     (row.parent.masks.name || '')).trim()
+
+}
+
+replyDiv.textContent =
+  '↳ Ответ: ' + parentMask
+
+    
 
     replyDiv.style.fontSize =
       '12px'
@@ -528,7 +550,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-     Ответы вида - Ответ на... | v1.3.3
+     Ответы вида - Ответ Маске | v1.3.4
     </span>
 
     <span id="build-user" style="float: right;">
