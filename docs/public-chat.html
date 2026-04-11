@@ -371,11 +371,11 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-      вставка данных о юзере в console.log | v1.2.8
+      вставка данных о юзере в console.log с проверкой | v1.2.9
     </span>
 
     <span id="build-user" style="float: right;">
-      user: --
+      user: loading...
     </span>
 
   </div>
@@ -429,6 +429,17 @@ window.goMain = goMain
 
 function updateServiceUser(user) {
 
+  if (!user) {
+
+    document
+      .getElementById('build-user')
+      .textContent =
+        'user: not found';
+
+    return;
+
+  }
+
   const joined =
     user.joined_at
       ? user.joined_at.substring(0, 20)
@@ -441,19 +452,13 @@ function updateServiceUser(user) {
     + ' | color_id: ' + (user.color_id ?? '--')
     + ' | joined_at: ' + joined;
 
-  const el =
-    document.getElementById('build-user');
-
-  if (el) {
-
-    el.textContent =
+  document
+    .getElementById('build-user')
+    .textContent =
       text;
-
-  }
 
 }
 
 </script>
-
 </body>
 </html>
