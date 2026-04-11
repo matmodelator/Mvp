@@ -96,6 +96,7 @@ input.addEventListener(
   (event) => {
 
     if (event.key === 'Enter') {
+      event.preventDefault()
       form.requestSubmit()
     }
 
@@ -175,11 +176,11 @@ async function loadMessages() {
       .from('public_chat_messages')
       .select(`
         *,
-        mask:masks!public_chat_messages_mask_id_fkey (
+        masks!public_chat_messages_mask_id_fkey (
           name,
           icon
         ),
-        ink:colors!public_chat_messages_color_id_fkey (
+        colors!public_chat_messages_color_id_fkey (
           hex
         )
       `)
@@ -187,7 +188,9 @@ async function loadMessages() {
 
   if (error) {
 
-    console.log(error.message)
+    console.log('Ошибка загрузки сообщений:', error.message)
+    status.textContent =
+      'Ошибка загрузки сообщений: ' + error.message
     return
 
   }
@@ -195,8 +198,8 @@ async function loadMessages() {
   messages.innerHTML = ''
 
   data.forEach(renderMessage)
-
 }
+
 /*
 ===========================================================
 ОТОБРАЖЕНИЕ СООБЩЕНИЯ
@@ -212,22 +215,26 @@ function renderMessage(row) {
   const div =
     document.createElement('div')
 
+  const maskText =
+    ((row.masks?.icon || '') + ' ' + (row.masks?.name || '')).trim()
+    || String(row.mask_id || '')
+
   div.textContent =
-    ((row.mask?.icon || '') + ' ' + (row.mask?.name || row.mask_id)) +
+    maskText +
     ' • ' +
     time +
     ': ' +
     row.message
 
   div.style.color =
-    row.ink?.hex || '#111111'
+    row.colors?.hex || '#111111'
 
   messages.appendChild(div)
 
   messages.scrollTop =
     messages.scrollHeight
-
 }
+
 /*
 ===========================================================
 ОТПРАВКА СООБЩЕНИЯ
@@ -353,7 +360,7 @@ window.goMain = goMain
 
   <div class="row" id="build-top">
 
-   замена функций Message  | v1.2.4
+   замена какщй то херни  | v1.2.5
 
   </div>
 
