@@ -143,6 +143,88 @@ body {
   }
 
 }
+
+ /* ========================= */
+/* ТИТР-КОНТЕЙНЕР */
+/* ========================= */
+
+.header {
+
+  position: relative;
+
+  width: 100%;
+
+  text-align: center;
+
+  padding: 20px;
+
+  font-size: 36px;
+
+  font-weight: bold;
+
+  background: white;
+
+  z-index: 10;
+
+  cursor: pointer;
+
+}
+
+/* ========================= */
+/* ВЫПАДАЮЩИЙ БЛОК */
+/* ========================= */
+
+.mvp-lines {
+
+  position: absolute;
+
+  top: 100%;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  opacity: 0;
+
+  transform-origin: top;
+
+  transition: all 0.3s ease;
+
+  pointer-events: none;
+
+}
+
+/* ========================= */
+/* СТРОКИ */
+/* ========================= */
+
+.mvp-lines span {
+
+  font-size: 22px;
+
+  font-weight: normal;
+
+  color: #333;
+
+}
+
+/* ========================= */
+/* HOVER */
+/* ========================= */
+
+.header:hover .mvp-lines {
+
+  opacity: 1;
+
+  transform: translateX(-50%) translateY(8px);
+
+}     
 </style>
 
 </head>
@@ -151,17 +233,25 @@ body {
 
 <div class="header">
 
-MVP
+M.V.P
+<div class="mvp-lines">
 
+    <span>Most</span>
+    <span>Valuable</span>
+    <span>Project</span>
+
+  </div>
 </div>
 
 <div class="images">
 
 <div class="image left"></div>
 
-<div class="image right"></div>
+<div class="image right"></div>      
 
 </div>
+
+
 
 
 
@@ -179,7 +269,7 @@ MVP
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    рабочий заставка | v1.0.0
+    central hover | v1.1.0
 
   </div>
 
