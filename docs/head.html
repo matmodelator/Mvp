@@ -67,7 +67,7 @@ body {
 }
 
 /* ========================= */
-/* КОНТЕЙНЕР */
+/* КОНТЕЙНЕР КАРТИНОК */
 /* ========================= */
 
 .images {
@@ -83,7 +83,7 @@ body {
 }
 
 /* ========================= */
-/* БЛОК КАРТИНКИ */
+/* ЛЕВАЯ / ПРАВАЯ */
 /* ========================= */
 
 .image {
@@ -92,62 +92,16 @@ body {
 
   height: 100%;
 
-  position: relative;
-
   background-size: contain;
 
   background-position: top center;
 
   background-repeat: no-repeat;
 
-  cursor: pointer;
-
 }
 
 /* ========================= */
-/* ТЕКСТ НАД КАРТИНКОЙ */
-/* ========================= */
-
-.hover-text {
-
-  position: absolute;
-
-  top: 10px;
-
-  left: 20px;
-
-  font-size: 26px;
-
-  font-weight: bold;
-
-  color: black;
-
-  background: rgba(255,255,255,0.8);
-
-  padding: 6px 12px;
-
-  white-space: nowrap;
-
-  overflow: hidden;
-
-  width: 0;
-
-  transition: width 0.4s ease;
-
-}
-
-/* ========================= */
-/* HOVER ЭФФЕКТ */
-/* ========================= */
-
-.image:hover .hover-text {
-
-  width: 100%;
-
-}
-
-/* ========================= */
-/* ЛЕВАЯ */
+/* ЛЕВАЯ КАРТИНКА */
 /* ========================= */
 
 .left {
@@ -157,7 +111,7 @@ body {
 }
 
 /* ========================= */
-/* ПРАВАЯ */
+/* ПРАВАЯ КАРТИНКА */
 /* ========================= */
 
 .right {
@@ -189,10 +143,129 @@ body {
   }
 
 }
+
+ /* ========================= */
+/* ТИТР-КОНТЕЙНЕР */
+/* ========================= */
+
+.header {
+
+  position: relative;
+
+  width: 100%;
+
+  text-align: center;
+
+  padding: 20px;
+
+  font-size: 36px;
+
+  font-weight: bold;
+
+  background: white;
+
+  z-index: 10;
+
+  cursor: pointer;
+
+}
+
+/* ========================= */
+/* ВЫПАДАЮЩИЙ БЛОК */
+/* ========================= */
+
+.mvp-lines {
+
+  position: absolute;
+
+  top: 100%;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  opacity: 0;
+
+  transform-origin: top;
+
+  transition: all 0.3s ease;
+
+  pointer-events: none;
+
+}
+
+/* ========================= */
+/* СТРОКИ */
+/* ========================= */
+
+.mvp-lines span {
+
+  font-size: 22px;
+
+  font-weight: normal;
+
+  color: #333;
+
+}
+
+/* ========================= */
+/* HOVER */
+/* ========================= */
+
+.header:hover .mvp-lines {
+
+  opacity: 1;
+
+  transform: translateX(-50%) translateY(8px);
+
+}    
+
+/* ТЕКСТ НАД КАРТИНКОЙ */
+
+.hover-text {
+
+  position: absolute;
+
+  top: 10px;
+
+  left: 60px;        /* сдвигаем правее — можешь поставить 30 / 50 / 60 */
+
+  background: none;  /* убираем белую полосу */
       
-</style>
+  font-size: 26px;
+
+  font-weight: bold;
+
+  color: black;
+
+  padding: 6px 12px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  width: 0;
+
+  transition: width 0.4s ease;
+
+}
+
+/* HOVER */
+
+.image:hover .hover-text {
+
+  width: 100%;
+
+}
 
       
+</style>
 
 </head>
 
@@ -222,7 +295,7 @@ M.V.P
   <div class="hover-text">
     Most Valuable Player
   </div>
-</div>    
+</div>     
 
 </div>
 
@@ -244,7 +317,7 @@ M.V.P
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    side hover | v1.2.0
+    side hover - косяки | v1.2.1
 
   </div>
 
