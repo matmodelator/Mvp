@@ -305,32 +305,14 @@ function renderMessage(row) {
     new Date(row.created_at)
       .toLocaleTimeString()
 
+  const wrap =
+    document.createElement('div')
+
   const div =
     document.createElement('div')
 
-const wrap =
-  document.createElement('div')
-
-const replyBtn =
-  document.createElement('button')
-
-replyBtn.type =
-  'button'
-
-replyBtn.textContent =
-  'Ответить'
-
-replyBtn.style.marginLeft =
-  '10px'
-
-replyBtn.onclick =
-  function () {
-
-    startReply(row)
-
-  }
-
-  
+  const replyBtn =
+    document.createElement('button')
 
   const maskRow =
     Array.isArray(row.masks)
@@ -346,6 +328,38 @@ replyBtn.onclick =
     ((maskRow?.icon || '') + ' ' + (maskRow?.name || '')).trim()
     || String(row.mask_id || '')
 
+  wrap.style.marginBottom =
+    '8px'
+
+  if (row.reply_to_id) {
+
+    wrap.style.marginLeft =
+      '24px'
+
+    wrap.style.borderLeft =
+      '2px solid rgba(255,255,255,0.18)'
+
+    wrap.style.paddingLeft =
+      '10px'
+
+    const replyDiv =
+      document.createElement('div')
+
+    replyDiv.textContent =
+      '↳ Ответ на сообщение #' + row.reply_to_id
+
+    replyDiv.style.fontSize =
+      '12px'
+
+    replyDiv.style.opacity =
+      '0.7'
+
+    replyDiv.style.marginBottom =
+      '2px'
+
+    wrap.appendChild(replyDiv)
+  }
+
   div.textContent =
     maskText +
     ' • ' +
@@ -356,11 +370,21 @@ replyBtn.onclick =
   div.style.color =
     colorRow?.hex || '#111111'
 
+  replyBtn.type =
+    'button'
+
+  replyBtn.textContent =
+    'Ответить'
+
+  replyBtn.onclick =
+    function () {
+      startReply(row)
+    }
+
   wrap.appendChild(div)
+  wrap.appendChild(replyBtn)
 
-wrap.appendChild(replyBtn)
-
-messages.appendChild(wrap)
+  messages.appendChild(wrap)
 
   messages.scrollTop =
     messages.scrollHeight
@@ -504,7 +528,7 @@ window.goMain = goMain
   <div class="row" id="build-top">
 
     <span id="build-left">
-     Функция: Ответы в чате fix errsyntax | v1.3.2
+     Ответы вида - Ответ на... | v1.3.3
     </span>
 
     <span id="build-user" style="float: right;">
