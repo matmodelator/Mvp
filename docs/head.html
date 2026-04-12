@@ -228,18 +228,22 @@ body {
 
 }    
 
-/* ТЕКСТ НАД КАРТИНКОЙ */
+/* ТЕКСТ НАД КАРТИНКАМИ */
 
-.hover-text {
+/* ========================= */
+/* ЛЕВЫЙ HOVER */
+/* ========================= */
+
+.hover-left {
 
   position: absolute;
 
   top: 10px;
 
-  left: 60px;        /* сдвигаем правее — можешь поставить 30 / 50 / 60 */
+  left: 60px;
 
-  background: none;  /* убираем белую полосу */
-      
+  background: none;
+
   font-size: 26px;
 
   font-weight: bold;
@@ -258,13 +262,50 @@ body {
 
 }
 
-/* HOVER */
+.left:hover .hover-left {
 
-.image:hover .hover-text {
-
-  width: 100%;
+  width: 360px;
 
 }
+
+/* ========================= */
+/* ПРАВЫЙ HOVER */
+/* ========================= */
+
+.hover-right {
+
+  position: absolute;
+
+  top: 10px;
+
+  left: 60px;
+
+  background: none;
+
+  font-size: 26px;
+
+  font-weight: bold;
+
+  color: black;
+
+  padding: 6px 12px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  width: 0;
+
+  transition: width 0.4s ease;
+
+}
+
+.right:hover .hover-right {
+
+  width: 330px;
+
+}
+
 
       
 </style>
@@ -288,16 +329,16 @@ M.V.P
 <div class="images">
 
 <div class="image left">
-  <div class="hover-text">
+  <div class="hover-left">
     Most Valuable Partner
   </div>
 </div>
 
 <div class="image right">
-  <div class="hover-text">
+  <div class="hover-right">
     Most Valuable Player
   </div>
-</div>     
+</div>
 
 </div>
 
@@ -319,7 +360,7 @@ M.V.P
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    side hover - fix err image | v1.2.2
+    TWO side hovers - fix err open | v1.2.3
 
   </div>
 
