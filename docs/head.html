@@ -126,6 +126,8 @@ body {
 
 .right {
 
+  background-image: url("https://matmodelator.github.io/Mvp/styles/dating.jpg");
+
   background-image: url("https://matmodelator.github.io/Mvp/styles/tennis.jpg");
 
 }
@@ -245,8 +247,8 @@ body {
 .hover-left {
 
   position: absolute;
-  top: 10px;
-  left: 350px;
+  top: 30px;
+  left: 300px;
 
   background: none;
 
@@ -278,8 +280,8 @@ body {
 .hover-right {
 
   position: absolute;
-  top: 10px;
-  left: 350px;
+  top: 30px;
+  left: 300px;
 
   background: none;
 
@@ -311,6 +313,16 @@ body {
 
 <body>
 
+<select id="fontSelect">
+/* список шрифтов */
+  <option value="Montserrat">Montserrat</option>
+  <option value="Roboto">Roboto</option>
+  <option value="Oswald">Oswald</option>
+  <option value="Playfair Display">Playfair Display</option>
+  <option value="Orbitron">Orbitron</option>
+
+</select>      
+
 <div class="header">
 
 M.V.P
@@ -339,7 +351,18 @@ M.V.P
 
 </div>
 
+<script>
+ /* Выбор шрифта */
+const select = document.getElementById('fontSelect')
 
+select.addEventListener('change', function () {
+
+  document.body.style.fontFamily =
+    "'" + this.value + "', Arial, sans-serif"
+
+})
+
+</script>
 
 
 
@@ -357,7 +380,7 @@ M.V.P
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    TWO side hovers - fix images | v1.2.7
+    ШРИФТ | v1.3.0
 
   </div>
 
