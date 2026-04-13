@@ -344,6 +344,8 @@ body {
 
   transition: clip-path 0.4s ease;
 
+  z-index: 2;
+
 }
 
 .right:hover .hover-right {
@@ -352,6 +354,52 @@ body {
 
 }
 
+/* ========================= */
+/* ВТОРАЯ КАРТИНКА (ЭФФЕКТ ПЕСКА) */
+/* ========================= */
+
+.right::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background-image: url("https://matmodelator.github.io/Mvp/styles/tennis.jpg");
+
+  background-size: contain;
+
+  background-position: top center;
+
+  background-repeat: no-repeat;
+
+  opacity: 0;
+
+  filter: blur(8px) saturate(0.7) contrast(1.2);
+
+  transform: scale(1.03);
+
+  transition:
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    transform 0.5s ease;
+
+  pointer-events: none;
+
+  z-index: 1;
+
+}
+
+.right:hover::after {
+
+  opacity: 1;
+
+  filter: blur(0) saturate(1) contrast(1);
+
+  transform: scale(1);
+
+}
 </style>
 
 </head>
