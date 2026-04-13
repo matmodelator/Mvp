@@ -1,4 +1,467 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="ru">
+
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500;700&family=Oswald:wght@400;600;700&family=Playfair+Display:wght@400;600&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>MVP</title>
+
+<link rel="stylesheet"
+      href="styles/console.css" />
+
+<style>
+
+/* ========================= */
+/* СБРОС */
+/* ========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ========================= */
+/* BODY */
+/* ========================= */
+
+body {
+
+  font-family: Arial, sans-serif;
+
+  height: 100vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+/* ========================= */
+/* ТИТР */
+/* ========================= */
+
+.header {
+
+  width: 100%;
+
+  text-align: center;
+
+  padding: 20px;
+
+  font-size: 36px;
+
+  font-weight: bold;
+
+  background: white;
+
+  z-index: 10;
+
+}
+
+/* ========================= */
+/* КОНТЕЙНЕР КАРТИНОК */
+/* ========================= */
+
+.images {
+
+  height: 70vh;
+
+  display: flex;
+
+  width: 100%;
+
+  align-items: flex-start;
+
+  transition: transform 0.25s ease;
+
+  overflow: hidden;
+
+}
+
+.image:hover {
+
+  transform: translateY(-6px) scale(1.03);
+
+}
+
+/* ========================= */
+/* ЛЕВАЯ / ПРАВАЯ */
+/* ========================= */
+
+.image {
+
+  width: 50%;
+
+  height: 100%;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background-size: contain;
+
+  background-position: top center;
+
+  background-repeat: no-repeat;
+
+}
+
+/* ========================= */
+/* ЛЕВАЯ КАРТИНКА */
+/* ========================= */
+
+.left {
+
+  background-image: url("https://matmodelator.github.io/Mvp/styles/dating.jpg");
+
+}
+
+/* ========================= */
+/* ПРАВАЯ КАРТИНКА */
+/* ========================= */
+
+.right {
+
+  background-image: url("https://matmodelator.github.io/Mvp/styles/dating.jpg");
+
+}
+
+/* ===== ВОТ НОВЫЙ ЭФФЕКТ МОЗАИКИ / ПЕСКА ===== */
+
+.right::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background-image: url("https://matmodelator.github.io/Mvp/styles/tennis.jpg");
+
+  background-size: contain;
+
+  background-position: top center;
+
+  background-repeat: no-repeat;
+
+  opacity: 0;
+
+  filter: blur(8px) saturate(0.7) contrast(1.2);
+
+  transform: scale(1.03);
+
+  transition:
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    transform 0.5s ease;
+
+  pointer-events: none;
+
+}
+
+.right:hover::after {
+
+  opacity: 1;
+
+  filter: blur(0) saturate(1) contrast(1);
+
+  transform: scale(1);
+
+}
+
+/* ========================= */
+/* MOBILE */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  .images {
+
+    flex-direction: column;
+
+    height: 70vh;
+
+  }
+
+  .image {
+
+    width: 100%;
+
+    height: 50%;
+
+  }
+
+}
+
+/* ========================= */
+/* ТИТР-КОНТЕЙНЕР */
+/* ========================= */
+
+.header {
+
+  position: relative;
+
+  width: 100%;
+
+  text-align: center;
+
+  padding: 20px;
+
+  font-size: 36px;
+
+  font-weight: bold;
+
+  background: white;
+
+  z-index: 10;
+
+  cursor: pointer;
+
+}
+
+/* ========================= */
+/* ВЫПАДАЮЩИЙ БЛОК */
+/* ========================= */
+
+.mvp-lines {
+
+  position: absolute;
+
+  top: 100%;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  opacity: 0;
+
+  transform-origin: top;
+
+  transition: all 0.3s ease;
+
+  pointer-events: none;
+
+}
+
+/* ========================= */
+/* СТРОКИ */
+/* ========================= */
+
+.mvp-lines span {
+
+  font-size: 22px;
+
+  font-weight: normal;
+
+  color: #00008B;
+
+}
+
+/* ========================= */
+/* MAIN HOVER */
+/* ========================= */
+
+.header:hover .mvp-lines {
+
+  opacity: 1;
+
+  transform: translateX(-50%) translateY(8px);
+
+}
+
+/* ========================= */
+/* ЛЕВЫЙ HOVER */
+/* ========================= */
+
+.hover-left {
+
+  position: absolute;
+
+  top: 30px;
+
+  left: 290px;
+
+  background: none;
+
+  font-size: 26px;
+
+  font-weight: bold;
+
+  color: #003366;
+
+  padding: 0;
+
+  white-space: nowrap;
+
+  clip-path: inset(0 100% 0 0);
+
+  transition: clip-path 0.4s ease;
+
+}
+
+.left:hover .hover-left {
+
+  clip-path: inset(0 0 0 0);
+
+}
+
+/* ========================= */
+/* ПРАВЫЙ HOVER */
+/* ========================= */
+
+.hover-right {
+
+  position: absolute;
+
+  top: 30px;
+
+  left: 300px;
+
+  background: none;
+
+  font-size: 26px;
+
+  font-weight: bold;
+
+  color: #003366;
+
+  padding: 0;
+
+  white-space: nowrap;
+
+  clip-path: inset(0 100% 0 0);
+
+  transition: clip-path 0.4s ease;
+
+}
+
+.right:hover .hover-right {
+
+  clip-path: inset(0 0 0 0);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<select id="fontSelect">
+
+  <option value="Montserrat">Montserrat</option>
+  <option value="Roboto">Roboto</option>
+  <option value="Oswald">Oswald</option>
+  <option value="Playfair Display">Playfair Display</option>
+  <option value="Orbitron">Orbitron</option>
+
+</select>
+
+<div class="header">
+
+M.V.P.
+
+<div class="mvp-lines">
+
+<span>Most</span>
+<span>Valuable</span>
+<span>Project</span>
+
+</div>
+
+</div>
+
+<div class="images">
+
+<div class="image left">
+<div class="hover-left">
+Most Valuable Partner
+</div>
+</div>
+
+<div class="image right">
+<div class="hover-right">
+Most Valuable Player
+</div>
+</div>
+
+</div>
+
+<script>
+
+const select = document.getElementById('fontSelect')
+
+select.addEventListener('change', function () {
+
+  document.body.style.fontFamily =
+    "'" + this.value + "', Arial, sans-serif"
+
+})
+
+</script>
+
+<div id="service-console">
+
+<div class="row" id="build-top">
+
+Одинаовые картинки | v1.3.2
+
+</div>
+
+<div class="row" id="build-down">
+
+deploy: --
+
+</div>
+
+</div>
+
+<script>
+
+(function () {
+
+const now = new Date();
+
+const pad = n =>
+String(n).padStart(2, '0');
+
+const date =
+pad(now.getDate())
++ '.'
++ pad(now.getMonth() + 1)
++ '.'
++ now.getFullYear();
+
+const time =
+pad(now.getHours())
++ ':'
++ pad(now.getMinutes());
+
+document
+.getElementById('build-down')
+.textContent =
+'deploy: '
++ date
++ ' '
++ time;
+
+})();
+
+</script>
+
+</body>
+</html>
 <html lang="ru">
 
 <head>
@@ -380,7 +843,7 @@ select.addEventListener('change', function () {
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    Одинаовые картинки| v1.3.2
+    мозаика| v1.3.3
 
   </div>
 
