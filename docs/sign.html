@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+  <title>Вход / Регистрация</title>
+
+  <style>
+
+/* ========================================
+   SERVICE CONSOLE
+   Показывает версию и время деплоя
+   Всегда закреплена внизу экрана
+======================================== */
+
+#service-console {
+
+  /* Приклеено к низу экрана */
+
+  position: fixed;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  /* Внешний вид как консоль */
+
+  padding: 6px 10px;
+
+  background: #111;
+  color: #8cff8c;
+
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.35;
+
+  border-top: 1px solid #333;
+
+  /* Поверх всех элементов */
+
+  z-index: 9999;
+
+  /* Легкая прозрачность */
+
+  opacity: 0.9;
+}
+
+/* Каждая строка консоли */
+
+#service-console .row {
+
+  display: block;
+
+}
+
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+    }
+
+    /* >>> NEW
+       Обертка для размещения кнопки глаза поверх input
+    */
+    .password-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    /* <<< NEW */
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .login-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .signup-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    #status {
+      margin-top: 16px;
+      text-align: center;
+      font-weight: bold;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Dating App MVP</h1>
+</header>
+
+<div class="container">
+
+  <h2>Вход / Регистрация</h2>
+
+  <form id="authForm">
+
+    <label>Email:</label>
+
+    <input
+      id="email"
+      type="email"
+      required
+    />
+
+    <label>Password:</label>
+
+    <!-- >>> CHANGED
+         Password помещен в wrapper,
+         чтобы добавить кнопку показа/скрытия
+    -->
+    <div class="password-wrapper">
+
+      <input
+        id="password"
+        type="password"
+        required
+        minlength="6"
+      />
+
+      <!--
+      👁 — пароль скрыт
+      🙈 — пароль показан
+      -->
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('password', this)"
+      >
+        👁
+      </button>
+
+    </div>
+    <!-- <<< CHANGED -->
+
+    <!-- >>> NEW
+         Confirm Password остается в общей форме,
+         но нужен только для Sign up.
+         Поэтому required здесь НЕ ставим.
+    -->
+    <label>Confirm password:</label>
+
+    <div class="password-wrapper">
+
+      <input
+        id="confirmPassword"
+        type="password"
+        minlength="6"
+        placeholder="Only for sign up"
+      />
+
+      <button
+        type="button"
+        class="eye-btn"
+        onclick="togglePassword('confirmPassword', this)"
+      >
+        👁
+      </button>
+
+    </div>
+    <!-- <<< NEW -->
+
+    <div class="buttons">
+
+      <button
+        type="button"
+        class="login-btn"
+        onclick="login()"
+      >
+        Log in
+      </button>
+
+      <button
+        type="button"
+        class="signup-btn"
+        onclick="signup()"
+      >
+        Sign up
+      </button>
+
+    </div>
+
+  </form>
+
+  <p id="status"></p>
+
+</div>
+
+<script type="module">
+
+  import { supabase }
+  from './supabase-config.js'
+
+  const emailInput =
+    document.getElementById('email')
+
+  const passwordInput =
+    document.getElementById('password')
+
+  /* >>> NEW
+     Поле confirm password.
+     Используется только в signup()
+  */
+  const confirmPasswordInput =
+    document.getElementById('confirmPassword')
+  /* <<< NEW */
+
+  const statusText =
+    document.getElementById('status')
+
+  /* >>> CHANGED
+     togglePassword меняет и тип поля,
+     и символ на кнопке:
+
+     👁 — скрыто
+     🙈 — показано
+  */
+  function togglePassword(id, btn) {
+
+    const field =
+      document.getElementById(id)
+
+    if (field.type === 'password') {
+
+      field.type =
+        'text'
+
+      btn.textContent =
+        '🙈'
+
+    }
+    else {
+
+      field.type =
+        'password'
+
+      btn.textContent =
+        '👁'
+
+    }
+
+  }
+
+  window.togglePassword =
+    togglePassword
+  /* <<< CHANGED */
+
+  async function login() {
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    statusText.textContent =
+      'Выполняется вход...'
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+    if (error) {
+
+      if (
+        error.message &&
+        error.message.includes(
+          'Email not confirmed'
+        )
+      ) {
+
+        statusText.textContent =
+          'Почта не подтверждена'
+
+        setTimeout(function () {
+
+          window.location.href =
+            'check-email.html'
+
+        }, 500)
+
+        return
+      }
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    statusText.textContent =
+      'Успешный вход'
+
+    setTimeout(function () {
+
+      window.location.href =
+        'main.html'
+
+    }, 300)
+  }
+
+  window.login =
+    login
+
+  async function signup() {
+
+    const email =
+      emailInput.value.trim()
+
+    const password =
+      passwordInput.value
+
+    /* >>> NEW
+       Confirm password обязателен
+       только для Sign up
+    */
+    const confirmPassword =
+      confirmPasswordInput.value.trim()
+
+    if (!confirmPassword) {
+
+      statusText.textContent =
+        'Заполните Confirm password'
+
+      return
+    }
+
+    if (password !== confirmPassword) {
+
+      statusText.textContent =
+        'Пароли не совпадают'
+
+      return
+    }
+    /* <<< NEW */
+
+    statusText.textContent =
+      'Регистрация...'
+
+    const { error } =
+      await supabase.auth.signUp({
+
+        email,
+        password,
+
+        options: {
+          emailRedirectTo:
+            'https://matmodelator.github.io/Mvp/confirm.html'
+        }
+
+      })
+
+    if (error) {
+
+      statusText.textContent =
+        'Ошибка: ' + error.message
+
+      return
+    }
+
+    statusText.textContent =
+      'Письмо отправлено. Проверь почту.'
+
+    setTimeout(function () {
+
+      window.location.href =
+        'check-email.html'
+
+    }, 800)
+  }
+
+  window.signup =
+    signup
+
+</script>
+
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+    remake index --> sign рабочий с обезьянкой и повтором пароля | v1.1.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
+
+  
+</body>
+</html>
