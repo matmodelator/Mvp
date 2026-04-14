@@ -78,11 +78,20 @@ body {
   background-position: top center;
   background-repeat: no-repeat;
   cursor: pointer;
-  transition: transform 0.25s ease;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.18);
 }
 
 .image:hover {
   transform: translateY(-6px) scale(1.03);
+
+  box-shadow:
+    0 16px 32px rgba(0,0,0,0.28);
 }
 
 /* ========================= */
@@ -91,6 +100,10 @@ body {
 
 .image:active {
   transform: translateY(2px) scale(0.98);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.22);
+
   transition: transform 0.08s ease;
 }
       
@@ -280,7 +293,7 @@ body {
 
 <div class="header">
 
-<img src="styles/logo.svg"
+<img src="styles/logo.png"
      alt="MVP logo"
      class="logo">
       
@@ -322,7 +335,7 @@ Most Valuable Player
 
 <div class="row" id="build-top">
 
-logo error check | v2.3.2
+png вместо svg и тени | v2.3.3
 
 </div>
 
