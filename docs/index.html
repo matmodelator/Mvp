@@ -34,6 +34,7 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* ========================= */
@@ -43,26 +44,90 @@ body {
 .header {
   position: relative;
   width: 100%;
-  text-align: center;
-
-  padding: 0;          /* важно */
-
-  font-size: 36px;
-  font-weight: bold;
+  height: 180px;
   background: white;
   z-index: 10;
   cursor: pointer;
+  overflow: visible;
 }
+
+/* ========================= */
+/* LOGO */
+/* ========================= */
+
+.logo {
+  position: absolute;
+  top: 35px;          /* двигаешь только logo */
+  left: 50%;
+  transform: translateX(-50%);
+  height: 70px;
+  width: auto;
+  display: block;
+  margin: 0;
+}
+
+/* ========================= */
+/* MVP */
+/* ========================= */
+
+.title {
+  position: absolute;
+  top: 110px;         /* двигаешь только MVP */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ========================= */
+/* ВЫПАДАЮЩИЙ БЛОК */
+/* ========================= */
+
+.mvp-lines {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transform: translateX(-50%);
+  transform-origin: top;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* ========================= */
+/* СТРОКИ */
+/* ========================= */
+
+.mvp-lines span {
+  font-size: 22px;
+  font-weight: normal;
+  color: #00008B;
+}
+
+/* ========================= */
+/* MAIN HOVER */
+/* ========================= */
+
+.header:hover .mvp-lines {
+  opacity: 1;
+  transform: translateX(-50%) translateY(8px);
+}
+
 /* ========================= */
 /* КОНТЕЙНЕР КАРТИНОК */
 /* ========================= */
 
 .images {
-  height: 70vh;
+  height: calc(100vh - 180px - 40px - 34px);
   display: flex;
   width: 100%;
   align-items: flex-start;
-  transition: transform 0.25s ease;
   overflow: hidden;
 }
 
@@ -79,12 +144,18 @@ body {
   background-position: top center;
   background-repeat: no-repeat;
   cursor: pointer;
-  transition: transform 0.25s ease,
-   }
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.18);
+}
 
 .image:hover {
   transform: translateY(-6px) scale(1.03);
- }
+  box-shadow:
+    0 16px 32px rgba(0,0,0,0.28);
+}
 
 /* ========================= */
 /* ЭФФЕКТ НАЖАТИЯ */
@@ -92,6 +163,8 @@ body {
 
 .image:active {
   transform: translateY(2px) scale(0.98);
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.22);
   transition: transform 0.08s ease;
 }
       
@@ -141,61 +214,6 @@ body {
 }
 
 /* ========================= */
-/* MOBILE */
-/* ========================= */
-
-@media (max-width: 768px) {
-
-  .images {
-    flex-direction: column;
-    height: 70vh;
-  }
-
-  .image {
-    width: 100%;
-    height: 50%;
-  }
-
-}
-
-/* ========================= */
-/* ВЫПАДАЮЩИЙ БЛОК */
-/* ========================= */
-
-.mvp-lines {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  opacity: 0;
-  transform: translateX(-50%);
-  transform-origin: top;
-  transition: all 0.3s ease;
-  pointer-events: none;
-}
-
-/* ========================= */
-/* СТРОКИ */
-/* ========================= */
-
-.mvp-lines span {
-  font-size: 22px;
-  font-weight: normal;
-  color: #00008B;
-}
-
-/* ========================= */
-/* MAIN HOVER */
-/* ========================= */
-
-.header:hover .mvp-lines {
-  opacity: 1;
-  transform: translateX(-50%) translateY(8px);
-}
-
-/* ========================= */
 /* ЛЕВЫЙ HOVER */
 /* ========================= */
 
@@ -242,52 +260,63 @@ body {
 }
 
 /* ========================= */
-/* LOGO */
-/* ========================= */
-
-.logo {
-  height: 70px;
-  display: block;
-
-  margin-top: 250px;   /* двигает логотип вниз */
-  margin-bottom: 5px;
-
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* ========================= */
 /* COPYRIGHT */
 /* ========================= */
 
 .copyright {
-
   width: 100%;
-
   text-align: center;
-
   padding: 10px 0;
-
   font-size: 14px;
-
   color: #444;
-
   background: #f8f8f8;
-
   border-top: 1px solid #ddd;
-
+  height: 40px;
+  flex-shrink: 0;
 }
 
 /* ========================= */
-/* MVP */
+/* MOBILE */
 /* ========================= */
 
-      .title {
+@media (max-width: 768px) {
 
-  margin-top: 10px;   /* двигает текст вниз */
-  margin-bottom: 0;
+  .header {
+    height: 150px;
+  }
 
-}      
+  .logo {
+    top: 20px;
+    height: 56px;
+  }
+
+  .title {
+    top: 88px;
+    font-size: 28px;
+  }
+
+  .mvp-lines {
+    top: 122px;
+  }
+
+  .images {
+    flex-direction: column;
+    height: calc(100vh - 150px - 40px - 34px);
+  }
+
+  .image {
+    width: 100%;
+    height: 50%;
+  }
+
+  .hover-left,
+  .hover-right {
+    left: 20px;
+    top: 20px;
+    font-size: 22px;
+  }
+
+}
 
 </style>
 
@@ -341,7 +370,7 @@ Most Valuable Player
 
 <div class="row" id="build-top">
 
-header fix | v2.3.6
+смена настроек сдвига | v2.3.7
 
 </div>
 
