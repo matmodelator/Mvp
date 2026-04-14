@@ -32,23 +32,22 @@
 body {
   font-family: 'Playfair Display', Arial, sans-serif;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
 }
 
 /* ========================= */
-/* ТИТР */
+/* ТИТР ПОВЕРХ КАРТИНОК */
 /* ========================= */
 
 .header {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 180px;
-  background: white;
+  height: 0;
+  background: transparent;
   z-index: 10;
   cursor: pointer;
-  overflow: visible;
 }
 
 /* ========================= */
@@ -57,13 +56,13 @@ body {
 
 .logo {
   position: absolute;
-  top: 35px;          /* двигаешь только logo */
+  top: 30px;              /* отдельно двигаешь logo */
   left: 50%;
   transform: translateX(-50%);
   height: 70px;
   width: auto;
   display: block;
-  margin: 0;
+  pointer-events: auto;
 }
 
 /* ========================= */
@@ -72,14 +71,14 @@ body {
 
 .title {
   position: absolute;
-  top: 110px;         /* двигаешь только MVP */
+  top: 105px;             /* отдельно двигаешь MVP */
   left: 50%;
   transform: translateX(-50%);
   font-size: 36px;
   font-weight: bold;
   line-height: 1;
-  margin: 0;
   white-space: nowrap;
+  pointer-events: auto;
 }
 
 /* ========================= */
@@ -88,16 +87,20 @@ body {
 
 .mvp-lines {
   position: absolute;
-  top: 150px;
+  top: 145px;
   left: 50%;
+
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 6px;
+
   opacity: 0;
-  transform: translateX(-50%);
-  transform-origin: top;
-  transition: all 0.3s ease;
+  transform: translate(-50%, 0);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+
   pointer-events: none;
+  text-align: center;
 }
 
 /* ========================= */
@@ -108,6 +111,8 @@ body {
   font-size: 22px;
   font-weight: normal;
   color: #00008B;
+  display: block;
+  text-align: center;
 }
 
 /* ========================= */
@@ -116,7 +121,7 @@ body {
 
 .header:hover .mvp-lines {
   opacity: 1;
-  transform: translateX(-50%) translateY(8px);
+  transform: translate(-50%, 8px);
 }
 
 /* ========================= */
@@ -124,7 +129,8 @@ body {
 /* ========================= */
 
 .images {
-  height: calc(100vh - 180px - 40px - 34px);
+  position: relative;
+  height: 100vh;
   display: flex;
   width: 100%;
   align-items: flex-start;
@@ -264,15 +270,17 @@ body {
 /* ========================= */
 
 .copyright {
+  position: absolute;
+  left: 0;
+  bottom: 34px;
   width: 100%;
   text-align: center;
   padding: 10px 0;
   font-size: 14px;
   color: #444;
-  background: #f8f8f8;
+  background: rgba(248,248,248,0.92);
   border-top: 1px solid #ddd;
-  height: 40px;
-  flex-shrink: 0;
+  z-index: 10;
 }
 
 /* ========================= */
@@ -280,10 +288,6 @@ body {
 /* ========================= */
 
 @media (max-width: 768px) {
-
-  .header {
-    height: 150px;
-  }
 
   .logo {
     top: 20px;
@@ -301,7 +305,7 @@ body {
 
   .images {
     flex-direction: column;
-    height: calc(100vh - 150px - 40px - 34px);
+    height: 100vh;
   }
 
   .image {
@@ -370,7 +374,7 @@ Most Valuable Player
 
 <div class="row" id="build-top">
 
-смена настроек сдвига | v2.3.7
+полный фикс от ИИ | v2.3.8
 
 </div>
 
