@@ -78,21 +78,12 @@ body {
   background-position: top center;
   background-repeat: no-repeat;
   cursor: pointer;
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-
-  box-shadow:
-    0 8px 18px rgba(0,0,0,0.18);
-}
+  transition: transform 0.25s ease,
+   }
 
 .image:hover {
   transform: translateY(-6px) scale(1.03);
-
-  box-shadow:
-    0 16px 32px rgba(0,0,0,0.28);
-}
+ }
 
 /* ========================= */
 /* ЭФФЕКТ НАЖАТИЯ */
@@ -100,10 +91,6 @@ body {
 
 .image:active {
   transform: translateY(2px) scale(0.98);
-
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.22);
-
   transition: transform 0.08s ease;
 }
       
@@ -260,7 +247,12 @@ body {
 .logo {
   height: 70px;
   display: block;
-  margin: 10px auto;
+
+  margin-top: 250px;   /* двигает логотип вниз */
+  margin-bottom: 5px;
+
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ========================= */
@@ -284,7 +276,18 @@ body {
   border-top: 1px solid #ddd;
 
 }
-      
+
+/* ========================= */
+/* MVP */
+/* ========================= */
+
+      .title {
+
+  margin-top: 10px;   /* двигает текст вниз */
+  margin-bottom: 0;
+
+}      
+
 </style>
 
 </head>
@@ -297,7 +300,9 @@ body {
      alt="MVP logo"
      class="logo">
       
+<div class="title">
 MVP
+</div>
 
 <div class="mvp-lines">
 
@@ -335,7 +340,7 @@ Most Valuable Player
 
 <div class="row" id="build-top">
 
-svg!!! | v2.3.4
+svg new | v2.3.5
 
 </div>
 
