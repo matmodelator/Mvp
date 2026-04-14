@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+  <title>Проверка аккаунта</title>
+
+<!-- СТИЛЬ КОНСОЛИ -->
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .status {
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-line;
+    }
+
+    .actions {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 6px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dating App MVP</h1>
+  </header>
+
+  <div class="container">
+    <div id="status" class="status">
+      Проверяем аккаунт...
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div class="actions">
+      <button onclick="window.location.href='index.html'">
+        На главную
+      </button>
+
+      <button onclick="window.location.reload()">
+        Проверить снова
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient }
+      from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const SUPABASE_URL =
+      'https://YOUR_PROJECT.supabase.co'
+
+    const SUPABASE_ANON_KEY =
+      'YOUR_SUPABASE_ANON_KEY'
+
+    const supabase =
+      createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const statusText =
+      document.getElementById('status')
+
+    const errorText =
+      document.getElementById('error')
+
+    async function ensureAccountRow(user) {
+      const { data: existingAccount, error: selectError } =
+        await supabase
+          .from('accounts')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
+
+      if (selectError) {
+        throw new Error(
+          'Ошибка чтения accounts: ' + selectError.message
+        )
+      }
+
+      if (existingAccount) {
+        return existingAccount
+      }
+
+      const { data: insertedAccount, error: insertError } =
+        await supabase
+          .from('accounts')
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              profile_completed: false
+            }
+          ])
+          .select()
+          .single()
+
+      if (insertError) {
+        throw new Error(
+          'Ошибка создания accounts: ' + insertError.message
+        )
+      }
+
+      return insertedAccount
+    }
+
+    function isProfileFilled(account) {
+      return account &&
+        account.profile_completed === true
+    }
+
+    async function checkAccount() {
+      try {
+        statusText.textContent =
+          'Проверяем пользователя...'
+
+        errorText.textContent = ''
+
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser()
+
+        if (userError) {
+          throw new Error(
+            'Ошибка получения пользователя: ' +
+            userError.message
+          )
+        }
+
+        const user = userData.user
+
+        if (!user) {
+          statusText.textContent =
+            'Пользователь не найден'
+
+          setTimeout(function () {
+            window.location.href = 'login.html'
+          }, 1200)
+
+          return
+        }
+
+        if (!user.email_confirmed_at) {
+          statusText.textContent =
+            'Почта не подтверждена'
+
+          setTimeout(function () {
+            window.location.href = 'confirm.html'
+          }, 1200)
+
+          return
+        }
+
+        statusText.textContent =
+          'Проверяем запись аккаунта...'
+
+        const account =
+          await ensureAccountRow(user)
+
+        if (!isProfileFilled(account)) {
+          statusText.textContent =
+            'Профиль не заполнен. Переходим к заполнению...'
+
+          setTimeout(function () {
+            window.location.href = 'account.html'
+          }, 1200)
+
+          return
+        }
+
+        statusText.textContent =
+          'Аккаунт готов. Переходим дальше...'
+
+        setTimeout(function () {
+          window.location.href = 'main.html'
+        }, 1000)
+
+      } catch (error) {
+        console.error(error)
+
+        statusText.textContent =
+          'Ошибка проверки аккаунта'
+
+        errorText.textContent =
+          error.message
+      }
+    }
+
+    checkAccount()
+  </script>
+
+
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+    создан без привяки к логике| v1.0.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
+
+</body>
+</html>  
