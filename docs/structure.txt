@@ -8,3 +8,64 @@ project/
 ├── backend/
 ├── frontend/
 └── database/
+
+общая структура :
+supabase-config.js
+   │
+   ├── index.html
+   ├── reg.html
+   ├── check-email.html
+   ├── confirm.html
+   ├── log.html
+   ├── check-account.html
+   └── account.html
+
+Полная блок-схема
+START
+  ↓
+index (entrance)
+  ↓
+check user
+  │
+  ├── нет user
+  │        ↓
+  │       sign
+  │        │
+  │        ├── reg
+  │        │     ↓
+  │        │   check-email
+  │        │     ↓
+  │        │   confirm
+  │        │     ↓
+  │        │   account
+  │        │     ↓
+  │        │    main
+  │        │
+  │        └── log
+  │              ↓
+  │          check-account
+  │              │
+  │              ├── account не заполнен
+  │              │         ↓
+  │              │       account
+  │              │         ↓
+  │              │        main
+  │              │
+  │              └── account заполнен
+  │                        ↓
+  │                       main
+  │
+  └── user есть
+           ↓
+     check-account
+           │
+           ├── account не заполнен
+           │         ↓
+           │       account
+           │         ↓
+           │        main
+           │
+           └── account заполнен
+                     ↓
+                    main
+
