@@ -32,7 +32,10 @@
 body {
   font-family: 'Playfair Display', Arial, sans-serif;
   height: 100vh;
-  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ========================= */
@@ -56,13 +59,16 @@ body {
 
 .logo {
   position: absolute;
-  top: 30px;              /* отдельно двигаешь logo */
+
+  top: 85px;              /* logo — ниже MVP */
+
   left: 50%;
   transform: translateX(-50%);
+
   height: 70px;
   width: auto;
-  display: block;
-  pointer-events: auto;
+
+  z-index: 11;
 }
 
 /* ========================= */
@@ -71,14 +77,19 @@ body {
 
 .title {
   position: absolute;
-  top: 105px;             /* отдельно двигаешь MVP */
+
+  top: 25px;              /* MVP — выше */
+
   left: 50%;
   transform: translateX(-50%);
-  font-size: 36px;
+
+  font-size: 42px;        /* можно увеличить как заглавный титр */
   font-weight: bold;
-  line-height: 1;
+  letter-spacing: 2px;
+
   white-space: nowrap;
-  pointer-events: auto;
+
+  z-index: 11;
 }
 
 /* ========================= */
@@ -87,7 +98,9 @@ body {
 
 .mvp-lines {
   position: absolute;
-  top: 145px;
+
+  top: 150px;             /* ниже logo */
+
   left: 50%;
 
   display: flex;
@@ -96,13 +109,14 @@ body {
   gap: 6px;
 
   opacity: 0;
-  transform: translate(-50%, 0);
+
+  transform: translate(-50%, 0) rotate(-90deg);
+
   transition: transform 0.3s ease, opacity 0.3s ease;
 
   pointer-events: none;
   text-align: center;
 }
-
 /* ========================= */
 /* СТРОКИ */
 /* ========================= */
@@ -121,22 +135,20 @@ body {
 
 .header:hover .mvp-lines {
   opacity: 1;
-  transform: translate(-50%, 8px);
+  transform: translate(-50%, 8px) rotate(-90deg);
 }
-
 /* ========================= */
 /* КОНТЕЙНЕР КАРТИНОК */
 /* ========================= */
 
 .images {
   position: relative;
-  height: 100vh;
+  height: 75vh;      /* 75% высоты экрана */
   display: flex;
   width: 100%;
   align-items: flex-start;
   overflow: hidden;
 }
-
 /* ========================= */
 /* ЛЕВАЯ / ПРАВАЯ */
 /* ========================= */
@@ -374,7 +386,7 @@ Most Valuable Player
 
 <div class="row" id="build-top">
 
-полный фикс от ИИ | v2.3.8
+разворот выпадающего текста | v2.3.9
 
 </div>
 
