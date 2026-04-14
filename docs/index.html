@@ -142,13 +142,20 @@ body {
 /* ========================= */
 
 .images {
-  position: relative;
-  height: 75vh;      /* 75% высоты экрана */
-  display: flex;
+  position: absolute;
+
+  bottom: 0;              /* прижать к низу */
+  left: 0;
+
   width: 100%;
+  height: 80vh;           /* 80% высоты экрана */
+
+  display: flex;
+
   align-items: flex-start;
   overflow: hidden;
 }
+      
 /* ========================= */
 /* ЛЕВАЯ / ПРАВАЯ */
 /* ========================= */
@@ -162,18 +169,12 @@ body {
   background-position: top center;
   background-repeat: no-repeat;
   cursor: pointer;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-  box-shadow:
-    0 8px 18px rgba(0,0,0,0.18);
-}
+  transition: transform 0.25s ease,
+   }
 
 .image:hover {
   transform: translateY(-6px) scale(1.03);
-  box-shadow:
-    0 16px 32px rgba(0,0,0,0.28);
-}
+   }
 
 /* ========================= */
 /* ЭФФЕКТ НАЖАТИЯ */
@@ -181,9 +182,7 @@ body {
 
 .image:active {
   transform: translateY(2px) scale(0.98);
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.22);
-  transition: transform 0.08s ease;
+    transition: transform 0.08s ease;
 }
       
 /* ========================= */
@@ -385,8 +384,7 @@ Most Valuable Player
 <div id="service-console">
 
 <div class="row" id="build-top">
-
-разворот выпадающего текста | v2.3.9
+минус тень | v2.3.10
 
 </div>
 
