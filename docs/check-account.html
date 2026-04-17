@@ -91,139 +91,211 @@
     </div>
   </div>
 
-  <script type="module">
-   import { supabase }
-  from './supabase-config.js'
+ <script type="module">
 
-    const statusText =
-      document.getElementById('status')
+import { supabase }
+from './supabase-config.js'
 
-    const errorText =
-      document.getElementById('error')
+const statusText =
+  document.getElementById('status')
 
-    async function ensureAccountRow(user) {
-      const { data: existingAccount, error: selectError } =
-        await supabase
-          .from('accounts')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle()
+const errorText =
+  document.getElementById('error')
 
-      if (selectError) {
-        throw new Error(
-          'Ошибка чтения accounts: ' + selectError.message
-        )
-      }
+/* ========================================
+   ОБЯЗАТЕЛЬНЫЕ ПОЛЯ
+======================================== */
 
-      if (existingAccount) {
-        return existingAccount
-      }
+const REQUIRED_FIELDS = [
+  'email',
+  'name',
+  'gender',
+  'birthday',
+  'tel_number'
+]
 
-      const { data: insertedAccount, error: insertError } =
+/* ========================================
+   ПРОВЕРКА ПУСТЫХ ПОЛЕЙ
+======================================== */
+
+function hasEmptyFields(account) {
+
+  for (const field of REQUIRED_FIELDS) {
+
+    if (
+      account[field] === null ||
+      account[field] === undefined ||
+      account[field] === ''
+    ) {
+      return true
+    }
+
+  }
+
+  return false
+}
+
+/* ========================================
+   ПРОВЕРКА АККАУНТА
+======================================== */
+
+async function checkAccount() {
+
+  try {
+
+    statusText.textContent =
+      'Проверяем пользователя...'
+
+    errorText.textContent = ''
+
+    /* ---------- USER ---------- */
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser()
+
+    if (userError) {
+      throw new Error(
+        'Ошибка получения пользователя: ' +
+        userError.message
+      )
+    }
+
+    const user =
+      userData.user
+
+    if (!user) {
+
+      statusText.textContent =
+        'Пользователь не найден'
+
+      setTimeout(function () {
+
+        window.location.href =
+          'login.html'
+
+      }, 1000)
+
+      return
+    }
+
+    if (!user.email_confirmed_at) {
+
+      statusText.textContent =
+        'Почта не подтверждена'
+
+      setTimeout(function () {
+
+        window.location.href =
+          'confirm.html'
+
+      }, 1000)
+
+      return
+    }
+
+    statusText.textContent =
+      'Проверяем запись аккаунта...'
+
+    /* ---------- ACCOUNTS ---------- */
+
+    const { data: account, error: selectError } =
+      await supabase
+        .from('accounts')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle()
+
+    if (selectError) {
+      throw new Error(
+        'Ошибка загрузки аккаунта: ' +
+        selectError.message
+      )
+    }
+
+    /* ---------- ЕСЛИ ЗАПИСИ НЕТ ---------- */
+
+    if (!account) {
+
+      const { error: insertError } =
         await supabase
           .from('accounts')
           .insert([
             {
               id: user.id,
-              email: user.email,
-              profile_completed: false
+              email: user.email
             }
           ])
-          .select()
-          .single()
 
       if (insertError) {
         throw new Error(
-          'Ошибка создания accounts: ' + insertError.message
+          'Ошибка создания аккаунта: ' +
+          insertError.message
         )
       }
 
-      return insertedAccount
+      statusText.textContent =
+        'Создан новый аккаунт'
+
+      setTimeout(function () {
+
+        window.location.href =
+          'account.html'
+
+      }, 800)
+
+      return
     }
 
-    function isProfileFilled(account) {
-      return account &&
-        account.profile_completed === true
+    /* ---------- ПРОВЕРКА ПОЛЕЙ ---------- */
+
+    if (hasEmptyFields(account)) {
+
+      statusText.textContent =
+        'Есть незаполненные поля'
+
+      setTimeout(function () {
+
+        window.location.href =
+          'account.html'
+
+      }, 800)
+
+      return
     }
 
-    async function checkAccount() {
-      try {
-        statusText.textContent =
-          'Проверяем пользователя...'
+    /* ---------- ВСЕ ЗАПОЛНЕНО ---------- */
 
-        errorText.textContent = ''
+    statusText.textContent =
+      'Аккаунт готов'
 
-        const { data: userData, error: userError } =
-          await supabase.auth.getUser()
+    setTimeout(function () {
 
-        if (userError) {
-          throw new Error(
-            'Ошибка получения пользователя: ' +
-            userError.message
-          )
-        }
+      window.location.href =
+        'main.html'
 
-        const user = userData.user
+    }, 800)
 
-        if (!user) {
-          statusText.textContent =
-            'Пользователь не найден'
+  }
 
-          setTimeout(function () {
-            window.location.href = 'login.html'
-          }, 1200)
+  catch (error) {
 
-          return
-        }
+    console.error(error)
 
-        if (!user.email_confirmed_at) {
-          statusText.textContent =
-            'Почта не подтверждена'
+    statusText.textContent =
+      'Ошибка проверки аккаунта'
 
-          setTimeout(function () {
-            window.location.href = 'confirm.html'
-          }, 1200)
+    errorText.textContent =
+      error.message
 
-          return
-        }
+  }
 
-        statusText.textContent =
-          'Проверяем запись аккаунта...'
+}
 
-        const account =
-          await ensureAccountRow(user)
+/* ======================================== */
 
-        if (!isProfileFilled(account)) {
-          statusText.textContent =
-            'Профиль не заполнен. Переходим к заполнению...'
+checkAccount()
 
-          setTimeout(function () {
-            window.location.href = 'account.html'
-          }, 1200)
-
-          return
-        }
-
-        statusText.textContent =
-          'Аккаунт готов. Переходим дальше...'
-
-        setTimeout(function () {
-          window.location.href = 'main.html'
-        }, 1000)
-
-      } catch (error) {
-        console.error(error)
-
-        statusText.textContent =
-          'Ошибка проверки аккаунта'
-
-        errorText.textContent =
-          error.message
-      }
-    }
-
-    checkAccount()
-  </script>
+</script>
 
 
 
@@ -241,7 +313,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   фикс привязки к config| v1.1.1
+   блок проверки аккаунта с разветвлением| v1.2.0
 
   </div>
 
