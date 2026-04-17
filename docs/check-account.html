@@ -80,15 +80,29 @@
 
     <div id="error" class="error"></div>
 
-    <div class="actions">
-      <button onclick="window.location.href='index.html'">
-        На главную
-      </button>
+<!-- Задаем КНОПКИ -->
+    
+   <div class="actions">
+  <button onclick="window.location.href='index.html'">
+    На главную
+  </button>
 
-      <button onclick="window.location.reload()">
-        Проверить снова
-      </button>
-    </div>
+  <button
+    id="fillAccountBtn"
+    onclick="window.location.href='account.html'"
+    style="display:none;"
+  >
+    Заполнить аккаунт
+  </button>
+
+  <button
+    id="goMainBtn"
+    onclick="window.location.href='main.html'"
+    style="display:none;"
+  >
+    Перейти дальше
+  </button>
+</div>
   </div>
 
 
@@ -288,7 +302,7 @@ checkAccount()
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   блок проверки аккаунта фикс таймеров и кнопок| v1.2.2
+   изменение кнопок| v1.2.3
 
   </div>
 
