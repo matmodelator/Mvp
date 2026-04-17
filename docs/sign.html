@@ -6,57 +6,12 @@
         content="width=device-width, initial-scale=1.0" />
   <title>Вход / Регистрация</title>
 
+<link rel="stylesheet"
+      href="styles/console.css" />
+  
   <style>
 
-/* ========================================
-   SERVICE CONSOLE
-   Показывает версию и время деплоя
-   Всегда закреплена внизу экрана
-======================================== */
-
-#service-console {
-
-  /* Приклеено к низу экрана */
-
-  position: fixed;
-  left: 0;
-  bottom: 0;
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  /* Внешний вид как консоль */
-
-  padding: 6px 10px;
-
-  background: #111;
-  color: #8cff8c;
-
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 1.35;
-
-  border-top: 1px solid #333;
-
-  /* Поверх всех элементов */
-
-  z-index: 9999;
-
-  /* Легкая прозрачность */
-
-  opacity: 0.9;
-}
-
-/* Каждая строка консоли */
-
-#service-console .row {
-
-  display: block;
-
-}
-
-    
+  
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -281,7 +236,7 @@
 
      👁 — скрыто
      🙈 — показано
-  */
+  
   function togglePassword(id, btn) {
 
     const field =
@@ -309,7 +264,9 @@
   }
 
   window.togglePassword =
-    togglePassword
+    togglePassword */
+
+  
   /* <<< CHANGED */
 
   async function login() {
@@ -363,7 +320,7 @@
     setTimeout(function () {
 
       window.location.href =
-        'main.html'
+        'check-account.html'
 
     }, 300)
   }
@@ -457,7 +414,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    remake index --> sign рабочий с обезьянкой и повтором пароля | v1.1.0
+   redirection on 'check-account.html' & style console & глазки в коммент | v1.1.1
 
   </div>
 
