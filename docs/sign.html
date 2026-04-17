@@ -102,6 +102,22 @@
       font-weight: bold;
       min-height: 24px;
     }
+
+/* Убирает встроенный глаз браузера */
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+    
   </style>
 </head>
 <body>
@@ -235,7 +251,7 @@
      и символ на кнопке:
 
      👁 — скрыто
-     🙈 — показано
+     🙈 — показано */
   
   function togglePassword(id, btn) {
 
@@ -264,7 +280,9 @@
   }
 
   window.togglePassword =
-    togglePassword */
+    togglePassword 
+
+  
 
   
   /* <<< CHANGED */
@@ -414,7 +432,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   redirection on 'check-account.html' & style console & глазки в коммент | v1.1.1
+   фикс дубль глазки | v1.1.2
 
   </div>
 
