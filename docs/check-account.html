@@ -92,17 +92,8 @@
   </div>
 
   <script type="module">
-    import { createClient }
-      from 'https://esm.sh/@supabase/supabase-js@2'
-
-    const SUPABASE_URL =
-      'https://YOUR_PROJECT.supabase.co'
-
-    const SUPABASE_ANON_KEY =
-      'YOUR_SUPABASE_ANON_KEY'
-
-    const supabase =
-      createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+   import { supabase }
+  from './supabase-config.js'
 
     const statusText =
       document.getElementById('status')
@@ -250,7 +241,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    добавлена привязка к config| v1.1.0
+   фикс привязки к config| v1.1.1
 
   </div>
 
