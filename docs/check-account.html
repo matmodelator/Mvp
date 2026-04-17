@@ -91,8 +91,12 @@
     </div>
   </div>
 
- <script type="module">
 
+<!-- ========================================
+     ПРОЦЕДУРА ПРОВЕРКИ АККАУНТА
+======================================== -->
+<script type="module">
+  
 import { supabase }
 from './supabase-config.js'
 
@@ -102,10 +106,6 @@ const statusText =
 const errorText =
   document.getElementById('error')
 
-/* ========================================
-   ОБЯЗАТЕЛЬНЫЕ ПОЛЯ
-======================================== */
-
 const REQUIRED_FIELDS = [
   'email',
   'name',
@@ -113,10 +113,6 @@ const REQUIRED_FIELDS = [
   'birthday',
   'tel_number'
 ]
-
-/* ========================================
-   ПРОВЕРКА ПУСТЫХ ПОЛЕЙ
-======================================== */
 
 function hasEmptyFields(account) {
 
@@ -135,10 +131,6 @@ function hasEmptyFields(account) {
   return false
 }
 
-/* ========================================
-   ПРОВЕРКА АККАУНТА
-======================================== */
-
 async function checkAccount() {
 
   try {
@@ -147,8 +139,6 @@ async function checkAccount() {
       'Проверяем пользователя...'
 
     errorText.textContent = ''
-
-    /* ---------- USER ---------- */
 
     const { data: userData, error: userError } =
       await supabase.auth.getUser()
@@ -173,7 +163,7 @@ async function checkAccount() {
         window.location.href =
           'login.html'
 
-      }, 1000)
+      }, 800)
 
       return
     }
@@ -188,15 +178,13 @@ async function checkAccount() {
         window.location.href =
           'confirm.html'
 
-      }, 1000)
+      }, 800)
 
       return
     }
 
     statusText.textContent =
-      'Проверяем запись аккаунта...'
-
-    /* ---------- ACCOUNTS ---------- */
+      'Проверяем аккаунт...'
 
     const { data: account, error: selectError } =
       await supabase
@@ -207,34 +195,15 @@ async function checkAccount() {
 
     if (selectError) {
       throw new Error(
-        'Ошибка загрузки аккаунта: ' +
+        'Ошибка чтения accounts: ' +
         selectError.message
       )
     }
 
-    /* ---------- ЕСЛИ ЗАПИСИ НЕТ ---------- */
-
     if (!account) {
 
-      const { error: insertError } =
-        await supabase
-          .from('accounts')
-          .insert([
-            {
-              id: user.id,
-              email: user.email
-            }
-          ])
-
-      if (insertError) {
-        throw new Error(
-          'Ошибка создания аккаунта: ' +
-          insertError.message
-        )
-      }
-
       statusText.textContent =
-        'Создан новый аккаунт'
+        'Аккаунт не найден. Переходим к заполнению...'
 
       setTimeout(function () {
 
@@ -245,13 +214,11 @@ async function checkAccount() {
 
       return
     }
-
-    /* ---------- ПРОВЕРКА ПОЛЕЙ ---------- */
 
     if (hasEmptyFields(account)) {
 
       statusText.textContent =
-        'Есть незаполненные поля'
+        'Есть незаполненные поля. Переходим к заполнению...'
 
       setTimeout(function () {
 
@@ -263,10 +230,8 @@ async function checkAccount() {
       return
     }
 
-    /* ---------- ВСЕ ЗАПОЛНЕНО ---------- */
-
     statusText.textContent =
-      'Аккаунт готов'
+      'Аккаунт готов. Переходим дальше...'
 
     setTimeout(function () {
 
@@ -287,16 +252,20 @@ async function checkAccount() {
     errorText.textContent =
       error.message
 
+    setTimeout(function () {
+
+      window.location.href =
+        'account.html'
+
+    }, 1200)
+
   }
 
 }
 
-/* ======================================== */
-
 checkAccount()
 
 </script>
-
 
 
 <!-- ========================================
@@ -313,7 +282,7 @@ checkAccount()
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   блок проверки аккаунта с разветвлением| v1.2.0
+   блок проверки аккаунта фикс переходов| v1.2.1
 
   </div>
 
