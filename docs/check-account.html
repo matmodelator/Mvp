@@ -96,7 +96,7 @@
      ПРОЦЕДУРА ПРОВЕРКИ АККАУНТА
 ======================================== -->
 <script type="module">
-  
+
 import { supabase }
 from './supabase-config.js'
 
@@ -106,6 +106,16 @@ const statusText =
 const errorText =
   document.getElementById('error')
 
+const fillAccountBtn =
+  document.getElementById('fillAccountBtn')
+
+const goMainBtn =
+  document.getElementById('goMainBtn')
+
+/* ========================================
+   ОБЯЗАТЕЛЬНЫЕ ПОЛЯ
+======================================== */
+
 const REQUIRED_FIELDS = [
   'email',
   'name',
@@ -113,6 +123,10 @@ const REQUIRED_FIELDS = [
   'birthday',
   'tel_number'
 ]
+
+/* ========================================
+   ПРОВЕРКА ПУСТЫХ ПОЛЕЙ
+======================================== */
 
 function hasEmptyFields(account) {
 
@@ -131,6 +145,10 @@ function hasEmptyFields(account) {
   return false
 }
 
+/* ========================================
+   ОСНОВНАЯ ПРОВЕРКА
+======================================== */
+
 async function checkAccount() {
 
   try {
@@ -139,6 +157,14 @@ async function checkAccount() {
       'Проверяем пользователя...'
 
     errorText.textContent = ''
+
+    fillAccountBtn.style.display =
+      'none'
+
+    goMainBtn.style.display =
+      'none'
+
+    /* ---------- USER ---------- */
 
     const { data: userData, error: userError } =
       await supabase.auth.getUser()
@@ -158,13 +184,6 @@ async function checkAccount() {
       statusText.textContent =
         'Пользователь не найден'
 
-      setTimeout(function () {
-
-        window.location.href =
-          'login.html'
-
-      }, 800)
-
       return
     }
 
@@ -173,18 +192,13 @@ async function checkAccount() {
       statusText.textContent =
         'Почта не подтверждена'
 
-      setTimeout(function () {
-
-        window.location.href =
-          'confirm.html'
-
-      }, 800)
-
       return
     }
 
     statusText.textContent =
       'Проверяем аккаунт...'
+
+    /* ---------- ACCOUNTS ---------- */
 
     const { data: account, error: selectError } =
       await supabase
@@ -200,45 +214,39 @@ async function checkAccount() {
       )
     }
 
+    /* ---------- НЕТ ЗАПИСИ ---------- */
+
     if (!account) {
 
       statusText.textContent =
-        'Аккаунт не найден. Переходим к заполнению...'
+        'Аккаунт не найден'
 
-      setTimeout(function () {
-
-        window.location.href =
-          'account.html'
-
-      }, 800)
+      fillAccountBtn.style.display =
+        'block'
 
       return
     }
+
+    /* ---------- ЕСТЬ ПУСТЫЕ ПОЛЯ ---------- */
 
     if (hasEmptyFields(account)) {
 
       statusText.textContent =
-        'Есть незаполненные поля. Переходим к заполнению...'
+        'Есть незаполненные поля'
 
-      setTimeout(function () {
-
-        window.location.href =
-          'account.html'
-
-      }, 800)
+      fillAccountBtn.style.display =
+        'block'
 
       return
     }
 
+    /* ---------- ВСЕ ЗАПОЛНЕНО ---------- */
+
     statusText.textContent =
-      'Аккаунт готов. Переходим дальше...'
+      'Аккаунт готов'
 
-    setTimeout(function () {
-
-      window.location.href =
-        'main.html'
-
-    }, 800)
+    goMainBtn.style.display =
+      'block'
 
   }
 
@@ -252,16 +260,14 @@ async function checkAccount() {
     errorText.textContent =
       error.message
 
-    setTimeout(function () {
-
-      window.location.href =
-        'account.html'
-
-    }, 1200)
+    fillAccountBtn.style.display =
+      'block'
 
   }
 
 }
+
+/* ======================================== */
 
 checkAccount()
 
@@ -282,7 +288,7 @@ checkAccount()
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   блок проверки аккаунта фикс переходов| v1.2.1
+   блок проверки аккаунта фикс таймеров и кнопок| v1.2.2
 
   </div>
 
