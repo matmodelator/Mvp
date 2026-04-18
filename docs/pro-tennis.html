@@ -1,8 +1,233 @@
-<!-- СТИЛЬ КОНСОЛИ -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Профиль - теннис, падель</title>
+
+  <!-- СТИЛЬ КОНСОЛИ -->
 
   <link rel="stylesheet"
         href="styles/console.css" />
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0; 
+    }
 
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dating App MVP</h1>
+  </header>
+
+  <div class="container">
+    <h2>Изменить профиль</h2>
+
+    <form id="profileForm">
+      <input id="nickname" type="text" placeholder="Ник" required />
+      <input id="age" type="number" placeholder="Возраст" min="18" max="99" />
+
+      <select id="gender">
+        <option value="">Ваш пол</option>
+        <option value="male">Мужчина</option>
+        <option value="female">Женщина</option>
+      </select>
+
+      <select id="looking_for">
+        <option value="">Кого ищете</option>
+        <option value="male">Мужчину</option>
+        <option value="female">Женщину</option>
+        <option value="any">Не важно</option>
+      </select>
+
+      <input id="city" type="text" placeholder="Город" />
+      <textarea id="bio" placeholder="О себе"></textarea>
+
+      <button type="submit">Сохранить профиль</button>
+    </form>
+
+    <div id="message" class="msg"></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
+
+    const form = document.getElementById('profileForm')
+    const message = document.getElementById('message')
+
+    function showMessage(text, type = '') {
+      message.textContent = text
+      message.className = `msg ${type}`
+    }
+
+   
+   // ЗАГРУЗКА ПРОФИЛЯ 
+    async function loadProfile() {
+
+  // получаем пользователя
+
+  const { data: userData } =
+    await supabase.auth.getUser()
+
+  const user = userData.user
+
+  // если не вошел — отправляем на логин
+
+  if (!user) {
+    window.location.href = 'log.html'
+    return
+  }
+
+  // читаем профиль
+
+  const { data: profile, error } =
+    await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+  if (error) {
+    console.log(error.message)
+    return
+  }
+
+  // если профиль есть — просто подставляем данные
+
+  if (profile) {
+
+    document.getElementById('nickname').value =
+      profile.nickname || ''
+
+    document.getElementById('age').value =
+      profile.age || ''
+
+    document.getElementById('gender').value =
+      profile.gender || ''
+
+    document.getElementById('looking_for').value =
+      profile.looking_for || ''
+
+    document.getElementById('city').value =
+      profile.city || ''
+
+    document.getElementById('bio').value =
+      profile.bio || ''
+  }
+
+}
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      const { data: userData } = await supabase.auth.getUser()
+      const user = userData.user
+
+      if (!user) {
+        showMessage('Сессия не найдена. Войди заново.', 'error')
+        return
+      }
+
+      const nickname = document.getElementById('nickname').value.trim()
+      const age = document.getElementById('age').value
+      const gender = document.getElementById('gender').value
+      const looking_for = document.getElementById('looking_for').value
+      const city = document.getElementById('city').value.trim()
+      const bio = document.getElementById('bio').value.trim()
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          nickname,
+          age: age ? Number(age) : null,
+          gender,
+          looking_for,
+          city,
+          bio
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        showMessage(error.message, 'error')
+        return
+      }
+
+      showMessage('Профиль сохранен', 'success')
+    })
+
+    loadProfile()
+  </script>
+</body>
+</html>
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -18,7 +243,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    рабочий вход с обезьянкой и повтором пароля | v1.1.0
+   создание из общего  profile | v1.0.0
 
   </div>
 
