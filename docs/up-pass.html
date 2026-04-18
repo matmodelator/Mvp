@@ -54,26 +54,19 @@
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      margin-bottom: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      padding: 10px;
       box-sizing: border-box;
-      font-size: 15px;
+      margin-bottom: 16px;
     }
-
-    /* ========================================
-       КНОПКА ГЛАЗА
-    ======================================== */
 
     .password-wrapper {
       position: relative;
+      margin-bottom: 16px;
     }
 
     .eye-btn {
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       border: none;
@@ -82,9 +75,7 @@
       font-size: 16px;
     }
 
-    /* ========================================
-       УБРАТЬ ВСТРОЕННЫЙ ГЛАЗ БРАУЗЕРА
-    ======================================== */
+    /* Убирает встроенный глаз браузера */
 
     input[type="password"]::-ms-reveal,
     input[type="password"]::-ms-clear {
@@ -95,12 +86,12 @@
       display: none !important;
     }
 
-    input[type="password"] {
-      appearance: none;
+    input[type="password"]::-webkit-textfield-decoration-container {
+      display: none !important;
     }
 
     /* ========================================
-       КНОПКА
+       КНОПКИ
     ======================================== */
 
     button {
@@ -112,15 +103,12 @@
       color: white;
       font-size: 15px;
       cursor: pointer;
+      margin-top: 6px;
     }
 
     button:hover {
       background: #1d4ed8;
     }
-
-    /* ========================================
-       СООБЩЕНИЯ
-    ======================================== */
 
     #status {
       margin-top: 16px;
@@ -223,172 +211,144 @@
 
     <div id="status"></div>
 
+    <button
+      id="goSignBtn"
+      onclick="goToSign()"
+      style="display:none;"
+    >
+      Переход к обновлению пароля
+    </button>
+
   </div>
 
 <script type="module">
 
-   import { supabase }
-   from './supabase-config.js'
+  import { supabase }
+  from './supabase-config.js'
 
-    const form = document.getElementById('passwordForm')
-    const emailInput = document.getElementById('email')
-    const codeInput = document.getElementById('code')
-    const passwordInput = document.getElementById('password')
-    const password2Input = document.getElementById('password2')
-    const statusEl = document.getElementById('status')
+  const form = document.getElementById('passwordForm')
+  const emailInput = document.getElementById('email')
+  const codeInput = document.getElementById('code')
+  const passwordInput = document.getElementById('password')
+  const password2Input = document.getElementById('password2')
+  const statusEl = document.getElementById('status')
+  const goSignBtn = document.getElementById('goSignBtn')
 
-    /* ========================================
-       ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
-    ======================================== */
+  function togglePassword(id, btn) {
 
-    function togglePassword(id, btn) {
+    const field =
+      document.getElementById(id)
 
-      const field =
-        document.getElementById(id)
+    if (field.type === 'password') {
 
-      if (field.type === 'password') {
+      field.type =
+        'text'
 
-        field.type = 'text'
-        btn.textContent = '🙈'
+      btn.textContent =
+        '🙈'
 
-      }
-      else {
+    }
+    else {
 
-        field.type = 'password'
-        btn.textContent = '👁'
+      field.type =
+        'password'
 
-      }
+      btn.textContent =
+        '👁'
 
     }
 
-    window.togglePassword =
-      togglePassword
+  }
 
-    /* ========================================
-       EMAIL ИЗ URL
-    ======================================== */
+  window.togglePassword =
+    togglePassword 
 
-    const params =
-      new URLSearchParams(window.location.search)
+  function goToSign() {
 
-    const emailFromUrl =
-      params.get('email')
+    window.location.href =
+      'sign.html'
 
-    if (emailFromUrl) {
-      emailInput.value =
-        emailFromUrl
+  }
+
+  window.goToSign =
+    goToSign
+
+  const params = new URLSearchParams(window.location.search)
+  const emailFromUrl = params.get('email')
+
+  if (emailFromUrl) {
+    emailInput.value = emailFromUrl
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault()
+
+    statusEl.textContent = ''
+    statusEl.className = ''
+    goSignBtn.style.display = 'none'
+
+    const email = emailInput.value.trim()
+    const token = codeInput.value.trim()
+    const password = passwordInput.value.trim()
+    const password2 = password2Input.value.trim()
+
+    if (!email) {
+      statusEl.textContent = 'Введите email.'
+      statusEl.className = 'error'
+      return
     }
 
-    /* ========================================
-       ОБРАБОТКА ФОРМЫ
-    ======================================== */
+    if (!/^\d{8}$/.test(token)) {
+      statusEl.textContent = 'Код должен состоять из 8 цифр.'
+      statusEl.className = 'error'
+      return
+    }
 
-    form.addEventListener(
-      'submit',
-      async function (e) {
+    if (password.length < 6) {
+      statusEl.textContent = 'Пароль должен быть не короче 6 символов.'
+      statusEl.className = 'error'
+      return
+    }
 
-        e.preventDefault()
+    if (password !== password2) {
+      statusEl.textContent = 'Пароли не совпадают.'
+      statusEl.className = 'error'
+      return
+    }
 
-        statusEl.textContent = ''
-        statusEl.className = ''
+    statusEl.textContent = 'Проверяем код...'
 
-        const email =
-          emailInput.value.trim()
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: 'recovery'
+    })
 
-        const token =
-          codeInput.value.trim()
+    if (verifyError) {
+      statusEl.textContent = 'Ошибка кода: ' + verifyError.message
+      statusEl.className = 'error'
+      return
+    }
 
-        const password =
-          passwordInput.value.trim()
+    statusEl.textContent = 'Меняем пароль...'
 
-        const password2 =
-          password2Input.value.trim()
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: password
+    })
 
-        if (!email) {
-          statusEl.textContent =
-            'Введите email.'
-          statusEl.className =
-            'error'
-          return
-        }
+    if (updateError) {
+      statusEl.textContent = 'Ошибка смены пароля: ' + updateError.message
+      statusEl.className = 'error'
+      return
+    }
 
-        if (!/^\d{8}$/.test(token)) {
-          statusEl.textContent =
-            'Код должен состоять из 8 цифр.'
-          statusEl.className =
-            'error'
-          return
-        }
+    statusEl.textContent =
+      'Пароль успешно изменен.\nТеперь нажмите кнопку ниже.'
 
-        if (password.length < 6) {
-          statusEl.textContent =
-            'Пароль должен быть не короче 6 символов.'
-          statusEl.className =
-            'error'
-          return
-        }
+    statusEl.className = 'success'
 
-        if (password !== password2) {
-          statusEl.textContent =
-            'Пароли не совпадают.'
-          statusEl.className =
-            'error'
-          return
-        }
-
-        statusEl.textContent =
-          'Проверяем код...'
-
-        const { error: verifyError } =
-          await supabase.auth.verifyOtp({
-            email: email,
-            token: token,
-            type: 'recovery'
-          })
-
-        if (verifyError) {
-          statusEl.textContent =
-            'Ошибка кода: '
-            + verifyError.message
-          statusEl.className =
-            'error'
-          return
-        }
-
-        statusEl.textContent =
-          'Меняем пароль...'
-
-        const { error: updateError } =
-          await supabase.auth.updateUser({
-            password: password
-          })
-
-        if (updateError) {
-          statusEl.textContent =
-            'Ошибка смены пароля: '
-            + updateError.message
-          statusEl.className =
-            'error'
-          return
-        }
-
-        statusEl.textContent =
-          'Пароль успешно изменен.\n'
-          + 'Теперь можно войти.'
-
-        statusEl.className =
-          'success'
-
-        setTimeout(
-          function () {
-            window.location.href =
-              'sign.html'
-          },
-          1500
-        )
-
-      }
-    )
+    goSignBtn.style.display = 'block'
+  })
 
 </script>
 
@@ -401,7 +361,7 @@
 
   <div class="row" id="build-top">
 
-    eyes | v1.2.0
+    eyes from sign & no timer | v1.2.1
 
   </div>
 
