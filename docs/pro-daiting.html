@@ -1,296 +1,341 @@
 <!DOCTYPE html>
 <html lang="ru">
+<head>  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Профиль - знакомства, общение</title>
 
-<head>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- СТИЛЬ КОНСОЛИ -->
 
-  <title>Gate | MVP</title>
-
-  <link rel="stylesheet" href="styles/console.css" />
-
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
   <style>
-    /* ========================= */
-    /* СБРОС */
-    /* ========================= */
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* ========================= */
-    /* BODY */
-    /* ========================= */
-
     body {
-      font-family: 'Playfair Display', Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow: hidden;
-      background: #fff;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0; 
     }
 
-    /* ========================= */
-    /* HEADER */
-    /* ========================= */
-
-    .header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    /* ========================= */
-    /* LOGO */
-    /* ========================= */
-
-    .logo {
-      position: absolute;
-      top: 85px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 70px;
-      width: auto;
-      z-index: 11;
-      pointer-events: auto;
-    }
-
-    /* ========================= */
-    /* TITLE */
-    /* ========================= */
-
-    .title {
-      position: absolute;
-      top: 25px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 42px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      white-space: nowrap;
-      z-index: 11;
-      color: #111;
-      pointer-events: auto;
-    }
-
-    /* ========================= */
-    /* IMAGES CONTAINER */
-    /* ========================= */
-
-    .images {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 80vh;
-      display: flex;
-      align-items: flex-start;
-      overflow: hidden;
-    }
-
-    /* ========================= */
-    /* IMAGE BLOCK */
-    /* ========================= */
-
-    .image {
-      width: 50%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      background-size: contain;
-      background-position: top center;
-      background-repeat: no-repeat;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .image:hover {
-      transform: translateY(-4px);
-    }
-
-    .image:active {
-      transform: translateY(2px) scale(0.99);
-      transition: transform 0.08s ease;
-    }
-
-    /* ========================= */
-    /* LEFT / RIGHT */
-    /* ========================= */
-
-    .left {
-      background-image: url("https://matmodelator.github.io/Mvp/images/dating.webp");
-    }
-
-    .right {
-      background-image: url("https://matmodelator.github.io/Mvp/images/tennis.webp");
-    }
-
-    /* ========================= */
-    /* GATE BUTTONS */
-    /* ========================= */
-
-    .gate-button {
-      position: absolute;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
-      color: #003366;
-      font-family: 'Playfair Display', Arial, sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      padding: 10px 26px;
-      border-radius: 999px;
-      cursor: pointer;
-      z-index: 3;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .gate-button:hover {
-      background: rgba(255, 255, 255, 1);
-      transform: translateX(-50%) translateY(-2px);
-    }
-
-    .gate-button:active {
-      transform: translateX(-50%) translateY(1px) scale(0.98);
-    }
-
-    /* ========================= */
-    /* COPYRIGHT */
-    /* ========================= */
-
-    .copyright {
-      position: absolute;
-      left: 0;
-      bottom: 34px;
-      width: 100%;
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
       text-align: center;
-      padding: 10px 0;
-      font-size: 14px;
-      color: #444;
-      background: rgba(248, 248, 248, 0.92);
-      border-top: 1px solid #ddd;
-      z-index: 10;
     }
 
-    /* ========================= */
-    /* MOBILE */
-    /* ========================= */
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-    @media (max-width: 768px) {
-      .logo {
-        top: 20px;
-        height: 56px;
-      }
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
 
-      .title {
-        top: 88px;
-        font-size: 28px;
-      }
+    input, select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
 
-      .images {
-        flex-direction: column;
-        height: 100vh;
-      }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
 
-      .image {
-        width: 100%;
-        height: 50%;
-      }
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
 
-      .gate-button {
-        top: 20px;
-        font-size: 20px;
-        padding: 9px 20px;
-      }
+    button:hover {
+      background: #1d4ed8;
+    }
 
-      .copyright {
-        font-size: 12px;
-        bottom: 34px;
-      }
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
     }
   </style>
 </head>
-
 <body>
+  <header>
+    <h1>Dating App MVP</h1>
+  </header>
 
-  <div class="header">
-    <img src="images/logo.svg" alt="MVP logo" class="logo">
+  <div class="container">
+    <h2>Изменить профиль</h2>
 
-    <div class="title">
-      MVP
-    </div>
+    <form id="profileForm">
+
+      <input id="nickname" type="text" placeholder="NickName" required />
+
+      <input id="country" type="text" placeholder="Country" />
+
+      <input id="city" type="text" placeholder="City" />
+
+      <select id="sex">
+        <option value="">Sex</option>
+        <option value="hetero">hetero</option>
+        <option value="homo">homo</option>
+        <option value="bi">bi</option>
+        <option value="couple">couple</option>
+        <option value="other">other</option>
+      </select>
+
+      <select id="zodiac">
+        <option value="">Zodiac</option>
+        <option value="Aries">Aries</option>
+        <option value="Taurus">Taurus</option>
+        <option value="Gemini">Gemini</option>
+        <option value="Cancer">Cancer</option>
+        <option value="Leo">Leo</option>
+        <option value="Virgo">Virgo</option>
+        <option value="Libra">Libra</option>
+        <option value="Scorpio">Scorpio</option>
+        <option value="Sagittarius">Sagittarius</option>
+        <option value="Capricorn">Capricorn</option>
+        <option value="Aquarius">Aquarius</option>
+        <option value="Pisces">Pisces</option>
+      </select>
+
+      <select id="statusField">
+        <option value="">Status</option>
+        <option value="Single">Single</option>
+        <option value="Married">Married</option>
+        <option value="Boyfriend">Boyfriend</option>
+        <option value="Girlfriend">Girlfriend</option>
+      </select>
+
+      <button type="submit">Сохранить профиль</button>
+
+    </form>
+
+    <div id="message" class="msg"></div>
   </div>
 
-  <div class="images">
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    <div class="image left" onclick="goGate('pro-daiting.html')">
-      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-daiting.html')">
-        daiting & communities
-      </button>
-    </div>
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
 
-    <div class="image right" onclick="goGate('pro-tennis.html')">
-      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-tennis.html')">
-        tennis & padel
-      </button>
-    </div>
+    const form = document.getElementById('profileForm')
+    const message = document.getElementById('message')
 
-  </div>
-
-  <footer class="copyright">
-    © 2026 MatModelator/MVP — Most Valuable Project
-  </footer>
-
-  <div id="service-console">
-    <div class="row" id="build-top">
-      add fields  | v1.1.0
-    </div>
-
-    <div class="row" id="build-down">
-      deploy: --
-    </div>
-  </div>
-
-  <script>
-    function goGate(url) {
-      window.location.href = url;
+    function showMessage(text, type = '') {
+      message.textContent = text
+      message.className = `msg ${type}`
     }
 
-    (function () {
-      const now = new Date();
+   
+   // ЗАГРУЗКА ПРОФИЛЯ 
+    async function loadProfile() {
 
-      const pad = n =>
-        String(n).padStart(2, '0');
+      // получаем пользователя
 
-      const date =
-        pad(now.getDate()) +
-        '.' +
-        pad(now.getMonth() + 1) +
-        '.' +
-        now.getFullYear();
+      const { data: userData } =
+        await supabase.auth.getUser()
 
-      const time =
-        pad(now.getHours()) +
-        ':' +
-        pad(now.getMinutes());
+      const user = userData.user
 
-      document
-        .getElementById('build-down')
-        .textContent =
-        'deploy: ' + date + ' ' + time;
-    })();
+      // если не вошел — отправляем на логин
+
+      if (!user) {
+        window.location.href = 'log.html'
+        return
+      }
+
+      // читаем профиль
+
+      const { data: profile, error } =
+        await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+      if (error) {
+        console.log(error.message)
+        return
+      }
+
+      // если профиль есть — просто подставляем данные
+
+      if (profile) {
+
+        document.getElementById('nickname').value =
+          profile.nickname || ''
+
+        document.getElementById('country').value =
+          profile.country || ''
+
+        document.getElementById('city').value =
+          profile.city || ''
+
+        document.getElementById('sex').value =
+          profile.sex || ''
+
+        document.getElementById('zodiac').value =
+          profile.zodiac || ''
+
+        document.getElementById('statusField').value =
+          profile.status || ''
+      }
+
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      const { data: userData } = await supabase.auth.getUser()
+      const user = userData.user
+
+      if (!user) {
+        showMessage('Сессия не найдена. Войди заново.', 'error')
+        return
+      }
+
+      const nickname =
+        document.getElementById('nickname').value.trim()
+
+      const country =
+        document.getElementById('country').value.trim()
+
+      const city =
+        document.getElementById('city').value.trim()
+
+      const sex =
+        document.getElementById('sex').value
+
+      const zodiac =
+        document.getElementById('zodiac').value
+
+      const status =
+        document.getElementById('statusField').value
+
+      const { error } =
+        await supabase
+          .from('profiles')
+          .update({
+            nickname,
+            country,
+            city,
+            sex,
+            zodiac,
+            status
+          })
+          .eq('id', user.id)
+
+      if (error) {
+        showMessage(error.message, 'error')
+        return
+      }
+
+      showMessage('Профиль сохранен', 'success')
+    })
+
+    loadProfile()
   </script>
-
 </body>
 </html>
+
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+   add fields | v1.1.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
