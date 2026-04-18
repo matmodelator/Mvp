@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Most Valuable Partner</title>
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    input, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .success {
+      color: #15803d;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Most Valuable Partner</h1>
+  </header>
+
+  <div class="container">
+    <h2>Изменить профиль</h2>
+
+    <form id="profileForm">
+      <input id="nickname" type="text" placeholder="NickName" required />
+
+      <input id="country" type="text" placeholder="Country" />
+
+      <input id="city" type="text" placeholder="City" />
+
+      <select id="sex">
+        <option value="">Sex</option>
+        <option value="hetero">hetero</option>
+        <option value="homo">homo</option>
+        <option value="bi">bi</option>
+        <option value="couple">couple</option>
+        <option value="other">other</option>
+      </select>
+
+      <select id="zodiac">
+        <option value="">Zodiac</option>
+        <option value="Aries">Aries</option>
+        <option value="Taurus">Taurus</option>
+        <option value="Gemini">Gemini</option>
+        <option value="Cancer">Cancer</option>
+        <option value="Leo">Leo</option>
+        <option value="Virgo">Virgo</option>
+        <option value="Libra">Libra</option>
+        <option value="Scorpio">Scorpio</option>
+        <option value="Sagittarius">Sagittarius</option>
+        <option value="Capricorn">Capricorn</option>
+        <option value="Aquarius">Aquarius</option>
+        <option value="Pisces">Pisces</option>
+      </select>
+
+      <select id="statusField">
+        <option value="">Status</option>
+        <option value="Single">Single</option>
+        <option value="Married">Married</option>
+        <option value="Boyfriend">Boyfriend</option>
+        <option value="Girlfriend">Girlfriend</option>
+      </select>
+
+      <button type="submit">Сохранить профиль</button>
+    </form>
+
+    <div id="message" class="msg"></div>
+  </div>
+
+  <div id="service-console">
+
+    <div class="row" id="build-top">
+      pro-dating profile fields updated | v1.1.0
+    </div>
+
+    <div class="row" id="build-down">
+      deploy: --
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
+
+    const form =
+      document.getElementById('profileForm')
+
+    const message =
+      document.getElementById('message')
+
+    function showMessage(text, type = '') {
+      message.textContent = text
+      message.className = `msg ${type}`
+    }
+
+    async function loadProfile() {
+
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser()
+
+      const user =
+        userData?.user
+
+      if (userError || !user) {
+        window.location.href = 'log.html'
+        return
+      }
+
+      const { data: profile, error } =
+        await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+      if (error) {
+        console.log('Ошибка загрузки профиля:', error.message)
+        return
+      }
+
+      if (profile) {
+        document.getElementById('nickname').value =
+          profile.nickname || ''
+
+        document.getElementById('country').value =
+          profile.country || ''
+
+        document.getElementById('city').value =
+          profile.city || ''
+
+        document.getElementById('sex').value =
+          profile.sex || ''
+
+        document.getElementById('zodiac').value =
+          profile.zodiac || ''
+
+        document.getElementById('statusField').value =
+          profile.status || ''
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser()
+
+      const user =
+        userData?.user
+
+      if (userError || !user) {
+        showMessage('Сессия не найдена. Войди заново.', 'error')
+        return
+      }
+
+      const nickname =
+        document.getElementById('nickname').value.trim()
+
+      const country =
+        document.getElementById('country').value.trim()
+
+      const city =
+        document.getElementById('city').value.trim()
+
+      const sex =
+        document.getElementById('sex').value
+
+      const zodiac =
+        document.getElementById('zodiac').value
+
+      const status =
+        document.getElementById('statusField').value
+
+      const { error } =
+        await supabase
+          .from('profiles')
+          .update({
+            nickname,
+            country,
+            city,
+            sex,
+            zodiac,
+            status
+          })
+          .eq('id', user.id)
+
+      if (error) {
+        showMessage(error.message, 'error')
+        return
+      }
+
+      showMessage('Профиль сохранен', 'success')
+    })
+
+    loadProfile()
+  </script>
+
+  <script>
+    (function () {
+
+      const now = new Date()
+
+      const pad = n =>
+        String(n).padStart(2, '0')
+
+      const date =
+          pad(now.getDate())
+        + '.'
+        + pad(now.getMonth() + 1)
+        + '.'
+        + now.getFullYear()
+
+      const time =
+          pad(now.getHours())
+        + ':'
+        + pad(now.getMinutes())
+
+      document
+        .getElementById('build-down')
+        .textContent =
+          'deploy: '
+          + date
+          + ' '
+          + time
+
+    })()
+  </script>
+
+</body>
+</html>
