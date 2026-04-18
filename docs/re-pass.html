@@ -176,6 +176,18 @@
     <div id="status"></div>
 
     <!-- ========================================
+         КНОПКА ПЕРЕХОДА К ОБНОВЛЕНИЮ ПАРОЛЯ
+    ======================================== -->
+
+    <button
+      id="goUpdateBtn"
+      onclick="goToUpdate()"
+      style="display:none; margin-top:12px;"
+    >
+      Переход к обновлению пароля
+    </button>
+
+    <!-- ========================================
          КНОПКА НАЗАД
     ======================================== -->
 
@@ -207,6 +219,27 @@
   const statusEl =
     document.getElementById('status')
 
+  const goUpdateBtn =
+    document.getElementById('goUpdateBtn')
+
+  /* ========================================
+     ПЕРЕХОД НА СТРАНИЦУ ОБНОВЛЕНИЯ ПАРОЛЯ
+  ======================================== */
+
+  function goToUpdate() {
+
+    const email =
+      emailInput.value.trim()
+
+    window.location.href =
+      'up-pass.html?email='
+      + encodeURIComponent(email)
+
+  }
+
+  window.goToUpdate =
+    goToUpdate
+
   /* ========================================
      ОБРАБОТКА ОТПРАВКИ ФОРМЫ
   ======================================== */
@@ -223,6 +256,9 @@
         'Отправляем код...'
 
       statusEl.className = ''
+
+      goUpdateBtn.style.display =
+        'none'
 
       const email =
         emailInput.value.trim()
@@ -259,26 +295,14 @@
 
       statusEl.textContent =
         'Если это правильный адрес,\n'
-        + 'то код отправлен.\n'
-        + 'Переходим к смене пароля...'
+        + 'код отправлен.\n'
+        + 'Нажмите кнопку ниже.'
 
       statusEl.className =
         'success'
 
-      /* ========================================
-         ПЕРЕХОД НА СТРАНИЦУ СМЕНЫ ПАРОЛЯ
-      ======================================== */
-
-      setTimeout(
-        function () {
-
-          window.location.href =
-            'up-pass.html?email='
-            + encodeURIComponent(email)
-
-        },
-        700
-      )
+      goUpdateBtn.style.display =
+        'block'
 
     }
   )
@@ -296,7 +320,7 @@
 
     <!-- ВЕРСИЯ СТРАНИЦЫ -->
 
-  comments & wrapping  | v1.1.1
+    no timer + update button | v1.1.2
 
   </div>
 
