@@ -11,7 +11,6 @@
   
   <style>
 
-  
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
@@ -53,9 +52,6 @@
       margin-bottom: 16px;
     }
 
-    /* >>> NEW
-       Обертка для размещения кнопки глаза поверх input
-    */
     .password-wrapper {
       position: relative;
       margin-bottom: 16px;
@@ -71,7 +67,6 @@
       cursor: pointer;
       font-size: 16px;
     }
-    /* <<< NEW */
 
     .buttons {
       display: flex;
@@ -103,20 +98,36 @@
       min-height: 24px;
     }
 
-/* Убирает встроенный глаз браузера */
+    /* КНОПКА ВОССТАНОВЛЕНИЯ */
 
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
+    .recovery-link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #2563eb;
+      text-decoration: none;
+      cursor: pointer;
+    }
 
-input[type="password"]::-webkit-credentials-auto-fill-button {
-  display: none !important;
-}
+    .recovery-link:hover {
+      text-decoration: underline;
+    }
 
-input[type="password"]::-webkit-textfield-decoration-container {
-  display: none !important;
-}
+    /* Убирает встроенный глаз браузера */
+
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+      display: none !important;
+    }
+
+    input[type="password"]::-webkit-textfield-decoration-container {
+      display: none !important;
+    }
     
   </style>
 </head>
@@ -142,10 +153,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
     <label>Password:</label>
 
-    <!-- >>> CHANGED
-         Password помещен в wrapper,
-         чтобы добавить кнопку показа/скрытия
-    -->
     <div class="password-wrapper">
 
       <input
@@ -154,11 +161,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
         required
         minlength="6"
       />
-
-      <!--
-      👁 — пароль скрыт
-      🙈 — пароль показан
-      -->
 
       <button
         type="button"
@@ -169,13 +171,7 @@ input[type="password"]::-webkit-textfield-decoration-container {
       </button>
 
     </div>
-    <!-- <<< CHANGED -->
 
-    <!-- >>> NEW
-         Confirm Password остается в общей форме,
-         но нужен только для Sign up.
-         Поэтому required здесь НЕ ставим.
-    -->
     <label>Confirm password:</label>
 
     <div class="password-wrapper">
@@ -196,7 +192,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
       </button>
 
     </div>
-    <!-- <<< NEW -->
 
     <div class="buttons">
 
@@ -222,6 +217,15 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
   <p id="status"></p>
 
+  <!-- ВОССТАНОВЛЕНИЕ ПАРОЛЯ -->
+
+  <a
+    href="re-pass.html"
+    class="recovery-link"
+  >
+    Забыли пароль? Восстановить доступ.
+  </a>
+
 </div>
 
 <script type="module">
@@ -235,24 +239,12 @@ input[type="password"]::-webkit-textfield-decoration-container {
   const passwordInput =
     document.getElementById('password')
 
-  /* >>> NEW
-     Поле confirm password.
-     Используется только в signup()
-  */
   const confirmPasswordInput =
     document.getElementById('confirmPassword')
-  /* <<< NEW */
 
   const statusText =
     document.getElementById('status')
 
-  /* >>> CHANGED
-     togglePassword меняет и тип поля,
-     и символ на кнопке:
-
-     👁 — скрыто
-     🙈 — показано */
-  
   function togglePassword(id, btn) {
 
     const field =
@@ -281,11 +273,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
   window.togglePassword =
     togglePassword 
-
-  
-
-  
-  /* <<< CHANGED */
 
   async function login() {
 
@@ -354,10 +341,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
     const password =
       passwordInput.value
 
-    /* >>> NEW
-       Confirm password обязателен
-       только для Sign up
-    */
     const confirmPassword =
       confirmPasswordInput.value.trim()
 
@@ -376,7 +359,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
       return
     }
-    /* <<< NEW */
 
     statusText.textContent =
       'Регистрация...'
@@ -418,21 +400,11 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
 </script>
 
-<!-- ========================================
-     SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
-======================================== -->
-
 <div id="service-console">
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-   фикс дубль глазки | v1.1.2
+  КНОПКА ВОССТАНОВЛЕНИЯ | v1.2.0
 
   </div>
 
@@ -444,28 +416,14 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
 </div>
 
-<!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
-======================================== -->
-
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
-
   const now = new Date();
-
-  /* Добавляет ведущий ноль */
 
   const pad = n =>
     String(n).padStart(2, '0');
-
-  /* Формат даты */
 
   const date =
       pad(now.getDate())
@@ -474,14 +432,10 @@ input[type="password"]::-webkit-textfield-decoration-container {
     + '.'
     + now.getFullYear();
 
-  /* Формат времени */
-
   const time =
       pad(now.getHours())
     + ':'
     + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
 
   document
     .getElementById('build-down')
@@ -495,6 +449,5 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
 </script>
 
-  
 </body>
 </html>
