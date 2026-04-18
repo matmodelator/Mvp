@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
   <title>Новый пароль</title>
 
  <!-- СТИЛЬ КОНСОЛИ -->
@@ -12,6 +12,11 @@
         href="styles/console.css" />
   
   <style>
+
+    /* ========================================
+       БАЗОВАЯ РАЗМЕТКА
+    ======================================== */
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -43,6 +48,10 @@
       line-height: 1.5;
     }
 
+    /* ========================================
+       ПОЛЯ ВВОДА
+    ======================================== */
+
     input {
       width: 100%;
       padding: 12px;
@@ -53,6 +62,46 @@
       box-sizing: border-box;
       font-size: 15px;
     }
+
+    /* ========================================
+       КНОПКА ГЛАЗА
+    ======================================== */
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* ========================================
+       УБРАТЬ ВСТРОЕННЫЙ ГЛАЗ БРАУЗЕРА
+    ======================================== */
+
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+      display: none !important;
+    }
+
+    input[type="password"] {
+      appearance: none;
+    }
+
+    /* ========================================
+       КНОПКА
+    ======================================== */
 
     button {
       width: 100%;
@@ -69,6 +118,10 @@
       background: #1d4ed8;
     }
 
+    /* ========================================
+       СООБЩЕНИЯ
+    ======================================== */
+
     #status {
       margin-top: 16px;
       font-size: 14px;
@@ -84,10 +137,14 @@
     .error {
       color: #b00020;
     }
+
   </style>
 </head>
+
 <body>
+
   <div class="box">
+
     <h1>Смена пароля</h1>
 
     <p>
@@ -95,6 +152,9 @@
     </p>
 
     <form id="passwordForm">
+
+      <!-- EMAIL -->
+
       <input
         id="email"
         type="email"
@@ -102,37 +162,73 @@
         required
       />
 
-      <input
-  id="code"
-  type="text"
-  inputmode="numeric"
-  maxlength="8"
-  placeholder="Код из письма"
-  required
-/>
+      <!-- КОД -->
 
       <input
-        id="password"
-        type="password"
-        placeholder="Новый пароль"
+        id="code"
+        type="text"
+        inputmode="numeric"
+        maxlength="8"
+        placeholder="Код из письма"
         required
       />
 
-      <input
-        id="password2"
-        type="password"
-        placeholder="Повторите новый пароль"
-        required
-      />
+      <!-- НОВЫЙ ПАРОЛЬ -->
 
-      <button type="submit">Сохранить новый пароль</button>
+      <div class="password-wrapper">
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Новый пароль"
+          required
+        />
+
+        <button
+          type="button"
+          class="eye-btn"
+          onclick="togglePassword('password', this)"
+        >
+          👁
+        </button>
+
+      </div>
+
+      <!-- ПОВТОР ПАРОЛЯ -->
+
+      <div class="password-wrapper">
+
+        <input
+          id="password2"
+          type="password"
+          placeholder="Повторите новый пароль"
+          required
+        />
+
+        <button
+          type="button"
+          class="eye-btn"
+          onclick="togglePassword('password2', this)"
+        >
+          👁
+        </button>
+
+      </div>
+
+      <button type="submit">
+        Сохранить новый пароль
+      </button>
+
     </form>
 
     <div id="status"></div>
+
   </div>
 
-  <script type="module">
-   import { supabase } from './supabase-config.js'
+<script type="module">
+
+   import { supabase }
+   from './supabase-config.js'
 
     const form = document.getElementById('passwordForm')
     const emailInput = document.getElementById('email')
@@ -141,100 +237,171 @@
     const password2Input = document.getElementById('password2')
     const statusEl = document.getElementById('status')
 
-    const params = new URLSearchParams(window.location.search)
-    const emailFromUrl = params.get('email')
+    /* ========================================
+       ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
+    ======================================== */
 
-    if (emailFromUrl) {
-      emailInput.value = emailFromUrl
+    function togglePassword(id, btn) {
+
+      const field =
+        document.getElementById(id)
+
+      if (field.type === 'password') {
+
+        field.type = 'text'
+        btn.textContent = '🙈'
+
+      }
+      else {
+
+        field.type = 'password'
+        btn.textContent = '👁'
+
+      }
+
     }
 
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault()
+    window.togglePassword =
+      togglePassword
 
-      statusEl.textContent = ''
-      statusEl.className = ''
+    /* ========================================
+       EMAIL ИЗ URL
+    ======================================== */
 
-      const email = emailInput.value.trim()
-      const token = codeInput.value.trim()
-      const password = passwordInput.value.trim()
-      const password2 = password2Input.value.trim()
+    const params =
+      new URLSearchParams(window.location.search)
 
-      if (!email) {
-        statusEl.textContent = 'Введите email.'
-        statusEl.className = 'error'
-        return
+    const emailFromUrl =
+      params.get('email')
+
+    if (emailFromUrl) {
+      emailInput.value =
+        emailFromUrl
+    }
+
+    /* ========================================
+       ОБРАБОТКА ФОРМЫ
+    ======================================== */
+
+    form.addEventListener(
+      'submit',
+      async function (e) {
+
+        e.preventDefault()
+
+        statusEl.textContent = ''
+        statusEl.className = ''
+
+        const email =
+          emailInput.value.trim()
+
+        const token =
+          codeInput.value.trim()
+
+        const password =
+          passwordInput.value.trim()
+
+        const password2 =
+          password2Input.value.trim()
+
+        if (!email) {
+          statusEl.textContent =
+            'Введите email.'
+          statusEl.className =
+            'error'
+          return
+        }
+
+        if (!/^\d{8}$/.test(token)) {
+          statusEl.textContent =
+            'Код должен состоять из 8 цифр.'
+          statusEl.className =
+            'error'
+          return
+        }
+
+        if (password.length < 6) {
+          statusEl.textContent =
+            'Пароль должен быть не короче 6 символов.'
+          statusEl.className =
+            'error'
+          return
+        }
+
+        if (password !== password2) {
+          statusEl.textContent =
+            'Пароли не совпадают.'
+          statusEl.className =
+            'error'
+          return
+        }
+
+        statusEl.textContent =
+          'Проверяем код...'
+
+        const { error: verifyError } =
+          await supabase.auth.verifyOtp({
+            email: email,
+            token: token,
+            type: 'recovery'
+          })
+
+        if (verifyError) {
+          statusEl.textContent =
+            'Ошибка кода: '
+            + verifyError.message
+          statusEl.className =
+            'error'
+          return
+        }
+
+        statusEl.textContent =
+          'Меняем пароль...'
+
+        const { error: updateError } =
+          await supabase.auth.updateUser({
+            password: password
+          })
+
+        if (updateError) {
+          statusEl.textContent =
+            'Ошибка смены пароля: '
+            + updateError.message
+          statusEl.className =
+            'error'
+          return
+        }
+
+        statusEl.textContent =
+          'Пароль успешно изменен.\n'
+          + 'Теперь можно войти.'
+
+        statusEl.className =
+          'success'
+
+        setTimeout(
+          function () {
+            window.location.href =
+              'sign.html'
+          },
+          1500
+        )
+
       }
-      
-if (!/^\d{8}$/.test(token)) {
-  statusEl.textContent = 'Код должен состоять из 8 цифр.'
-  statusEl.className = 'error'
-  return
-}
-      
-      if (password.length < 6) {
-        statusEl.textContent = 'Пароль должен быть не короче 6 символов.'
-        statusEl.className = 'error'
-        return
-      }
+    )
 
-      if (password !== password2) {
-        statusEl.textContent = 'Пароли не совпадают.'
-        statusEl.className = 'error'
-        return
-      }
-
-      statusEl.textContent = 'Проверяем код...'
-
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email: email,
-        token: token,
-        type: 'recovery'
-      })
-
-      if (verifyError) {
-        statusEl.textContent = 'Ошибка кода: ' + verifyError.message
-        statusEl.className = 'error'
-        return
-      }
-
-      statusEl.textContent = 'Меняем пароль...'
-
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: password
-      })
-
-      if (updateError) {
-        statusEl.textContent = 'Ошибка смены пароля: ' + updateError.message
-        statusEl.className = 'error'
-        return
-      }
-
-      statusEl.textContent = 'Пароль успешно изменен. Теперь можно войти.'
-      statusEl.className = 'success'
-
-      setTimeout(function () {
-        window.location.href = 'sign.html'
-      }, 1500)
-    })
-  </script>
-
+</script>
 
 
 <!-- ========================================
      SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
 ======================================== -->
 
 <div id="service-console">
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-    switch on config & console & sign | v1.1.0
+    eyes | v1.2.0
 
   </div>
 
@@ -246,28 +413,15 @@ if (!/^\d{8}$/.test(token)) {
 
 </div>
 
-<!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
-======================================== -->
 
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
-
   const now = new Date();
-
-  /* Добавляет ведущий ноль */
 
   const pad = n =>
     String(n).padStart(2, '0');
-
-  /* Формат даты */
 
   const date =
       pad(now.getDate())
@@ -276,14 +430,10 @@ if (!/^\d{8}$/.test(token)) {
     + '.'
     + now.getFullYear();
 
-  /* Формат времени */
-
   const time =
       pad(now.getHours())
     + ':'
     + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
 
   document
     .getElementById('build-down')
@@ -295,7 +445,7 @@ if (!/^\d{8}$/.test(token)) {
 
 })();
 
-</script> 
+</script>
 
 </body>
 </html>
