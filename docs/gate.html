@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Gate | MVP</title>
+
+  <link rel="stylesheet" href="styles/console.css" />
+
+  <style>
+    /* ========================= */
+    /* СБРОС */
+    /* ========================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ========================= */
+    /* BODY */
+    /* ========================= */
+
+    body {
+      font-family: 'Playfair Display', Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* ========================= */
+    /* HEADER */
+    /* ========================= */
+
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ========================= */
+    /* LOGO */
+    /* ========================= */
+
+    .logo {
+      position: absolute;
+      top: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 70px;
+      width: auto;
+      z-index: 11;
+      pointer-events: auto;
+    }
+
+    /* ========================= */
+    /* TITLE */
+    /* ========================= */
+
+    .title {
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      z-index: 11;
+      color: #111;
+      pointer-events: auto;
+    }
+
+    /* ========================= */
+    /* IMAGES CONTAINER */
+    /* ========================= */
+
+    .images {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80vh;
+      display: flex;
+      align-items: flex-start;
+      overflow: hidden;
+    }
+
+    /* ========================= */
+    /* IMAGE BLOCK */
+    /* ========================= */
+
+    .image {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background-size: contain;
+      background-position: top center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .image:hover {
+      transform: translateY(-4px);
+    }
+
+    .image:active {
+      transform: translateY(2px) scale(0.99);
+      transition: transform 0.08s ease;
+    }
+
+    /* ========================= */
+    /* LEFT / RIGHT */
+    /* ========================= */
+
+    .left {
+      background-image: url("https://matmodelator.github.io/Mvp/images/dating.webp");
+    }
+
+    .right {
+      background-image: url("https://matmodelator.github.io/Mvp/images/tennis.webp");
+    }
+
+    /* ========================= */
+    /* GATE BUTTONS */
+    /* ========================= */
+
+    .gate-button {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      color: #003366;
+      font-family: 'Playfair Display', Arial, sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      padding: 10px 26px;
+      border-radius: 999px;
+      cursor: pointer;
+      z-index: 3;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .gate-button:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .gate-button:active {
+      transform: translateX(-50%) translateY(1px) scale(0.98);
+    }
+
+    /* ========================= */
+    /* COPYRIGHT */
+    /* ========================= */
+
+    .copyright {
+      position: absolute;
+      left: 0;
+      bottom: 34px;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #444;
+      background: rgba(248, 248, 248, 0.92);
+      border-top: 1px solid #ddd;
+      z-index: 10;
+    }
+
+    /* ========================= */
+    /* MOBILE */
+    /* ========================= */
+
+    @media (max-width: 768px) {
+      .logo {
+        top: 20px;
+        height: 56px;
+      }
+
+      .title {
+        top: 88px;
+        font-size: 28px;
+      }
+
+      .images {
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .image {
+        width: 100%;
+        height: 50%;
+      }
+
+      .gate-button {
+        top: 20px;
+        font-size: 20px;
+        padding: 9px 20px;
+      }
+
+      .copyright {
+        font-size: 12px;
+        bottom: 34px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <img src="images/logo.svg" alt="MVP logo" class="logo">
+
+    <div class="title">
+      MVP
+    </div>
+  </div>
+
+  <div class="images">
+
+    <div class="image left" onclick="goGate('pro-daiting.html')">
+      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-daiting.html')">
+        daiting
+      </button>
+    </div>
+
+    <div class="image right" onclick="goGate('pro-tennis.html')">
+      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-tennis.html')">
+        tennis
+      </button>
+    </div>
+
+  </div>
+
+  <footer class="copyright">
+    © 2026 MatModelator/MVP — Most Valuable Project
+  </footer>
+
+  <div id="service-console">
+    <div class="row" id="build-top">
+      gate.html  pictures | v1.0.0
+    </div>
+
+    <div class="row" id="build-down">
+      deploy: --
+    </div>
+  </div>
+
+  <script>
+    function goGate(url) {
+      window.location.href = url;
+    }
+
+    (function () {
+      const now = new Date();
+
+      const pad = n =>
+        String(n).padStart(2, '0');
+
+      const date =
+        pad(now.getDate()) +
+        '.' +
+        pad(now.getMonth() + 1) +
+        '.' +
+        now.getFullYear();
+
+      const time =
+        pad(now.getHours()) +
+        ':' +
+        pad(now.getMinutes());
+
+      document
+        .getElementById('build-down')
+        .textContent =
+        'deploy: ' + date + ' ' + time;
+    })();
+  </script>
+
+</body>
+</html>
