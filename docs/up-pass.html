@@ -6,8 +6,7 @@
         content="width=device-width, initial-scale=1.0" />
   <title>Новый пароль</title>
 
- <!-- СТИЛЬ КОНСОЛИ -->
-
+  <!-- СТИЛЬ КОНСОЛИ -->
   <link rel="stylesheet"
         href="styles/console.css" />
   
@@ -46,10 +45,13 @@
       color: #555;
       font-size: 14px;
       line-height: 1.5;
+      text-align: center;
+      margin-bottom: 20px;
     }
 
     /* ========================================
        ПОЛЯ ВВОДА
+       ВЗЯТО ПО ЛОГИКЕ ИЗ sign
     ======================================== */
 
     input {
@@ -57,6 +59,9 @@
       padding: 10px;
       box-sizing: border-box;
       margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
     }
 
     .password-wrapper {
@@ -73,9 +78,36 @@
       background: none;
       cursor: pointer;
       font-size: 16px;
+      padding: 0;
+      width: auto;
+      margin: 0;
+      color: inherit;
     }
 
-    /* Убирает встроенный глаз браузера */
+    /* ========================================
+       ОСНОВНЫЕ КНОПКИ
+    ======================================== */
+
+    .main-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .main-btn:hover {
+      background: #1d4ed8;
+    }
+
+    /* ========================================
+       УБИРАЕТ ВСТРОЕННЫЙ ГЛАЗ БРАУЗЕРА
+       ВЗЯТО ИЗ sign
+    ======================================== */
 
     input[type="password"]::-ms-reveal,
     input[type="password"]::-ms-clear {
@@ -91,24 +123,8 @@
     }
 
     /* ========================================
-       КНОПКИ
+       СООБЩЕНИЯ
     ======================================== */
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #2563eb;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 6px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
 
     #status {
       margin-top: 16px;
@@ -203,7 +219,10 @@
 
       </div>
 
-      <button type="submit">
+      <button
+        type="submit"
+        class="main-btn"
+      >
         Сохранить новый пароль
       </button>
 
@@ -213,10 +232,11 @@
 
     <button
       id="goSignBtn"
+      class="main-btn"
       onclick="goToSign()"
       style="display:none;"
     >
-      Переход к обновлению пароля
+     Вернуться на сайт
     </button>
 
   </div>
@@ -233,6 +253,11 @@
   const password2Input = document.getElementById('password2')
   const statusEl = document.getElementById('status')
   const goSignBtn = document.getElementById('goSignBtn')
+
+  /* ========================================
+     ПОКАЗ / СКРЫТИЕ ПАРОЛЯ
+     ВЗЯТО ПО ЛОГИКЕ ИЗ sign
+  ======================================== */
 
   function togglePassword(id, btn) {
 
@@ -261,7 +286,11 @@
   }
 
   window.togglePassword =
-    togglePassword 
+    togglePassword
+
+  /* ========================================
+     ПЕРЕХОД НА sign
+  ======================================== */
 
   function goToSign() {
 
@@ -273,12 +302,24 @@
   window.goToSign =
     goToSign
 
-  const params = new URLSearchParams(window.location.search)
-  const emailFromUrl = params.get('email')
+  /* ========================================
+     EMAIL ИЗ URL
+  ======================================== */
+
+  const params =
+    new URLSearchParams(window.location.search)
+
+  const emailFromUrl =
+    params.get('email')
 
   if (emailFromUrl) {
-    emailInput.value = emailFromUrl
+    emailInput.value =
+      emailFromUrl
   }
+
+  /* ========================================
+     ОБРАБОТКА ФОРМЫ
+  ======================================== */
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault()
@@ -293,30 +334,39 @@
     const password2 = password2Input.value.trim()
 
     if (!email) {
-      statusEl.textContent = 'Введите email.'
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Введите email.'
+      statusEl.className =
+        'error'
       return
     }
 
     if (!/^\d{8}$/.test(token)) {
-      statusEl.textContent = 'Код должен состоять из 8 цифр.'
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Код должен состоять из 8 цифр.'
+      statusEl.className =
+        'error'
       return
     }
 
     if (password.length < 6) {
-      statusEl.textContent = 'Пароль должен быть не короче 6 символов.'
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Пароль должен быть не короче 6 символов.'
+      statusEl.className =
+        'error'
       return
     }
 
     if (password !== password2) {
-      statusEl.textContent = 'Пароли не совпадают.'
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Пароли не совпадают.'
+      statusEl.className =
+        'error'
       return
     }
 
-    statusEl.textContent = 'Проверяем код...'
+    statusEl.textContent =
+      'Проверяем код...'
 
     const { error: verifyError } = await supabase.auth.verifyOtp({
       email: email,
@@ -325,33 +375,39 @@
     })
 
     if (verifyError) {
-      statusEl.textContent = 'Ошибка кода: ' + verifyError.message
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Ошибка кода: ' + verifyError.message
+      statusEl.className =
+        'error'
       return
     }
 
-    statusEl.textContent = 'Меняем пароль...'
+    statusEl.textContent =
+      'Меняем пароль...'
 
     const { error: updateError } = await supabase.auth.updateUser({
       password: password
     })
 
     if (updateError) {
-      statusEl.textContent = 'Ошибка смены пароля: ' + updateError.message
-      statusEl.className = 'error'
+      statusEl.textContent =
+        'Ошибка смены пароля: ' + updateError.message
+      statusEl.className =
+        'error'
       return
     }
 
     statusEl.textContent =
       'Пароль успешно изменен.\nТеперь нажмите кнопку ниже.'
 
-    statusEl.className = 'success'
+    statusEl.className =
+      'success'
 
-    goSignBtn.style.display = 'block'
+    goSignBtn.style.display =
+      'block'
   })
 
 </script>
-
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -360,19 +416,14 @@
 <div id="service-console">
 
   <div class="row" id="build-top">
-
-    eyes from sign & no timer | v1.2.1
-
+    eyes styles& button back to | v1.2.2
   </div>
 
   <div class="row" id="build-down">
-
     deploy: --
-
   </div>
 
 </div>
-
 
 <script>
 
