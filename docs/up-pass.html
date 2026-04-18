@@ -5,6 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Новый пароль</title>
+
+ <!-- СТИЛЬ КОНСОЛИ -->
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
   <style>
     body {
       margin: 0;
@@ -126,12 +132,7 @@
   </div>
 
   <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-    const SUPABASE_URL = 'https://fnodbpiwkkrdgqvmyanq.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+   import { supabase } from './supabase-config.js'
 
     const form = document.getElementById('passwordForm')
     const emailInput = document.getElementById('email')
@@ -212,11 +213,89 @@ if (!/^\d{8}$/.test(token)) {
       statusEl.className = 'success'
 
       setTimeout(function () {
-        window.location.href = 'log.html'
+        window.location.href = 'sign.html'
       }, 1500)
     })
   </script>
 
+
+
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+    switch on config & console & sign | v1.1.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script> 
 
 </body>
 </html>
