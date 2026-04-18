@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Профиль - теннис, падель</title>
+  <title>Профиль - знакомства, общение</title>
 
   <!-- СТИЛЬ КОНСОЛИ -->
 
@@ -102,7 +101,7 @@
 </head>
 <body>
   <header>
-    <h1>Tennis App MVP</h1>
+    <h1>Dating App MVP</h1>
   </header>
 
   <div class="container">
@@ -116,23 +115,38 @@
 
       <input id="city" type="text" placeholder="City" />
 
-      <select id="level">
-        <option value="">Level</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-        <option value="Professional">Professional</option>
+      <select id="sex">
+        <option value="">Sex</option>
+        <option value="hetero">hetero</option>
+        <option value="homo">homo</option>
+        <option value="bi">bi</option>
+        <option value="couple">couple</option>
+        <option value="other">other</option>
       </select>
 
-      <select id="experience">
-        <option value="">Experience</option>
-        <option value="less_1_year">Less than 1 year</option>
-        <option value="1_3_years">1–3 years</option>
-        <option value="3_5_years">3–5 years</option>
-        <option value="5_plus_years">5+ years</option>
+      <select id="zodiac">
+        <option value="">Zodiac</option>
+        <option value="Aries">Aries</option>
+        <option value="Taurus">Taurus</option>
+        <option value="Gemini">Gemini</option>
+        <option value="Cancer">Cancer</option>
+        <option value="Leo">Leo</option>
+        <option value="Virgo">Virgo</option>
+        <option value="Libra">Libra</option>
+        <option value="Scorpio">Scorpio</option>
+        <option value="Sagittarius">Sagittarius</option>
+        <option value="Capricorn">Capricorn</option>
+        <option value="Aquarius">Aquarius</option>
+        <option value="Pisces">Pisces</option>
       </select>
 
-      <input id="events" type="text" placeholder="Events" />
+      <select id="statusField">
+        <option value="">Status</option>
+        <option value="Single">Single</option>
+        <option value="Married">Married</option>
+        <option value="Boyfriend">Boyfriend</option>
+        <option value="Girlfriend">Girlfriend</option>
+      </select>
 
       <button type="submit">Сохранить профиль</button>
 
@@ -202,14 +216,14 @@
         document.getElementById('city').value =
           profile.city || ''
 
-        document.getElementById('level').value =
-          profile.level || ''
+        document.getElementById('sex').value =
+          profile.sex || ''
 
-        document.getElementById('experience').value =
-          profile.experience || ''
+        document.getElementById('zodiac').value =
+          profile.zodiac || ''
 
-        document.getElementById('events').value =
-          profile.events || ''
+        document.getElementById('statusField').value =
+          profile.status || ''
       }
 
     }
@@ -234,14 +248,14 @@
       const city =
         document.getElementById('city').value.trim()
 
-      const level =
-        document.getElementById('level').value
+      const sex =
+        document.getElementById('sex').value
 
-      const experience =
-        document.getElementById('experience').value
+      const zodiac =
+        document.getElementById('zodiac').value
 
-      const events =
-        document.getElementById('events').value.trim()
+      const status =
+        document.getElementById('statusField').value
 
       const { error } =
         await supabase
@@ -250,9 +264,9 @@
             nickname,
             country,
             city,
-            level,
-            experience,
-            events
+            sex,
+            zodiac,
+            status
           })
           .eq('id', user.id)
 
@@ -292,7 +306,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   tennis fields update | v1.1.0
+   backup | v1.1.2
 
   </div>
 
@@ -353,6 +367,7 @@
 
 })();
 
-</script>
-</body>
+  </body>
 </html>
+
+</script>
