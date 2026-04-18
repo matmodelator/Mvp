@@ -2,25 +2,38 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
   <title>Восстановление пароля</title>
 
-<!-- СТИЛЬ КОНСОЛИ -->
+<!-- ========================================
+     СТИЛЬ СЕРВИСНОЙ КОНСОЛИ
+======================================== -->
 
   <link rel="stylesheet"
         href="styles/console.css" />
 
-  
   <style>
+
+    /* ========================================
+       БАЗОВАЯ РАЗМЕТКА СТРАНИЦЫ
+    ======================================== */
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f6f8;
+
+      /* Центрирование блока по экрану */
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
     }
+
+    /* ========================================
+       ОСНОВНОЙ БЛОК
+    ======================================== */
 
     .box {
       width: 100%;
@@ -43,6 +56,10 @@
       font-size: 14px;
     }
 
+    /* ========================================
+       ПОЛЯ ВВОДА
+    ======================================== */
+
     input {
       width: 100%;
       padding: 12px;
@@ -53,6 +70,10 @@
       box-sizing: border-box;
       font-size: 15px;
     }
+
+    /* ========================================
+       КНОПКА
+    ======================================== */
 
     button {
       width: 100%;
@@ -69,11 +90,21 @@
       background: #1d4ed8;
     }
 
+    /* ========================================
+       БЛОК СООБЩЕНИЙ
+       ВАЖНО:
+       white-space: pre-line
+       позволяет делать перенос строк через \n
+    ======================================== */
+
     #status {
       margin-top: 16px;
       font-size: 14px;
       text-align: center;
       min-height: 20px;
+
+      /* перенос строк из JS */
+      white-space: pre-line;
     }
 
     .success {
@@ -84,6 +115,10 @@
       color: #b00020;
     }
 
+    /* ========================================
+       ССЫЛКА НАЗАД
+    ======================================== */
+
     .link-back {
       display: block;
       margin-top: 18px;
@@ -91,123 +126,177 @@
       text-decoration: none;
       color: #2563eb;
     }
+
   </style>
 </head>
+
 <body>
+
   <div class="box">
+
     <h1>Восстановление пароля</h1>
 
+    <!-- ========================================
+         ОПИСАНИЕ
+         Перенос по предложениям через <br>
+    ======================================== -->
+
     <p>
-      Введите email, указанный при регистрации.
+      Введите email, указанный при регистрации.<br>
       На него будет отправлен код для смены пароля.
     </p>
 
+    <!-- ========================================
+         ФОРМА ВОССТАНОВЛЕНИЯ
+    ======================================== -->
+
     <form id="recoveryForm">
+
+      <!-- EMAIL -->
+
       <input
         id="email"
         type="email"
         placeholder="Email"
         required
       />
-      <button type="submit">Отправить код</button>
+
+      <!-- КНОПКА ОТПРАВКИ -->
+
+      <button type="submit">
+        Отправить код
+      </button>
+
     </form>
+
+    <!-- ========================================
+         СООБЩЕНИЯ
+    ======================================== -->
 
     <div id="status"></div>
 
-    <a class="link-back" href="index.html">Назад</a>
+    <!-- ========================================
+         КНОПКА НАЗАД
+    ======================================== -->
+
+    <a
+      class="link-back"
+      href="index.html"
+    >
+      Назад
+    </a>
+
   </div>
 
 
+<!-- ========================================
+     ЛОГИКА ВОССТАНОВЛЕНИЯ ПАРОЛЯ
+======================================== -->
+
 <script type="module">
- import { supabase } from './supabase-config.js'
-  
-  const form = document.getElementById('recoveryForm')
-  const emailInput = document.getElementById('email')
-  const statusEl = document.getElementById('status')
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault()
+ import { supabase }
+ from './supabase-config.js'
 
-    statusEl.textContent = 'Отправляем код...'
-    statusEl.className = ''
+  const form =
+    document.getElementById('recoveryForm')
 
-    const email = emailInput.value.trim()
+  const emailInput =
+    document.getElementById('email')
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email)
+  const statusEl =
+    document.getElementById('status')
 
-    if (error) {
-      statusEl.textContent = 'Ошибка: ' + error.message
-      statusEl.className = 'error'
-      return
-    }
+  /* ========================================
+     ОБРАБОТКА ОТПРАВКИ ФОРМЫ
+  ======================================== */
 
-    statusEl.textContent = 'Если это правильный адрес, то код отправлен. Переходим к смене пароля...'
-    statusEl.className = 'success'
+  form.addEventListener(
+    'submit',
+    async function (e) {
 
-    setTimeout(function () {
-      window.location.href =
-        'up-pass.html?email=' + encodeURIComponent(email)
-    }, 700)
-  })
-</script>
-
-  
-
-
-<!--  
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-    const SUPABASE_URL = 'https://fnodbpiwkkrdgqvmyanq.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I'
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-    const form = document.getElementById('recoveryForm')
-    const emailInput = document.getElementById('email')
-    const statusEl = document.getElementById('status')
-
-    form.addEventListener('submit', async function (e) {
       e.preventDefault()
 
-      statusEl.textContent = 'Отправляем письмо...'
+      /* Сообщение: отправка */
+
+      statusEl.textContent =
+        'Отправляем код...'
+
       statusEl.className = ''
 
-      const email = emailInput.value.trim()
+      const email =
+        emailInput.value.trim()
 
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://matmodelator.github.io/Mvp/up-pass.html'
-      })
+      /* ========================================
+         ОТПРАВКА КОДА В SUPABASE
+      ======================================== */
+
+      const { error } =
+        await supabase.auth.resetPasswordForEmail(
+          email
+        )
+
+      /* ========================================
+         ОШИБКА
+      ======================================== */
 
       if (error) {
-        statusEl.textContent = 'Ошибка: ' + error.message
-        statusEl.className = 'error'
+
+        statusEl.textContent =
+          'Ошибка:\n'
+          + error.message
+
+        statusEl.className =
+          'error'
+
         return
       }
 
+      /* ========================================
+         УСПЕХ
+         Перенос строк через \n
+      ======================================== */
+
       statusEl.textContent =
-        'Если такой email существует, ссылка для смены пароля отправлена.'
-      statusEl.className = 'success'
-    })
-  </script>
--->
+        'Если это правильный адрес,\n'
+        + 'то код отправлен.\n'
+        + 'Переходим к смене пароля...'
+
+      statusEl.className =
+        'success'
+
+      /* ========================================
+         ПЕРЕХОД НА СТРАНИЦУ СМЕНЫ ПАРОЛЯ
+      ======================================== */
+
+      setTimeout(
+        function () {
+
+          window.location.href =
+            'up-pass.html?email='
+            + encodeURIComponent(email)
+
+        },
+        700
+      )
+
+    }
+  )
+
+</script>
 
 
 <!-- ========================================
      SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
 ======================================== -->
 
 <div id="service-console">
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
+    <!-- ВЕРСИЯ СТРАНИЦЫ -->
 
-switch to config & console| v1.1.0
+  comments & wrapping  | v1.1.1
 
   </div>
 
@@ -219,44 +308,31 @@ switch to config & console| v1.1.0
 
 </div>
 
+
 <!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
+     АВТОВЫВОД ДАТЫ И ВРЕМЕНИ
 ======================================== -->
 
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
+  const now = new Date()
 
-  const now = new Date();
-
-  /* Добавляет ведущий ноль */
-
-  const pad = n =>
-    String(n).padStart(2, '0');
-
-  /* Формат даты */
+  const pad =
+    n => String(n).padStart(2, '0')
 
   const date =
       pad(now.getDate())
     + '.'
     + pad(now.getMonth() + 1)
     + '.'
-    + now.getFullYear();
-
-  /* Формат времени */
+    + now.getFullYear()
 
   const time =
       pad(now.getHours())
     + ':'
-    + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
+    + pad(now.getMinutes())
 
   document
     .getElementById('build-down')
@@ -264,11 +340,11 @@ switch to config & console| v1.1.0
       'deploy: '
       + date
       + ' '
-      + time;
+      + time
 
-})();
+})()
 
 </script>
-  
+
 </body>
 </html>
