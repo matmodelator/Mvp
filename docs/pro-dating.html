@@ -109,14 +109,20 @@
 
     <form id="profileForm">
 
-      <input id="nickname" type="text" placeholder="NickName" required />
+      <select id="mode">
+        <option value="">mode</option>
+        <option value="отношения">отношения</option>
+        <option value="встречи">встречи</option>
+      </select>
 
-      <input id="country" type="text" placeholder="Country" />
+      <input id="nickname" type="text" placeholder="nickname" required />
 
-      <input id="city" type="text" placeholder="City" />
+      <input id="country" type="text" placeholder="country" />
+
+      <input id="city" type="text" placeholder="city" />
 
       <select id="sex">
-        <option value="">Sex</option>
+        <option value="">sex</option>
         <option value="hetero">hetero</option>
         <option value="homo">homo</option>
         <option value="bi">bi</option>
@@ -125,7 +131,7 @@
       </select>
 
       <select id="zodiac">
-        <option value="">Zodiac</option>
+        <option value="">zodiac</option>
         <option value="Aries">Aries</option>
         <option value="Taurus">Taurus</option>
         <option value="Gemini">Gemini</option>
@@ -141,7 +147,7 @@
       </select>
 
       <select id="statusField">
-        <option value="">Status</option>
+        <option value="">status</option>
         <option value="Single">Single</option>
         <option value="Married">Married</option>
         <option value="Boyfriend">Boyfriend</option>
@@ -207,6 +213,9 @@
 
       if (profile) {
 
+        document.getElementById('mode').value =
+          profile.mode || ''
+
         document.getElementById('nickname').value =
           profile.nickname || ''
 
@@ -239,6 +248,9 @@
         return
       }
 
+      const mode =
+        document.getElementById('mode').value
+
       const nickname =
         document.getElementById('nickname').value.trim()
 
@@ -261,6 +273,7 @@
         await supabase
           .from('profiles')
           .update({
+            mode,
             nickname,
             country,
             city,
@@ -306,7 +319,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   backup | v1.1.2
+  mode&leters | v1.1.3
 
   </div>
 
@@ -367,7 +380,6 @@
 
 })();
 
-  </body>
-</html>
-
 </script>
+</body>
+</html>
