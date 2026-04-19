@@ -110,29 +110,41 @@
 
     <form id="profileForm">
 
-      <input id="nickname" type="text" placeholder="NickName" required />
+      <select id="game">
+        <option value="">game</option>
+        <option value="tennis">tennis</option>
+        <option value="padel">padel</option>
+      </select>
 
-      <input id="country" type="text" placeholder="Country" />
+      <input id="nickname" type="text" placeholder="nickname" required />
 
-      <input id="city" type="text" placeholder="City" />
+      <input id="country" type="text" placeholder="country" />
+
+      <input id="city" type="text" placeholder="city" />
 
       <select id="level">
-        <option value="">Level</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-        <option value="Professional">Professional</option>
+        <option value="">level</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
       </select>
 
       <select id="experience">
-        <option value="">Experience</option>
+        <option value="">experience</option>
         <option value="less_1_year">Less than 1 year</option>
         <option value="1_3_years">1–3 years</option>
         <option value="3_5_years">3–5 years</option>
         <option value="5_plus_years">5+ years</option>
       </select>
 
-      <input id="events" type="text" placeholder="Events" />
+      <input id="events" type="text" placeholder="events" />
 
       <button type="submit">Сохранить профиль</button>
 
@@ -193,6 +205,9 @@
 
       if (profile) {
 
+        document.getElementById('game').value =
+          profile.game || ''
+
         document.getElementById('nickname').value =
           profile.nickname || ''
 
@@ -225,6 +240,9 @@
         return
       }
 
+      const game =
+        document.getElementById('game').value
+
       const nickname =
         document.getElementById('nickname').value.trim()
 
@@ -234,8 +252,11 @@
       const city =
         document.getElementById('city').value.trim()
 
-      const level =
+      const levelValue =
         document.getElementById('level').value
+
+      const level =
+        levelValue ? Number(levelValue) : null
 
       const experience =
         document.getElementById('experience').value
@@ -247,6 +268,7 @@
         await supabase
           .from('profiles')
           .update({
+            game,
             nickname,
             country,
             city,
@@ -292,7 +314,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-   tennis fields update | v1.1.0
+   level 10 + game  | v1.1.1
 
   </div>
 
