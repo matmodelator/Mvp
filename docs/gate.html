@@ -234,14 +234,14 @@
 
   <div class="images">
 
-    <div class="image left" onclick="goGate('pro-dating.html')">
-      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-dating.html')">
+    <div class="image left" onclick="goGate('pro-dating.html', 'dating')">
+      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-dating.html', 'dating')">
         daiting
       </button>
     </div>
 
-    <div class="image right" onclick="goGate('pro-tennis.html')">
-      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-tennis.html')">
+    <div class="image right" onclick="goGate('pro-tennis.html', 'playing')">
+      <button class="gate-button" onclick="event.stopPropagation(); goGate('pro-tennis.html', 'playing')">
         tennis
       </button>
     </div>
@@ -254,7 +254,7 @@
 
   <div id="service-console">
     <div class="row" id="build-top">
-      fix syntaxerror | v1.0.2
+      types | v1.0.3
     </div>
 
     <div class="row" id="build-down">
@@ -263,8 +263,9 @@
   </div>
 
   <script>
-    function goGate(url) {
-      window.location.href = url;
+    function goGate(url, type) {
+      window.location.href =
+        url + '?type=' + encodeURIComponent(type);
     }
 
     (function () {
