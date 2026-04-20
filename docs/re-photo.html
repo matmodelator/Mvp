@@ -1,17 +1,24 @@
-  
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+
+<!-- Адаптация под мобильные -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>up-photo</title>
+
+<title>re-photo</title>
 
 <!-- СТИЛЬ КОНСОЛИ -->
 
   <link rel="stylesheet"
         href="styles/console.css" />
-  
+    
 <style>
+/* ================================
+   БАЗА
+================================ */
+
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
@@ -20,7 +27,7 @@ body {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   background: #fff;
   padding: 24px;
@@ -31,6 +38,10 @@ body {
 h2, h3 {
   margin-top: 0;
 }
+
+/* ================================
+   ВЕРХНЯЯ ПАНЕЛЬ
+================================ */
 
 .controls {
   margin-bottom: 24px;
@@ -95,6 +106,10 @@ button:disabled {
   white-space: pre-line;
 }
 
+/* ================================
+   ДВЕ КОЛОНКИ
+================================ */
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -102,7 +117,7 @@ button:disabled {
 }
 
 .panel {
-  flex: 1 1 460px;
+  flex: 1 1 520px;
   background: #fafafa;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -110,25 +125,48 @@ button:disabled {
 }
 
 .preview-box {
-  min-height: 320px;
+  min-height: 420px;
   background: #e5e7eb;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-
-.preview-box img {
-  max-width: 100%;
-  max-height: 520px;
-  display: none;
+  overflow: auto;
+  position: relative;
 }
 
 .info {
   margin-top: 12px;
   font-size: 14px;
   color: #444;
+  white-space: pre-line;
+}
+
+/* ================================
+   CANVAS
+================================ */
+
+#cropCanvas {
+  max-width: 100%;
+  display: none;
+  cursor: crosshair;
+  background: #ddd;
+}
+
+#resultPreview {
+  max-width: 100%;
+  max-height: 700px;
+  display: none;
+}
+
+/* ================================
+   ПОДСКАЗКИ
+================================ */
+
+.note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #555;
   white-space: pre-line;
 }
 </style>
@@ -151,25 +189,25 @@ button:disabled {
 
       <!-- Режим кропа -->
       <div class="field">
-        <label for="cropMode">Кроп</label>
+        <label for="cropMode">Режим кропа</label>
         <select id="cropMode">
-          <option value="none">Без кропа</option>
+          <option value="free">Свободный прямоугольник</option>
           <option value="square">Квадрат 1:1</option>
           <option value="landscape">Горизонтально 4:3</option>
           <option value="portrait">Вертикально 3:4</option>
         </select>
       </div>
 
-      <!-- Ограничение ширины -->
+      <!-- Максимальная ширина -->
       <div class="field">
         <label for="maxWidth">Max width</label>
-        <input id="maxWidth" type="number" value="1200" min="100" step="50">
+        <input id="maxWidth" type="number" value="1200" min="50" step="50">
       </div>
 
-      <!-- Ограничение высоты -->
+      <!-- Максимальная высота -->
       <div class="field">
         <label for="maxHeight">Max height</label>
-        <input id="maxHeight" type="number" value="1200" min="100" step="50">
+        <input id="maxHeight" type="number" value="1200" min="50" step="50">
       </div>
 
       <!-- Качество WebP -->
@@ -181,39 +219,39 @@ button:disabled {
     </div>
 
     <div class="buttons">
-
-      <!-- Применить выбранные настройки -->
+      <!-- Применить: вырезать выбранную область, уменьшить и перевести в webp -->
       <button id="applyBtn" type="button">Применить</button>
 
-      <!-- Только кроп -->
-      <button id="cropBtn" type="button">Кроп по центру</button>
-
-      <!-- Только resize -->
-      <button id="resizeBtn" type="button">Resize</button>
-
-      <!-- Полная обработка: crop + resize + webp -->
-      <button id="fullProcessBtn" type="button">Кроп + Resize + WebP</button>
+      <!-- Сбросить выделение -->
+      <button id="resetCropBtn" type="button">Сбросить выделение</button>
 
       <!-- Скачать готовый результат -->
       <button id="downloadBtn" type="button" disabled>Скачать результат</button>
-
     </div>
 
     <div class="status" id="status"></div>
+
+    <div class="note">
+      Слева загрузи фото и выдели область мышью или пальцем.
+      Потом нажми «Применить».
+    </div>
+
   </div>
 
   <div class="row">
 
+    <!-- ЛЕВАЯ ПАНЕЛЬ: исходник и область выделения -->
     <div class="panel">
-      <h3>Исходник</h3>
+      <h3>Исходник и выделение</h3>
 
       <div class="preview-box">
-        <img id="originalPreview" alt="Исходник">
+        <canvas id="cropCanvas"></canvas>
       </div>
 
       <div class="info" id="originalInfo"></div>
     </div>
 
+    <!-- ПРАВАЯ ПАНЕЛЬ: результат -->
     <div class="panel">
       <h3>Результат</h3>
 
@@ -231,18 +269,48 @@ button:disabled {
 <script>
 /*
 ================================
-Глобальные переменные
+ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 ================================
 */
 
 let originalFile = null;
-let originalObjectUrl = null;
 let processedFile = null;
 let processedObjectUrl = null;
 
+let sourceImage = null;
+
+/*
+  Размер исходной картинки в пикселях
+*/
+let imageNaturalWidth = 0;
+let imageNaturalHeight = 0;
+
+/*
+  Canvas может быть уменьшен визуально.
+  Поэтому отдельно храним реальный размер canvas.
+*/
+let canvasDisplayWidth = 0;
+let canvasDisplayHeight = 0;
+
+/*
+  Выделение пользователя на canvas
+*/
+let cropRect = null;
+
+/*
+  Флаг рисования прямоугольника
+*/
+let isSelecting = false;
+
+/*
+  Точка начала выделения
+*/
+let startX = 0;
+let startY = 0;
+
 /*
 ================================
-DOM элементы
+DOM
 ================================
 */
 
@@ -253,12 +321,12 @@ const maxHeightInput = document.getElementById("maxHeight");
 const qualityInput = document.getElementById("quality");
 
 const applyBtn = document.getElementById("applyBtn");
-const cropBtn = document.getElementById("cropBtn");
-const resizeBtn = document.getElementById("resizeBtn");
-const fullProcessBtn = document.getElementById("fullProcessBtn");
+const resetCropBtn = document.getElementById("resetCropBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 
-const originalPreview = document.getElementById("originalPreview");
+const cropCanvas = document.getElementById("cropCanvas");
+const cropCtx = cropCanvas.getContext("2d");
+
 const resultPreview = document.getElementById("resultPreview");
 const originalInfo = document.getElementById("originalInfo");
 const resultInfo = document.getElementById("resultInfo");
@@ -266,7 +334,7 @@ const statusBox = document.getElementById("status");
 
 /*
 ================================
-Выбор файла
+ВЫБОР ФАЙЛА
 ================================
 */
 
@@ -277,41 +345,55 @@ photoInput.addEventListener("change", async (event) => {
   originalFile = event.target.files[0] || null;
 
   if (!originalFile) {
-    clearOriginal();
+    clearCanvas();
+    originalInfo.textContent = "";
     return;
   }
 
-  await showOriginal();
+  if (!originalFile.type.startsWith("image/")) {
+    setStatus("Нужен файл изображения.");
+    return;
+  }
+
+  try {
+    await loadOriginalIntoCanvas(originalFile);
+    setDefaultCrop();
+    drawCanvas();
+    setStatus("Фото загружено. Выдели область и нажми «Применить».");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
 });
 
 /*
 ================================
-Кнопка "Применить"
-Делает выбранные настройки:
-- если выбран кроп -> применяет кроп
-- resize
-- webp
+КНОПКА ПРИМЕНИТЬ
 ================================
 */
 
 applyBtn.addEventListener("click", async () => {
-  if (!originalFile) {
+  if (!originalFile || !sourceImage) {
     setStatus("Сначала выбери фото.");
+    return;
+  }
+
+  if (!cropRect || cropRect.width < 2 || cropRect.height < 2) {
+    setStatus("Сначала выдели область на изображении.");
     return;
   }
 
   try {
     clearStatus();
 
-    processedFile = await processImage(originalFile, {
-      doCrop: cropMode.value !== "none",
-      cropMode: cropMode.value,
-      doResize: true,
+    processedFile = await cropResizeAndConvertSelectionToWebp(originalFile, {
+      cropRectCanvas: cropRect,
+      canvasWidth: cropCanvas.width,
+      canvasHeight: cropCanvas.height,
+      imageWidth: imageNaturalWidth,
+      imageHeight: imageNaturalHeight,
       maxWidth: Number(maxWidthInput.value) || 1200,
       maxHeight: Number(maxHeightInput.value) || 1200,
-      outputType: "image/webp",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "webp"
+      quality: Number(qualityInput.value) || 0.75
     });
 
     await showResult(processedFile);
@@ -323,109 +405,24 @@ applyBtn.addEventListener("click", async () => {
 
 /*
 ================================
-Кнопка "Кроп по центру"
-Только кроп без resize
+КНОПКА СБРОСИТЬ ВЫДЕЛЕНИЕ
 ================================
 */
 
-cropBtn.addEventListener("click", async () => {
-  if (!originalFile) {
+resetCropBtn.addEventListener("click", () => {
+  if (!sourceImage) {
     setStatus("Сначала выбери фото.");
     return;
   }
 
-  try {
-    clearStatus();
-
-    processedFile = await processImage(originalFile, {
-      doCrop: true,
-      cropMode: cropMode.value,
-      doResize: false,
-      maxWidth: Number(maxWidthInput.value) || 1200,
-      maxHeight: Number(maxHeightInput.value) || 1200,
-      outputType: "image/jpeg",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "jpg"
-    });
-
-    await showResult(processedFile);
-    setStatus("Готово: только кроп.");
-  } catch (error) {
-    setStatus("Ошибка: " + error.message);
-  }
+  setDefaultCrop();
+  drawCanvas();
+  setStatus("Выделение сброшено.");
 });
 
 /*
 ================================
-Кнопка "Resize"
-Только изменение размеров без кропа
-================================
-*/
-
-resizeBtn.addEventListener("click", async () => {
-  if (!originalFile) {
-    setStatus("Сначала выбери фото.");
-    return;
-  }
-
-  try {
-    clearStatus();
-
-    processedFile = await processImage(originalFile, {
-      doCrop: false,
-      cropMode: "none",
-      doResize: true,
-      maxWidth: Number(maxWidthInput.value) || 1200,
-      maxHeight: Number(maxHeightInput.value) || 1200,
-      outputType: "image/jpeg",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "jpg"
-    });
-
-    await showResult(processedFile);
-    setStatus("Готово: только resize.");
-  } catch (error) {
-    setStatus("Ошибка: " + error.message);
-  }
-});
-
-/*
-================================
-Кнопка "Кроп + Resize + WebP"
-Полная обработка отдельной кнопкой
-================================
-*/
-
-fullProcessBtn.addEventListener("click", async () => {
-  if (!originalFile) {
-    setStatus("Сначала выбери фото.");
-    return;
-  }
-
-  try {
-    clearStatus();
-
-    processedFile = await processImage(originalFile, {
-      doCrop: cropMode.value !== "none",
-      cropMode: cropMode.value,
-      doResize: true,
-      maxWidth: Number(maxWidthInput.value) || 1200,
-      maxHeight: Number(maxHeightInput.value) || 1200,
-      outputType: "image/webp",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "webp"
-    });
-
-    await showResult(processedFile);
-    setStatus("Готово: кроп + resize + webp.");
-  } catch (error) {
-    setStatus("Ошибка: " + error.message);
-  }
-});
-
-/*
-================================
-Скачать результат локально
+КНОПКА СКАЧАТЬ
 ================================
 */
 
@@ -445,32 +442,258 @@ downloadBtn.addEventListener("click", () => {
 
 /*
 ================================
-Показать исходник
+ЗАГРУЗКА ИСХОДНИКА В CANVAS
 ================================
 */
 
-async function showOriginal() {
-  if (originalObjectUrl) {
-    URL.revokeObjectURL(originalObjectUrl);
-  }
+async function loadOriginalIntoCanvas(file) {
+  const dataUrl = await readFileAsDataURL(file);
+  const img = await loadImage(dataUrl);
 
-  originalObjectUrl = URL.createObjectURL(originalFile);
+  sourceImage = img;
+  imageNaturalWidth = img.width;
+  imageNaturalHeight = img.height;
 
-  originalPreview.src = originalObjectUrl;
-  originalPreview.style.display = "block";
+  /*
+    Чтобы большое фото помещалось в панель,
+    рисуем его на canvas в уменьшенном виде.
+  */
+  const maxCanvasWidth = 520;
+  const maxCanvasHeight = 700;
 
-  const meta = await getImageMetaFromObjectUrl(originalObjectUrl);
+  const scale = Math.min(
+    maxCanvasWidth / img.width,
+    maxCanvasHeight / img.height,
+    1
+  );
+
+  canvasDisplayWidth = Math.round(img.width * scale);
+  canvasDisplayHeight = Math.round(img.height * scale);
+
+  cropCanvas.width = canvasDisplayWidth;
+  cropCanvas.height = canvasDisplayHeight;
+  cropCanvas.style.display = "block";
 
   originalInfo.textContent =
-    "Имя: " + originalFile.name + "\n" +
-    "Тип: " + originalFile.type + "\n" +
-    "Размер: " + formatSize(originalFile.size) + "\n" +
-    "Разрешение: " + meta.width + " × " + meta.height;
+    "Имя: " + file.name + "\n" +
+    "Тип: " + file.type + "\n" +
+    "Размер: " + formatSize(file.size) + "\n" +
+    "Разрешение: " + img.width + " × " + img.height + "\n" +
+    "Canvas: " + cropCanvas.width + " × " + cropCanvas.height;
 }
 
 /*
 ================================
-Показать результат
+СТАНДАРТНОЕ ВЫДЕЛЕНИЕ
+================================
+*/
+
+function setDefaultCrop() {
+  if (!sourceImage) return;
+
+  const w = Math.round(cropCanvas.width * 0.6);
+  const h = getDefaultHeightByMode(w);
+
+  cropRect = {
+    x: Math.round((cropCanvas.width - w) / 2),
+    y: Math.round((cropCanvas.height - h) / 2),
+    width: w,
+    height: h
+  };
+
+  normalizeCropRect();
+}
+
+/*
+================================
+ВЫЧИСЛИТЬ ВЫСОТУ ПО РЕЖИМУ
+================================
+*/
+
+function getDefaultHeightByMode(width) {
+  const mode = cropMode.value;
+
+  if (mode === "square") {
+    return width;
+  }
+
+  if (mode === "landscape") {
+    return Math.round(width * 3 / 4);
+  }
+
+  if (mode === "portrait") {
+    return Math.round(width * 4 / 3);
+  }
+
+  return Math.round(width * 0.7);
+}
+
+/*
+================================
+РИСОВАНИЕ CANVAS
+================================
+*/
+
+function drawCanvas() {
+  if (!sourceImage) return;
+
+  cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+  /*
+    Рисуем исходник
+  */
+  cropCtx.drawImage(
+    sourceImage,
+    0, 0, imageNaturalWidth, imageNaturalHeight,
+    0, 0, cropCanvas.width, cropCanvas.height
+  );
+
+  if (!cropRect) return;
+
+  /*
+    Затемнение вокруг выбранной области
+  */
+  cropCtx.save();
+  cropCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
+  cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
+
+  cropCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  cropCtx.restore();
+
+  /*
+    Повторно рисуем изображение только внутри выбранной области,
+    чтобы внутри прямоугольника картинка была яркой и чистой
+  */
+  cropCtx.save();
+  cropCtx.beginPath();
+  cropCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  cropCtx.clip();
+
+  cropCtx.drawImage(
+    sourceImage,
+    0, 0, imageNaturalWidth, imageNaturalHeight,
+    0, 0, cropCanvas.width, cropCanvas.height
+  );
+  cropCtx.restore();
+
+  /*
+    Рамка выделения
+  */
+  cropCtx.strokeStyle = "#2563eb";
+  cropCtx.lineWidth = 2;
+  cropCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+
+  /*
+    Маленькие угловые маркеры для наглядности
+  */
+  drawCornerHandles();
+}
+
+/*
+================================
+УГЛОВЫЕ МАРКЕРЫ
+================================
+*/
+
+function drawCornerHandles() {
+  const s = 10;
+  const points = [
+    [cropRect.x, cropRect.y],
+    [cropRect.x + cropRect.width, cropRect.y],
+    [cropRect.x, cropRect.y + cropRect.height],
+    [cropRect.x + cropRect.width, cropRect.y + cropRect.height]
+  ];
+
+  cropCtx.fillStyle = "#2563eb";
+
+  points.forEach(([x, y]) => {
+    cropCtx.fillRect(x - s / 2, y - s / 2, s, s);
+  });
+}
+
+/*
+================================
+ПРЕОБРАЗОВАТЬ ВЫДЕЛЕНИЕ:
+CROP + RESIZE + WEBP
+================================
+*/
+
+async function cropResizeAndConvertSelectionToWebp(file, options = {}) {
+  const {
+    cropRectCanvas,
+    canvasWidth,
+    canvasHeight,
+    imageWidth,
+    imageHeight,
+    maxWidth = 1200,
+    maxHeight = 1200,
+    quality = 0.8
+  } = options;
+
+  const dataUrl = await readFileAsDataURL(file);
+  const image = await loadImage(dataUrl);
+
+  /*
+    Перевод координат из canvas в координаты реального исходника
+  */
+  const scaleX = imageWidth / canvasWidth;
+  const scaleY = imageHeight / canvasHeight;
+
+  let srcX = Math.round(cropRectCanvas.x * scaleX);
+  let srcY = Math.round(cropRectCanvas.y * scaleY);
+  let srcW = Math.round(cropRectCanvas.width * scaleX);
+  let srcH = Math.round(cropRectCanvas.height * scaleY);
+
+  /*
+    Защита от выхода за границы
+  */
+  srcX = Math.max(0, Math.min(srcX, imageWidth - 1));
+  srcY = Math.max(0, Math.min(srcY, imageHeight - 1));
+  srcW = Math.max(1, Math.min(srcW, imageWidth - srcX));
+  srcH = Math.max(1, Math.min(srcH, imageHeight - srcY));
+
+  /*
+    Resize уже вырезанной области
+  */
+  const scale = Math.min(
+    maxWidth / srcW,
+    maxHeight / srcH,
+    1
+  );
+
+  const targetWidth = Math.round(srcW * scale);
+  const targetHeight = Math.round(srcH * scale);
+
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = targetWidth;
+  outCanvas.height = targetHeight;
+
+  const outCtx = outCanvas.getContext("2d");
+
+  if (!outCtx) {
+    throw new Error("Canvas context недоступен.");
+  }
+
+  outCtx.drawImage(
+    image,
+    srcX, srcY, srcW, srcH,
+    0, 0, targetWidth, targetHeight
+  );
+
+  const blob = await canvasToBlob(outCanvas, "image/webp", quality);
+
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
+
+  return new File(
+    [blob],
+    baseName + ".webp",
+    { type: "image/webp" }
+  );
+}
+
+/*
+================================
+ПОКАЗАТЬ РЕЗУЛЬТАТ
 ================================
 */
 
@@ -502,114 +725,227 @@ async function showResult(file) {
 
 /*
 ================================
-Главная универсальная функция обработки
+MOUSE EVENTS
 ================================
 */
 
-async function processImage(file, options = {}) {
-  const {
-    doCrop = false,
-    cropMode = "none",
-    doResize = true,
-    maxWidth = 1200,
-    maxHeight = 1200,
-    outputType = "image/webp",
-    quality = 0.8,
-    forceOutputExtension = "webp"
-  } = options;
+cropCanvas.addEventListener("mousedown", onPointerDown);
+cropCanvas.addEventListener("mousemove", onPointerMove);
+window.addEventListener("mouseup", onPointerUp);
 
-  if (!file) {
-    throw new Error("Файл не передан.");
-  }
+/*
+================================
+TOUCH EVENTS
+================================
+*/
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Нужен файл изображения.");
-  }
+cropCanvas.addEventListener("touchstart", onTouchStart, { passive: false });
+cropCanvas.addEventListener("touchmove", onTouchMove, { passive: false });
+window.addEventListener("touchend", onTouchEnd, { passive: false });
 
-  const dataUrl = await readFileAsDataURL(file);
-  const image = await loadImage(dataUrl);
+/*
+================================
+POINTER DOWN
+================================
+*/
 
-  let srcX = 0;
-  let srcY = 0;
-  let srcW = image.width;
-  let srcH = image.height;
+function onPointerDown(event) {
+  if (!sourceImage) return;
 
-  /*
-  ================================================
-  КРОП ПО ЦЕНТРУ
-  Если включен, вырезаем центральную область
-  ================================================
-  */
-  if (doCrop && cropMode !== "none") {
-    const ratio = getCropRatio(cropMode);
-    const crop = getCenteredCrop(image.width, image.height, ratio);
+  const pos = getMousePosOnCanvas(event);
 
-    srcX = crop.srcX;
-    srcY = crop.srcY;
-    srcW = crop.srcW;
-    srcH = crop.srcH;
-  }
+  isSelecting = true;
+  startX = pos.x;
+  startY = pos.y;
 
-  /*
-  ================================================
-  RESIZE
-  Если включен, уменьшаем до лимитов
-  ================================================
-  */
-  let targetWidth = srcW;
-  let targetHeight = srcH;
+  cropRect = {
+    x: pos.x,
+    y: pos.y,
+    width: 0,
+    height: 0
+  };
 
-  if (doResize) {
-    const scale = Math.min(
-      maxWidth / srcW,
-      maxHeight / srcH,
-      1
-    );
-
-    targetWidth = Math.round(srcW * scale);
-    targetHeight = Math.round(srcH * scale);
-  }
-
-  /*
-  ================================================
-  Создаём canvas и рисуем туда нужную область
-  ================================================
-  */
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) {
-    throw new Error("Canvas context недоступен.");
-  }
-
-  ctx.drawImage(
-    image,
-    srcX, srcY, srcW, srcH,
-    0, 0, targetWidth, targetHeight
-  );
-
-  /*
-  ================================================
-  Конвертируем в нужный формат
-  ================================================
-  */
-  const blob = await canvasToBlob(canvas, outputType, quality);
-
-  const baseName = file.name.replace(/\.[^/.]+$/, "");
-
-  return new File(
-    [blob],
-    baseName + "." + forceOutputExtension,
-    { type: outputType }
-  );
+  drawCanvas();
 }
 
 /*
 ================================
-Пропорции для кропа
+POINTER MOVE
+================================
+*/
+
+function onPointerMove(event) {
+  if (!isSelecting || !sourceImage) return;
+
+  const pos = getMousePosOnCanvas(event);
+  updateCropByCurrentPoint(pos.x, pos.y);
+  drawCanvas();
+}
+
+/*
+================================
+POINTER UP
+================================
+*/
+
+function onPointerUp() {
+  if (!isSelecting) return;
+
+  isSelecting = false;
+  normalizeCropRect();
+  drawCanvas();
+}
+
+/*
+================================
+TOUCH START
+================================
+*/
+
+function onTouchStart(event) {
+  if (!sourceImage) return;
+  event.preventDefault();
+
+  const pos = getTouchPosOnCanvas(event);
+
+  isSelecting = true;
+  startX = pos.x;
+  startY = pos.y;
+
+  cropRect = {
+    x: pos.x,
+    y: pos.y,
+    width: 0,
+    height: 0
+  };
+
+  drawCanvas();
+}
+
+/*
+================================
+TOUCH MOVE
+================================
+*/
+
+function onTouchMove(event) {
+  if (!isSelecting || !sourceImage) return;
+  event.preventDefault();
+
+  const pos = getTouchPosOnCanvas(event);
+  updateCropByCurrentPoint(pos.x, pos.y);
+  drawCanvas();
+}
+
+/*
+================================
+TOUCH END
+================================
+*/
+
+function onTouchEnd(event) {
+  if (!isSelecting) return;
+  event.preventDefault();
+
+  isSelecting = false;
+  normalizeCropRect();
+  drawCanvas();
+}
+
+/*
+================================
+ОБНОВИТЬ ВЫДЕЛЕНИЕ ТЕКУЩЕЙ ТОЧКОЙ
+================================
+*/
+
+function updateCropByCurrentPoint(currentX, currentY) {
+  let x = startX;
+  let y = startY;
+  let width = currentX - startX;
+  let height = currentY - startY;
+
+  const mode = cropMode.value;
+
+  /*
+    Если режим не свободный —
+    держим пропорцию
+  */
+  if (mode !== "free") {
+    const ratio = getCropRatio(mode);
+
+    const absWidth = Math.abs(width);
+    const absHeight = Math.abs(height);
+
+    /*
+      Строим размер по dominant axis
+    */
+    if (absWidth / ratio > absHeight) {
+      height = Math.sign(height || 1) * Math.round(absWidth / ratio);
+    } else {
+      width = Math.sign(width || 1) * Math.round(absHeight * ratio);
+    }
+  }
+
+  cropRect = { x, y, width, height };
+  normalizeCropRect();
+  clampCropRectToCanvas();
+}
+
+/*
+================================
+НОРМАЛИЗАЦИЯ ПРЯМОУГОЛЬНИКА
+Чтобы width/height были положительными
+================================
+*/
+
+function normalizeCropRect() {
+  if (!cropRect) return;
+
+  if (cropRect.width < 0) {
+    cropRect.x += cropRect.width;
+    cropRect.width = Math.abs(cropRect.width);
+  }
+
+  if (cropRect.height < 0) {
+    cropRect.y += cropRect.height;
+    cropRect.height = Math.abs(cropRect.height);
+  }
+}
+
+/*
+================================
+НЕ ВЫПУСКАТЬ ВЫДЕЛЕНИЕ ЗА ГРАНИЦЫ CANVAS
+================================
+*/
+
+function clampCropRectToCanvas() {
+  if (!cropRect) return;
+
+  if (cropRect.x < 0) {
+    cropRect.width += cropRect.x;
+    cropRect.x = 0;
+  }
+
+  if (cropRect.y < 0) {
+    cropRect.height += cropRect.y;
+    cropRect.y = 0;
+  }
+
+  if (cropRect.x + cropRect.width > cropCanvas.width) {
+    cropRect.width = cropCanvas.width - cropRect.x;
+  }
+
+  if (cropRect.y + cropRect.height > cropCanvas.height) {
+    cropRect.height = cropCanvas.height - cropRect.y;
+  }
+
+  cropRect.width = Math.max(1, cropRect.width);
+  cropRect.height = Math.max(1, cropRect.height);
+}
+
+/*
+================================
+ПРОПОРЦИИ РЕЖИМОВ КРОПА
 ================================
 */
 
@@ -622,54 +958,44 @@ function getCropRatio(mode) {
 
 /*
 ================================
-Центрированный кроп
+ПОЛУЧИТЬ ПОЗИЦИЮ МЫШИ НА CANVAS
 ================================
 */
 
-function getCenteredCrop(width, height, ratio) {
-  if (!ratio) {
-    return {
-      srcX: 0,
-      srcY: 0,
-      srcW: width,
-      srcH: height
-    };
-  }
+function getMousePosOnCanvas(event) {
+  const rect = cropCanvas.getBoundingClientRect();
 
-  const currentRatio = width / height;
+  const scaleX = cropCanvas.width / rect.width;
+  const scaleY = cropCanvas.height / rect.height;
 
-  let srcW;
-  let srcH;
-  let srcX;
-  let srcY;
-
-  /*
-  Если исходник слишком широкий,
-  режем края слева и справа
-  */
-  if (currentRatio > ratio) {
-    srcH = height;
-    srcW = Math.round(height * ratio);
-    srcX = Math.round((width - srcW) / 2);
-    srcY = 0;
-  }
-  /*
-  Если исходник слишком высокий,
-  режем верх и низ
-  */
-  else {
-    srcW = width;
-    srcH = Math.round(width / ratio);
-    srcX = 0;
-    srcY = Math.round((height - srcH) / 2);
-  }
-
-  return { srcX, srcY, srcW, srcH };
+  return {
+    x: Math.round((event.clientX - rect.left) * scaleX),
+    y: Math.round((event.clientY - rect.top) * scaleY)
+  };
 }
 
 /*
 ================================
-Прочитать файл как dataURL
+ПОЛУЧИТЬ ПОЗИЦИЮ TOUCH НА CANVAS
+================================
+*/
+
+function getTouchPosOnCanvas(event) {
+  const touch = event.touches[0] || event.changedTouches[0];
+  const rect = cropCanvas.getBoundingClientRect();
+
+  const scaleX = cropCanvas.width / rect.width;
+  const scaleY = cropCanvas.height / rect.height;
+
+  return {
+    x: Math.round((touch.clientX - rect.left) * scaleX),
+    y: Math.round((touch.clientY - rect.top) * scaleY)
+  };
+}
+
+/*
+================================
+HELPERS
 ================================
 */
 
@@ -684,12 +1010,6 @@ function readFileAsDataURL(file) {
   });
 }
 
-/*
-================================
-Загрузить картинку
-================================
-*/
-
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -700,12 +1020,6 @@ function loadImage(src) {
     img.src = src;
   });
 }
-
-/*
-================================
-Canvas -> Blob
-================================
-*/
 
 function canvasToBlob(canvas, type, quality) {
   return new Promise((resolve, reject) => {
@@ -719,12 +1033,6 @@ function canvasToBlob(canvas, type, quality) {
   });
 }
 
-/*
-================================
-Получить размеры картинки по object URL
-================================
-*/
-
 function getImageMetaFromObjectUrl(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -734,28 +1042,16 @@ function getImageMetaFromObjectUrl(url) {
       height: img.height
     });
 
-    img.onerror = () => reject(new Error("Не удалось прочитать размер изображения."));
+    img.onerror = () => reject(new Error("Не удалось прочитать размеры результата."));
     img.src = url;
   });
 }
-
-/*
-================================
-Красивый формат размера файла
-================================
-*/
 
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / 1024 / 1024).toFixed(2) + " MB";
 }
-
-/*
-================================
-Статус
-================================
-*/
 
 function setStatus(text) {
   statusBox.textContent = text;
@@ -765,28 +1061,12 @@ function clearStatus() {
   statusBox.textContent = "";
 }
 
-/*
-================================
-Очистить исходник
-================================
-*/
-
-function clearOriginal() {
-  if (originalObjectUrl) {
-    URL.revokeObjectURL(originalObjectUrl);
-    originalObjectUrl = null;
-  }
-
-  originalPreview.src = "";
-  originalPreview.style.display = "none";
-  originalInfo.textContent = "";
+function clearCanvas() {
+  cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+  cropCanvas.style.display = "none";
+  sourceImage = null;
+  cropRect = null;
 }
-
-/*
-================================
-Сбросить результат
-================================
-*/
 
 function resetResult() {
   if (processedObjectUrl) {
@@ -803,7 +1083,6 @@ function resetResult() {
 </script>
 
 
-
 <!-- ========================================
      SERVICE CONSOLE
      Верхняя строка редактируется вручную
@@ -817,7 +1096,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
- кнопка ПРИМЕНИТЬ| v1.2.2
+КРОП| v1.2.3
 
   </div>
 
