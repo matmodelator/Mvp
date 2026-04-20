@@ -3,7 +3,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Адаптация под мобильные -->
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
 <title>Upload Photo</title>
 
 <!-- СТИЛЬ КОНСОЛИ -->
@@ -11,13 +15,19 @@
   <link rel="stylesheet"
         href="styles/console.css" />
   
+  
 <style>
+
+/* Общий стиль страницы */
+
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
   margin: 0;
   padding: 40px;
 }
+
+/* Контейнер */
 
 .container {
   max-width: 1000px;
@@ -28,16 +38,21 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* Панель настроек */
+
 .controls {
   margin-bottom: 20px;
 }
+
+/* Две колонки: исходник / результат */
 
 .row {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  margin-top: 20px;
 }
+
+/* Блок одной картинки */
 
 .panel {
   flex: 1 1 420px;
@@ -47,9 +62,7 @@ body {
   padding: 16px;
 }
 
-.panel h3 {
-  margin-top: 0;
-}
+/* Область изображения */
 
 .preview-box {
   width: 100%;
@@ -59,14 +72,16 @@ body {
   justify-content: center;
   background: #eee;
   border-radius: 8px;
-  overflow: hidden;
 }
+
+/* Само изображение */
 
 .preview-box img {
   max-width: 100%;
   max-height: 500px;
-  display: block;
 }
+
+/* Текст информации */
 
 .info {
   margin-top: 12px;
@@ -75,21 +90,18 @@ body {
   white-space: pre-line;
 }
 
+/* Статус */
+
 .status {
   margin-top: 12px;
   font-size: 14px;
   color: #b91c1c;
-  white-space: pre-line;
 }
 
-.buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
+/* Кнопки */
 
 button {
+  margin-top: 12px;
   padding: 10px 18px;
   border: none;
   border-radius: 6px;
@@ -98,359 +110,689 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #1d4ed8;
-}
-
 button:disabled {
   background: #94a3b8;
-  cursor: not-allowed;
 }
 
-label {
-  display: block;
-  margin-top: 12px;
-  font-size: 14px;
-}
-
-input[type="number"],
-select {
-  margin-top: 4px;
-  padding: 8px;
-  width: 180px;
-}
-
-.note {
-  font-size: 13px;
-  color: #666;
-  margin-top: 6px;
-}
 </style>
+
 </head>
 <body>
 
 <div class="container">
 
-  <h2>Загрузка и обработка фото</h2>
+<h2>Upload Photo</h2>
 
-  <div class="controls">
-    <input id="photoInput" type="file" accept="image/*">
+<div class="controls">
 
-    <label>
-      Режим обрезки
-      <select id="cropMode">
-        <option value="none">Без обрезки</option>
-        <option value="square">Квадрат</option>
-        <option value="avatar">Аватар 1:1</option>
-        <option value="landscape">Горизонтально 4:3</option>
-        <option value="portrait">Вертикально 3:4</option>
-      </select>
-    </label>
+<!-- Выбор файла -->
 
-    <label>
-      Max width
-      <input id="maxWidth" type="number" value="1200" min="100" step="50">
-    </label>
+<input
+  id="photoInput"
+  type="file"
+  accept="image/*"
+>
 
-    <label>
-      Max height
-      <input id="maxHeight" type="number" value="1200" min="100" step="50">
-    </label>
+<br><br>
 
-    <label>
-      Quality (0.1–1)
-      <input id="quality" type="number" value="0.75" min="0.1" max="1" step="0.05">
-    </label>
+<!-- Режим кропа -->
 
-    <div class="buttons">
-      <button id="processBtn" type="button">Обработать фото</button>
-      <button id="downloadBtn" type="button" disabled>Скачать результат</button>
-    </div>
+<select id="cropMode">
 
-    <div class="status" id="status"></div>
-  </div>
+<option value="none">
+Без обрезки
+</option>
 
-  <div class="row">
-    <div class="panel">
-      <h3>Исходник</h3>
-      <div class="preview-box">
-        <img id="originalPreview" src="" style="display:none">
-      </div>
-      <div class="info" id="originalInfo"></div>
-    </div>
+<option value="square">
+Квадрат
+</option>
 
-    <div class="panel">
-      <h3>Результат</h3>
-      <div class="preview-box">
-        <img id="resultPreview" src="" style="display:none">
-      </div>
-      <div class="info" id="resultInfo"></div>
-      <div class="note">
-        Результат можно скачать локально. Для сохранения в Supabase этот файл потом надо upload'ить в Storage.
-      </div>
-    </div>
-  </div>
+<option value="avatar">
+Аватар 1:1
+</option>
+
+<option value="landscape">
+Горизонтально 4:3
+</option>
+
+<option value="portrait">
+Вертикально 3:4
+</option>
+
+</select>
+
+<br><br>
+
+<!-- Максимальная ширина -->
+
+Max width:
+
+<input
+  id="maxWidth"
+  type="number"
+  value="1200"
+>
+
+<br><br>
+
+<!-- Максимальная высота -->
+
+Max height:
+
+<input
+  id="maxHeight"
+  type="number"
+  value="1200"
+>
+
+<br><br>
+
+<!-- Качество WebP -->
+
+Quality:
+
+<input
+  id="quality"
+  type="number"
+  value="0.75"
+  step="0.05"
+>
+
+<br>
+
+<button
+  id="processBtn"
+  type="button">
+Обработать фото
+</button>
+
+<button
+  id="downloadBtn"
+  type="button"
+  disabled>
+Скачать результат
+</button>
+
+<div
+  class="status"
+  id="status">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="panel">
+
+<h3>Исходник</h3>
+
+<div class="preview-box">
+
+<img
+  id="originalPreview"
+  style="display:none"
+>
+
+</div>
+
+<div
+  class="info"
+  id="originalInfo">
+</div>
+
+</div>
+
+<div class="panel">
+
+<h3>Результат</h3>
+
+<div class="preview-box">
+
+<img
+  id="resultPreview"
+  style="display:none"
+>
+
+</div>
+
+<div
+  class="info"
+  id="resultInfo">
+</div>
+
+</div>
+
+</div>
 
 </div>
 
 <script>
+
+/*
+================================
+Глобальные переменные
+================================
+*/
+
 let originalFile = null;
 let processedFile = null;
 let processedUrl = null;
-let originalUrl = null;
 
-const photoInput = document.getElementById("photoInput");
-const processBtn = document.getElementById("processBtn");
-const downloadBtn = document.getElementById("downloadBtn");
+/*
+================================
+DOM элементы
+================================
+*/
 
-const originalPreview = document.getElementById("originalPreview");
-const resultPreview = document.getElementById("resultPreview");
+const photoInput =
+  document.getElementById("photoInput");
 
-const originalInfo = document.getElementById("originalInfo");
-const resultInfo = document.getElementById("resultInfo");
-const statusBox = document.getElementById("status");
+const processBtn =
+  document.getElementById("processBtn");
 
-photoInput.addEventListener("change", handleFileSelect);
-processBtn.addEventListener("click", processPhoto);
-downloadBtn.addEventListener("click", downloadProcessedFile);
+const downloadBtn =
+  document.getElementById("downloadBtn");
 
-function handleFileSelect(event) {
-  clearStatus();
-  processedFile = null;
-  downloadBtn.disabled = true;
-  resultPreview.style.display = "none";
-  resultPreview.src = "";
-  resultInfo.textContent = "";
+const originalPreview =
+  document.getElementById("originalPreview");
 
-  originalFile = event.target.files[0] || null;
-  if (!originalFile) {
-    originalPreview.style.display = "none";
-    originalPreview.src = "";
-    originalInfo.textContent = "";
-    return;
-  }
+const resultPreview =
+  document.getElementById("resultPreview");
 
-  if (originalUrl) URL.revokeObjectURL(originalUrl);
-  originalUrl = URL.createObjectURL(originalFile);
+const originalInfo =
+  document.getElementById("originalInfo");
 
-  originalPreview.src = originalUrl;
-  originalPreview.style.display = "block";
+const resultInfo =
+  document.getElementById("resultInfo");
 
-  const img = new Image();
-  img.onload = function () {
+const statusBox =
+  document.getElementById("status");
+
+/*
+================================
+Выбор файла
+================================
+*/
+
+photoInput.addEventListener(
+  "change",
+  function(event) {
+
+    originalFile =
+      event.target.files[0];
+
+    if (!originalFile)
+      return;
+
+    const url =
+      URL.createObjectURL(
+        originalFile
+      );
+
+    originalPreview.src = url;
+    originalPreview.style.display =
+      "block";
+
     originalInfo.textContent =
-      "Имя: " + originalFile.name + "\n" +
-      "Тип: " + originalFile.type + "\n" +
-      "Размер: " + formatSize(originalFile.size) + "\n" +
-      "Разрешение: " + img.width + " × " + img.height;
-  };
-  img.src = originalUrl;
-}
+      "Size: " +
+      formatSize(
+        originalFile.size
+      );
+
+  }
+);
+
+/*
+================================
+Кнопка обработки
+================================
+*/
+
+processBtn.addEventListener(
+  "click",
+  processPhoto
+);
+
+/*
+================================
+Главная функция обработки
+================================
+*/
 
 async function processPhoto() {
-  clearStatus();
 
   if (!originalFile) {
-    setStatus("Сначала выбери фото.");
+    setStatus(
+      "Выберите фото"
+    );
     return;
   }
 
-  processBtn.disabled = true;
-  processBtn.textContent = "Обработка...";
-  downloadBtn.disabled = true;
-
   try {
-    const cropMode = document.getElementById("cropMode").value;
-    const maxWidth = Number(document.getElementById("maxWidth").value) || 1200;
-    const maxHeight = Number(document.getElementById("maxHeight").value) || 1200;
-    const quality = Number(document.getElementById("quality").value) || 0.75;
 
-    processedFile = await resizeCropAndConvertToWebp(originalFile, {
-      cropMode,
-      maxWidth,
-      maxHeight,
-      quality
-    });
+    const cropMode =
+      document.getElementById(
+        "cropMode"
+      ).value;
 
-    if (processedUrl) URL.revokeObjectURL(processedUrl);
-    processedUrl = URL.createObjectURL(processedFile);
+    const maxWidth =
+      Number(
+        document.getElementById(
+          "maxWidth"
+        ).value
+      );
 
-    resultPreview.src = processedUrl;
-    resultPreview.style.display = "block";
+    const maxHeight =
+      Number(
+        document.getElementById(
+          "maxHeight"
+        ).value
+      );
 
-    const resultImg = new Image();
-    resultImg.onload = function () {
-      const percent = originalFile.size > 0
-        ? (((originalFile.size - processedFile.size) / originalFile.size) * 100).toFixed(1)
-        : "0";
+    const quality =
+      Number(
+        document.getElementById(
+          "quality"
+        ).value
+      );
 
-      resultInfo.textContent =
-        "Имя: " + processedFile.name + "\n" +
-        "Тип: " + processedFile.type + "\n" +
-        "Размер: " + formatSize(processedFile.size) + "\n" +
-        "Разрешение: " + resultImg.width + " × " + resultImg.height + "\n" +
-        "Экономия: " + percent + "%";
-    };
-    resultImg.src = processedUrl;
+    processedFile =
+      await resizeCropAndConvertToWebp(
+        originalFile,
+        {
+          cropMode,
+          maxWidth,
+          maxHeight,
+          quality
+        }
+      );
 
-    downloadBtn.disabled = false;
-    setStatus("Фото обработано.");
-  } catch (error) {
-    console.error(error);
-    setStatus("Ошибка: " + error.message);
-  } finally {
-    processBtn.disabled = false;
-    processBtn.textContent = "Обработать фото";
+    processedUrl =
+      URL.createObjectURL(
+        processedFile
+      );
+
+    resultPreview.src =
+      processedUrl;
+
+    resultPreview.style.display =
+      "block";
+
+    resultInfo.textContent =
+      "Size: " +
+      formatSize(
+        processedFile.size
+      );
+
+    downloadBtn.disabled =
+      false;
+
   }
+
+  catch(error) {
+
+    setStatus(
+      error.message
+    );
+
+  }
+
 }
 
-async function resizeCropAndConvertToWebp(file, options = {}) {
-  const {
-    cropMode = "none",
-    maxWidth = 1200,
-    maxHeight = 1200,
-    quality = 0.8
-  } = options;
+/*
+================================
+Resize + Crop + Convert
+================================
+*/
 
-  if (!file) {
-    throw new Error("Файл не передан");
-  }
+async function resizeCropAndConvertToWebp(
+  file,
+  options
+) {
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Нужен файл изображения");
-  }
+  const dataUrl =
+    await readFileAsDataURL(
+      file
+    );
 
-  const dataUrl = await readFileAsDataURL(file);
-  const image = await loadImage(dataUrl);
+  const image =
+    await loadImage(
+      dataUrl
+    );
 
   let srcX = 0;
   let srcY = 0;
   let srcW = image.width;
   let srcH = image.height;
 
-  if (cropMode !== "none") {
-    const targetRatio = getCropRatio(cropMode);
-    ({ srcX, srcY, srcW, srcH } = getCenteredCrop(image.width, image.height, targetRatio));
+  /*
+  Определяем кроп
+  */
+
+  if (options.cropMode !== "none") {
+
+    const ratio =
+      getCropRatio(
+        options.cropMode
+      );
+
+    const crop =
+      getCenteredCrop(
+        image.width,
+        image.height,
+        ratio
+      );
+
+    srcX = crop.srcX;
+    srcY = crop.srcY;
+    srcW = crop.srcW;
+    srcH = crop.srcH;
+
   }
 
-  const scale = Math.min(maxWidth / srcW, maxHeight / srcH, 1);
-  const targetWidth = Math.round(srcW * scale);
-  const targetHeight = Math.round(srcH * scale);
+  /*
+  Resize
+  */
 
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
+  const scale =
+    Math.min(
+      options.maxWidth / srcW,
+      options.maxHeight / srcH,
+      1
+    );
 
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("Canvas context недоступен");
-  }
+  const targetWidth =
+    Math.round(
+      srcW * scale
+    );
+
+  const targetHeight =
+    Math.round(
+      srcH * scale
+    );
+
+  /*
+  Canvas
+  */
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    targetWidth;
+
+  canvas.height =
+    targetHeight;
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
 
   ctx.drawImage(
     image,
-    srcX, srcY, srcW, srcH,
-    0, 0, targetWidth, targetHeight
+    srcX,
+    srcY,
+    srcW,
+    srcH,
+    0,
+    0,
+    targetWidth,
+    targetHeight
   );
 
-  const blob = await canvasToBlob(canvas, "image/webp", quality);
-  const baseName = file.name.replace(/\.[^/.]+$/, "");
+  /*
+  Convert to WebP
+  */
+
+  const blob =
+    await canvasToBlob(
+      canvas,
+      "image/webp",
+      options.quality
+    );
+
+  const baseName =
+    file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    );
 
   return new File(
     [blob],
-    baseName + ".webp",
-    { type: "image/webp" }
+    baseName +
+    ".webp",
+    {
+      type:
+        "image/webp"
+    }
   );
+
 }
+
+/*
+================================
+Crop ratio
+================================
+*/
 
 function getCropRatio(mode) {
-  if (mode === "square" || mode === "avatar") return 1 / 1;
-  if (mode === "landscape") return 4 / 3;
-  if (mode === "portrait") return 3 / 4;
+
+  if (mode === "square")
+    return 1 / 1;
+
+  if (mode === "avatar")
+    return 1 / 1;
+
+  if (mode === "landscape")
+    return 4 / 3;
+
+  if (mode === "portrait")
+    return 3 / 4;
+
   return null;
+
 }
 
-function getCenteredCrop(width, height, ratio) {
-  if (!ratio) {
-    return { srcX: 0, srcY: 0, srcW: width, srcH: height };
-  }
+/*
+================================
+Centered crop
+================================
+*/
 
-  const currentRatio = width / height;
+function getCenteredCrop(
+  width,
+  height,
+  ratio
+) {
 
-  let srcW, srcH, srcX, srcY;
+  if (!ratio)
+    return {
+      srcX: 0,
+      srcY: 0,
+      srcW: width,
+      srcH: height
+    };
+
+  const currentRatio =
+    width / height;
+
+  let srcW,
+      srcH,
+      srcX,
+      srcY;
 
   if (currentRatio > ratio) {
+
     srcH = height;
-    srcW = Math.round(height * ratio);
-    srcX = Math.round((width - srcW) / 2);
+    srcW = height * ratio;
+
+    srcX =
+      (width - srcW) / 2;
+
     srcY = 0;
-  } else {
-    srcW = width;
-    srcH = Math.round(width / ratio);
-    srcX = 0;
-    srcY = Math.round((height - srcH) / 2);
+
   }
 
-  return { srcX, srcY, srcW, srcH };
+  else {
+
+    srcW = width;
+    srcH = width / ratio;
+
+    srcX = 0;
+
+    srcY =
+      (height - srcH) / 2;
+
+  }
+
+  return {
+    srcX,
+    srcY,
+    srcW,
+    srcH
+  };
+
 }
 
+/*
+================================
+Helpers
+================================
+*/
+
 function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Ошибка чтения файла"));
-    reader.readAsDataURL(file);
-  });
+
+  return new Promise(
+    function(resolve, reject) {
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        () => resolve(
+          reader.result
+        );
+
+      reader.onerror =
+        () => reject(
+          new Error(
+            "Read error"
+          )
+        );
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
 }
 
 function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Ошибка загрузки изображения"));
-    img.src = src;
-  });
+
+  return new Promise(
+    function(resolve, reject) {
+
+      const img =
+        new Image();
+
+      img.onload =
+        () => resolve(img);
+
+      img.onerror =
+        () => reject(
+          new Error(
+            "Image load error"
+          )
+        );
+
+      img.src = src;
+
+    }
+  );
+
 }
 
-function canvasToBlob(canvas, type, quality) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error("Не удалось создать Blob"));
-        return;
-      }
-      resolve(blob);
-    }, type, quality);
-  });
-}
+function canvasToBlob(
+  canvas,
+  type,
+  quality
+) {
 
-function downloadProcessedFile() {
-  if (!processedFile || !processedUrl) {
-    setStatus("Нет обработанного файла для сохранения.");
-    return;
-  }
+  return new Promise(
+    function(resolve) {
 
-  const a = document.createElement("a");
-  a.href = processedUrl;
-  a.download = processedFile.name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+      canvas.toBlob(
+        resolve,
+        type,
+        quality
+      );
+
+    }
+  );
+
 }
 
 function formatSize(bytes) {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+
+  if (bytes < 1024)
+    return bytes + " B";
+
+  if (bytes < 1024 * 1024)
+    return (
+      (bytes / 1024)
+      .toFixed(1) +
+      " KB"
+    );
+
+  return (
+    (bytes / 1024 / 1024)
+    .toFixed(2) +
+    " MB"
+  );
+
 }
 
 function setStatus(text) {
-  statusBox.textContent = text;
+
+  statusBox.textContent =
+    text;
+
 }
 
-function clearStatus() {
-  statusBox.textContent = "";
-}
+/*
+================================
+Download
+================================
+*/
+
+downloadBtn.addEventListener(
+  "click",
+  function() {
+
+    if (!processedFile)
+      return;
+
+    const a =
+      document.createElement("a");
+
+    a.href =
+      processedUrl;
+
+    a.download =
+      processedFile.name;
+
+    a.click();
+
+  }
+);
+
 </script>
+
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -465,13 +807,8 @@ function clearStatus() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-preview исходника
-preview результата
-обрезка по центру
-resize
-convert to webp
-кнопка Скачать результат
-        CONSOLE| v1.1.0
+кроп по центру (разные режимы)
+resize с сохранением пропорций| v1.1.0
 
   </div>
 
