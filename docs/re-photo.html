@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Upload Photo</title>
+
+  <!-- СТИЛЬ КОНСОЛИ -->
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 40px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.preview {
+  margin-top: 20px;
+}
+
+img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.info {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #444;
+}
+
+button {
+  margin-top: 16px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>
+Загрузка фото
+</h2>
+
+<input
+  id="photoInput"
+  type="file"
+  accept="image/*"
+/>
+
+<div class="preview">
+
+<img
+  id="preview"
+  src=""
+  style="display:none"
+/>
+
+<div class="info"
+     id="info">
+</div>
+
+</div>
+
+<button
+  onclick="processPhoto()">
+Обработать фото
+</button>
+
+</div>
+
+<script>
+
+let originalFile = null;
+let processedFile = null;
+
+document
+  .getElementById("photoInput")
+  .addEventListener(
+    "change",
+    function(event) {
+
+      originalFile =
+        event.target.files[0];
+
+      if (!originalFile) return;
+
+      const url =
+        URL.createObjectURL(
+          originalFile
+        );
+
+      const img =
+        document.getElementById(
+          "preview"
+        );
+
+      img.src = url;
+      img.style.display = "block";
+
+      showInfo(
+        "Original size: " +
+        formatSize(
+          originalFile.size
+        )
+      );
+
+    }
+  );
+
+async function processPhoto() {
+
+  if (!originalFile) {
+    alert(
+      "Выберите файл"
+    );
+    return;
+  }
+
+  processedFile =
+    await resizeAndConvertToWebp(
+      originalFile,
+      {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.75
+      }
+    );
+
+  const url =
+    URL.createObjectURL(
+      processedFile
+    );
+
+  document
+    .getElementById(
+      "preview"
+    )
+    .src = url;
+
+  showInfo(
+    "Original: " +
+    formatSize(
+      originalFile.size
+    ) +
+    " → WebP: " +
+    formatSize(
+      processedFile.size
+    )
+  );
+
+}
+
+async function resizeAndConvertToWebp(
+  file,
+  options = {}
+) {
+
+  const {
+    maxWidth = 1200,
+    maxHeight = 1200,
+    quality = 0.8
+  } = options;
+
+  const imageBitmap =
+    await createImageBitmap(
+      file
+    );
+
+  let width =
+    imageBitmap.width;
+
+  let height =
+    imageBitmap.height;
+
+  const ratio =
+    Math.min(
+      maxWidth / width,
+      maxHeight / height,
+      1
+    );
+
+  const targetWidth =
+    Math.round(
+      width * ratio
+    );
+
+  const targetHeight =
+    Math.round(
+      height * ratio
+    );
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    targetWidth;
+
+  canvas.height =
+    targetHeight;
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+  ctx.drawImage(
+    imageBitmap,
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
+
+  const blob =
+    await new Promise(
+      (resolve) => {
+
+        canvas.toBlob(
+          resolve,
+          "image/webp",
+          quality
+        );
+
+      }
+    );
+
+  const baseName =
+    file.name
+      .replace(
+        /\.[^/.]+$/,
+        ""
+      );
+
+  return new File(
+    [blob],
+    baseName + ".webp",
+    {
+      type:
+        "image/webp"
+    }
+  );
+
+}
+
+function formatSize(
+  bytes
+) {
+
+  if (bytes < 1024)
+    return bytes + " B";
+
+  if (bytes < 1024 * 1024)
+    return (
+      (bytes / 1024)
+        .toFixed(1) +
+      " KB"
+    );
+
+  return (
+    (bytes / 1024 / 1024)
+      .toFixed(2) +
+    " MB"
+  );
+
+}
+
+function showInfo(
+  text
+) {
+
+  document
+    .getElementById(
+      "info"
+    )
+    .textContent =
+    text;
+
+}
+
+</script>
+
+</body>
+</html>
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+принимает фото
+уменьшает размер
+конвертирует в webp
+показывает preview
+показывает размер до / после
+создаёт готовый processedFile | v1.0.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
