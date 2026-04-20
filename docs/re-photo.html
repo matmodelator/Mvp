@@ -1,20 +1,19 @@
 
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ru">
 <head>
 
 <meta charset="UTF-8">
+
+<!-- Адаптация под мобильные устройства -->
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
 <title>Upload Photo</title>
 
-  <!-- СТИЛЬ КОНСОЛИ -->
-
-  <link rel="stylesheet"
-        href="styles/console.css" />
-
 <style>
+
+/* Общий стиль страницы */
 
 body {
   font-family: Arial, sans-serif;
@@ -22,6 +21,8 @@ body {
   margin: 0;
   padding: 40px;
 }
+
+/* Контейнер формы */
 
 .container {
   max-width: 600px;
@@ -32,20 +33,38 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+/* Блок preview */
+
 .preview {
   margin-top: 20px;
 }
+
+/* Картинка */
 
 img {
   max-width: 100%;
   border-radius: 8px;
 }
 
+/* Информация о размере */
+
 .info {
   margin-top: 12px;
   font-size: 14px;
   color: #444;
+  white-space: pre-line;
 }
+
+/* Статус / ошибки */
+
+.status {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b91c1c;
+  white-space: pre-line;
+}
+
+/* Кнопка */
 
 button {
   margin-top: 16px;
@@ -73,6 +92,8 @@ button:hover {
 Загрузка фото
 </h2>
 
+<!-- Выбор файла -->
+
 <input
   id="photoInput"
   type="file"
@@ -81,20 +102,35 @@ button:hover {
 
 <div class="preview">
 
+<!-- Превью изображения -->
+
 <img
   id="preview"
   src=""
   style="display:none"
 />
 
-<div class="info"
-     id="info">
+<!-- Информация о размере -->
+
+<div
+  class="info"
+  id="info">
+</div>
+
+<!-- Сообщения / ошибки -->
+
+<div
+  class="status"
+  id="status">
 </div>
 
 </div>
+
+<!-- Кнопка обработки -->
 
 <button
-  onclick="processPhoto()">
+  id="processBtn"
+  type="button">
 Обработать фото
 </button>
 
@@ -102,85 +138,195 @@ button:hover {
 
 <script>
 
-let originalFile = null;
-let processedFile = null;
+/*
+================================
+Глобальные переменные
+================================
+*/
 
-document
-  .getElementById("photoInput")
-  .addEventListener(
-    "change",
-    function(event) {
+let originalFile = null;   // исходный файл
+let processedFile = null;  // обработанный файл
 
-      originalFile =
-        event.target.files[0];
+/*
+================================
+DOM элементы
+================================
+*/
 
-      if (!originalFile) return;
+const photoInput =
+  document.getElementById("photoInput");
 
-      const url =
-        URL.createObjectURL(
-          originalFile
-        );
+const preview =
+  document.getElementById("preview");
 
-      const img =
-        document.getElementById(
-          "preview"
-        );
+const info =
+  document.getElementById("info");
 
-      img.src = url;
-      img.style.display = "block";
+const status =
+  document.getElementById("status");
 
-      showInfo(
-        "Original size: " +
-        formatSize(
-          originalFile.size
-        )
+const processBtn =
+  document.getElementById("processBtn");
+
+/*
+================================
+Выбор файла пользователем
+================================
+*/
+
+photoInput.addEventListener(
+  "change",
+  function(event) {
+
+    clearStatus();
+
+    originalFile =
+      event.target.files[0];
+
+    processedFile = null;
+
+    if (!originalFile) return;
+
+    /*
+    Создаем preview
+    */
+
+    const url =
+      URL.createObjectURL(
+        originalFile
       );
 
-    }
-  );
+    preview.src = url;
+
+    preview.style.display =
+      "block";
+
+    /*
+    Показываем информацию
+    */
+
+    info.textContent =
+      "Original size: " +
+      formatSize(
+        originalFile.size
+      );
+
+  }
+);
+
+/*
+================================
+Кнопка обработки
+================================
+*/
+
+processBtn.addEventListener(
+  "click",
+  processPhoto
+);
+
+/*
+================================
+Главная функция обработки
+================================
+*/
 
 async function processPhoto() {
 
+  clearStatus();
+
+  /*
+  Проверка файла
+  */
+
   if (!originalFile) {
-    alert(
-      "Выберите файл"
+
+    setStatus(
+      "Сначала выберите фото"
     );
+
     return;
   }
 
-  processedFile =
-    await resizeAndConvertToWebp(
-      originalFile,
-      {
-        maxWidth: 1200,
-        maxHeight: 1200,
-        quality: 0.75
-      }
+  processBtn.disabled =
+    true;
+
+  processBtn.textContent =
+    "Обработка...";
+
+  try {
+
+    /*
+    Сжатие + конвертация
+    */
+
+    processedFile =
+      await resizeAndConvertToWebp(
+        originalFile,
+        {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.75
+        }
+      );
+
+    /*
+    Показываем preview
+    */
+
+    const url =
+      URL.createObjectURL(
+        processedFile
+      );
+
+    preview.src = url;
+
+    /*
+    Показываем размеры
+    */
+
+    info.textContent =
+      "Original: " +
+      formatSize(
+        originalFile.size
+      ) +
+      "\nWebP: " +
+      formatSize(
+        processedFile.size
+      );
+
+    setStatus(
+      "Фото обработано"
     );
 
-  const url =
-    URL.createObjectURL(
-      processedFile
+  }
+  catch(error) {
+
+    console.error(error);
+
+    setStatus(
+      "Ошибка: " +
+      error.message
     );
 
-  document
-    .getElementById(
-      "preview"
-    )
-    .src = url;
+  }
+  finally {
 
-  showInfo(
-    "Original: " +
-    formatSize(
-      originalFile.size
-    ) +
-    " → WebP: " +
-    formatSize(
-      processedFile.size
-    )
-  );
+    processBtn.disabled =
+      false;
+
+    processBtn.textContent =
+      "Обработать фото";
+
+  }
 
 }
+
+/*
+================================
+Resize + Convert to WebP
+================================
+*/
 
 async function resizeAndConvertToWebp(
   file,
@@ -193,16 +339,33 @@ async function resizeAndConvertToWebp(
     quality = 0.8
   } = options;
 
-  const imageBitmap =
-    await createImageBitmap(
+  /*
+  Читаем файл
+  */
+
+  const dataUrl =
+    await readFileAsDataURL(
       file
     );
 
+  /*
+  Загружаем изображение
+  */
+
+  const image =
+    await loadImage(
+      dataUrl
+    );
+
   let width =
-    imageBitmap.width;
+    image.width;
 
   let height =
-    imageBitmap.height;
+    image.height;
+
+  /*
+  Расчет масштаба
+  */
 
   const ratio =
     Math.min(
@@ -221,6 +384,10 @@ async function resizeAndConvertToWebp(
       height * ratio
     );
 
+  /*
+  Создаем canvas
+  */
+
   const canvas =
     document.createElement(
       "canvas"
@@ -237,37 +404,43 @@ async function resizeAndConvertToWebp(
       "2d"
     );
 
+  /*
+  Рисуем изображение
+  */
+
   ctx.drawImage(
-    imageBitmap,
+    image,
     0,
     0,
     targetWidth,
     targetHeight
   );
 
+  /*
+  Конвертируем в WebP
+  */
+
   const blob =
-    await new Promise(
-      (resolve) => {
-
-        canvas.toBlob(
-          resolve,
-          "image/webp",
-          quality
-        );
-
-      }
+    await canvasToBlob(
+      canvas,
+      "image/webp",
+      quality
     );
 
+  /*
+  Новое имя файла
+  */
+
   const baseName =
-    file.name
-      .replace(
-        /\.[^/.]+$/,
-        ""
-      );
+    file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    );
 
   return new File(
     [blob],
-    baseName + ".webp",
+    baseName +
+    ".webp",
     {
       type:
         "image/webp"
@@ -275,6 +448,124 @@ async function resizeAndConvertToWebp(
   );
 
 }
+
+/*
+================================
+File → base64
+================================
+*/
+
+function readFileAsDataURL(
+  file
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+      reader.onload =
+        () => resolve(
+          reader.result
+        );
+
+      reader.onerror =
+        () => reject(
+          new Error(
+            "Read error"
+          )
+        );
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+/*
+================================
+Load image
+================================
+*/
+
+function loadImage(
+  src
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const img =
+        new Image();
+
+      img.onload =
+        () => resolve(
+          img
+        );
+
+      img.onerror =
+        () => reject(
+          new Error(
+            "Image load error"
+          )
+        );
+
+      img.src = src;
+
+    }
+  );
+
+}
+
+/*
+================================
+Canvas → Blob
+================================
+*/
+
+function canvasToBlob(
+  canvas,
+  type,
+  quality
+) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      canvas.toBlob(
+        function(blob) {
+
+          if (!blob)
+            reject(
+              new Error(
+                "Blob error"
+              )
+            );
+
+          else
+            resolve(
+              blob
+            );
+
+        },
+        type,
+        quality
+      );
+
+    }
+  );
+
+}
+
+/*
+================================
+Формат размера файла
+================================
+*/
 
 function formatSize(
   bytes
@@ -286,35 +577,43 @@ function formatSize(
   if (bytes < 1024 * 1024)
     return (
       (bytes / 1024)
-        .toFixed(1) +
+      .toFixed(1) +
       " KB"
     );
 
   return (
     (bytes / 1024 / 1024)
-      .toFixed(2) +
+    .toFixed(2) +
     " MB"
   );
 
 }
 
-function showInfo(
+/*
+================================
+Status helpers
+================================
+*/
+
+function setStatus(
   text
 ) {
 
-  document
-    .getElementById(
-      "info"
-    )
-    .textContent =
+  status.textContent =
     text;
+
+}
+
+function clearStatus() {
+
+  status.textContent =
+    "";
 
 }
 
 </script>
 
-</body>
-</html>
+
 <!-- ========================================
      SERVICE CONSOLE
      Верхняя строка редактируется вручную
@@ -328,12 +627,12 @@ function showInfo(
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-принимает фото
-уменьшает размер
-конвертирует в webp
-показывает preview
-показывает размер до / после
-создаёт готовый processedFile | v1.0.0
+убрал onclick="processPhoto()" и повесил нормальный addEventListener
+добавил try/catch
+заменил createImageBitmap на более совместимый вариант
+добавил вывод ошибки на экран
+добавил type="button", чтобы кнопка не вела себя странно рядом с формами
+        COMMENTS| v1.0.1
 
   </div>
 
@@ -395,3 +694,6 @@ function showInfo(
 })();
 
 </script>
+
+  </body>
+</html>    
