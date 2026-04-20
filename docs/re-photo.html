@@ -19,11 +19,11 @@ body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
   margin: 0;
-  padding: 30px;
+  padding: 24px;
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
   background: #fff;
   padding: 24px;
@@ -67,19 +67,27 @@ h2, h3 {
 }
 
 .toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: start;
 }
 
 .left-tools,
+.center-tools,
 .right-tools {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+}
+
+.center-tools {
+  justify-content: center;
+}
+
+.right-tools {
+  justify-content: flex-end;
 }
 
 button {
@@ -164,7 +172,7 @@ button.active {
   white-space: pre-line;
 }
 
-.color-panel {
+.mode-panel {
   margin-top: 14px;
   padding: 14px;
   background: #f8fafc;
@@ -173,11 +181,12 @@ button.active {
   display: none;
 }
 
-.color-panel.visible {
+.mode-panel.visible {
   display: block;
 }
 
-.color-grid {
+.color-grid,
+.crop-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 14px 18px;
@@ -203,19 +212,15 @@ button.active {
   color: #555;
 }
 
-@media (max-width: 800px) {
-  body {
-    padding: 12px;
-  }
-
+@media (max-width: 900px) {
   .toolbar {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .left-tools,
+  .center-tools,
   .right-tools {
-    width: 100%;
+    justify-content: flex-start;
   }
 }
 </style>
@@ -232,16 +237,6 @@ button.active {
       <div class="field">
         <label for="photoInput">Файл</label>
         <input id="photoInput" type="file" accept="image/*">
-      </div>
-
-      <div class="field">
-        <label for="cropMode">Кроп</label>
-        <select id="cropMode">
-          <option value="free">Свободный прямоугольник</option>
-          <option value="square">Квадрат 1:1</option>
-          <option value="landscape">Горизонтально 4:3</option>
-          <option value="portrait">Вертикально 3:4</option>
-        </select>
       </div>
 
       <div class="field">
@@ -262,9 +257,14 @@ button.active {
 
     <div class="toolbar">
       <div class="left-tools">
-        <button id="cropModeBtn" type="button">Кроп</button>
+        <button id="cropModeBtn" type="button">Crop</button>
         <button id="resizeModeBtn" type="button">Resize</button>
-        <button id="colorModeBtn" type="button">Цвет</button>
+        <button id="colorModeBtn" type="button">Color</button>
+        <button id="backToOriginalBtn" type="button" disabled>Вернуться к исходнику</button>
+      </div>
+
+      <div class="center-tools">
+        <button id="undoBtn" type="button" disabled>Отменить правку</button>
       </div>
 
       <div class="right-tools">
@@ -273,7 +273,21 @@ button.active {
       </div>
     </div>
 
-    <div id="colorPanel" class="color-panel">
+    <div id="cropPanel" class="mode-panel">
+      <div class="crop-grid">
+        <div class="field">
+          <label for="cropMode">Crop mode</label>
+          <select id="cropMode">
+            <option value="free">Свободный прямоугольник</option>
+            <option value="square">Квадрат 1:1</option>
+            <option value="landscape">Горизонтально 4:3</option>
+            <option value="portrait">Вертикально 3:4</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="colorPanel" class="mode-panel">
       <div class="color-grid">
         <div class="slider-wrap">
           <label for="brightnessRange">Яркость</label>
@@ -304,17 +318,16 @@ button.active {
     <div class="status" id="status"></div>
 
     <div class="note">
-Кроп: включи кнопку «Кроп» и выделяй прямоугольник.
-Resize: включи кнопку «Resize», кликни в точку — это центр, колесо или pinch меняют масштаб, при увеличении картинку можно тянуть.
-Цвет: включи кнопку «Цвет» и крути ползунки.
-Применить: сохраняет текущий результат в WebP.
+Crop: включи кнопку и выделяй прямоугольник.
+Resize: включи кнопку, кликни в точку — это центр. Колесо или pinch меняют масштаб. При увеличении картинку можно тянуть.
+Color: включи кнопку и меняй ползунки.
+Применить: результат становится новым содержимым Editor и одновременно показывается справа.
     </div>
-
   </div>
 
   <div class="row">
     <div class="panel">
-      <h3>Редактор</h3>
+      <h3>Editor</h3>
       <div class="preview-box">
         <canvas id="editCanvas"></canvas>
       </div>
@@ -322,7 +335,7 @@ Resize: включи кнопку «Resize», кликни в точку — э�
     </div>
 
     <div class="panel">
-      <h3>Результат</h3>
+      <h3>Result</h3>
       <div class="preview-box">
         <img id="resultPreview" alt="Результат">
       </div>
@@ -339,7 +352,8 @@ Resize: включи кнопку «Resize», кликни в точку — э�
 ================================
 */
 
-let originalFile = null;
+let sourceFile = null;          // текущий файл редактора
+let originalFile = null;        // самый первый исходник
 let processedFile = null;
 let processedObjectUrl = null;
 let sourceImage = null;
@@ -350,7 +364,12 @@ let imageNaturalHeight = 0;
 let activeMode = null; // null | crop | resize | color
 
 /*
-  КРОП
+  ИСТОРИЯ
+*/
+const editHistory = []; // stack of File
+
+/*
+  CROP
 */
 let cropRect = null;
 let isSelectingCrop = false;
@@ -359,8 +378,6 @@ let cropStartY = 0;
 
 /*
   RESIZE VIEW
-  centerX / centerY — центр в координатах исходного изображения
-  zoom = 1 — без приближения
 */
 let resizeView = {
   centerX: 0,
@@ -373,12 +390,13 @@ let resizePanStartCanvasX = 0;
 let resizePanStartCanvasY = 0;
 let resizePanStartCenterX = 0;
 let resizePanStartCenterY = 0;
+let suppressResizeClick = false;
 
 let pinchStartDistance = null;
 let pinchStartZoom = 1;
 
 /*
-  ЦВЕТ
+  COLOR
 */
 const colorState = {
   brightness: 0,
@@ -403,9 +421,12 @@ const cropModeBtn = document.getElementById("cropModeBtn");
 const resizeModeBtn = document.getElementById("resizeModeBtn");
 const colorModeBtn = document.getElementById("colorModeBtn");
 
+const backToOriginalBtn = document.getElementById("backToOriginalBtn");
+const undoBtn = document.getElementById("undoBtn");
 const applyBtn = document.getElementById("applyBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 
+const cropPanel = document.getElementById("cropPanel");
 const colorPanel = document.getElementById("colorPanel");
 
 const brightnessRange = document.getElementById("brightnessRange");
@@ -435,27 +456,34 @@ const statusBox = document.getElementById("status");
 photoInput.addEventListener("change", async (event) => {
   clearStatus();
   resetResult();
+  clearHistory();
 
-  originalFile = event.target.files[0] || null;
+  const file = event.target.files[0] || null;
 
-  if (!originalFile) {
+  if (!file) {
     clearCanvas();
     originalInfo.textContent = "";
     return;
   }
 
-  if (!originalFile.type.startsWith("image/")) {
+  if (!file.type.startsWith("image/")) {
     setStatus("Нужен файл изображения.");
     return;
   }
 
   try {
-    await loadOriginalIntoCanvas(originalFile);
-    setDefaultCrop();
-    setDefaultResizeView();
+    originalFile = file;
+    sourceFile = file;
+
+    await loadSourceFileIntoEditor(sourceFile);
+
+    resetAllEditingState();
     activeMode = null;
     updateModeUI();
     drawEditor();
+    updateHistoryButtons();
+
+    backToOriginalBtn.disabled = false;
     setStatus("Фото загружено.");
   } catch (error) {
     setStatus("Ошибка: " + error.message);
@@ -464,7 +492,7 @@ photoInput.addEventListener("change", async (event) => {
 
 /*
 ================================
-TOGGLE КНОПКИ РЕЖИМОВ
+TOGGLE РЕЖИМОВ
 ================================
 */
 
@@ -488,12 +516,13 @@ function updateModeUI() {
   resizeModeBtn.classList.toggle("active", activeMode === "resize");
   colorModeBtn.classList.toggle("active", activeMode === "color");
 
+  cropPanel.classList.toggle("visible", activeMode === "crop");
   colorPanel.classList.toggle("visible", activeMode === "color");
 
   if (activeMode === "crop") {
     editCanvas.style.cursor = "crosshair";
   } else if (activeMode === "resize") {
-    editCanvas.style.cursor = resizeView.zoom > 1 ? "grab" : "pointer";
+    editCanvas.style.cursor = isPanningResize ? "grabbing" : (resizeView.zoom > 1 ? "grab" : "pointer");
   } else {
     editCanvas.style.cursor = "default";
   }
@@ -501,7 +530,7 @@ function updateModeUI() {
 
 /*
 ================================
-ПОЛЗУНКИ ЦВЕТА
+COLOR SLIDERS
 ================================
 */
 
@@ -522,12 +551,12 @@ function updateModeUI() {
 
 /*
 ================================
-КНОПКА ПРИМЕНИТЬ
+APPLY
 ================================
 */
 
 applyBtn.addEventListener("click", async () => {
-  if (!sourceImage || !originalFile) {
+  if (!sourceImage || !sourceFile) {
     setStatus("Сначала выбери фото.");
     return;
   }
@@ -535,14 +564,16 @@ applyBtn.addEventListener("click", async () => {
   try {
     clearStatus();
 
-    processedFile = await buildFinalFile(originalFile, {
-      useCrop: !!cropRect,
+    const currentFileBeforeApply = sourceFile;
+
+    processedFile = await buildFinalFile(sourceFile, {
+      useCrop: activeMode === "crop" && !!cropRect,
       cropRectCanvas: cropRect,
       canvasWidth: editCanvas.width,
       canvasHeight: editCanvas.height,
       imageWidth: imageNaturalWidth,
       imageHeight: imageNaturalHeight,
-      useResize: resizeView.zoom > 1 || !isResizeDefault(),
+      useResize: activeMode === "resize" || resizeView.zoom > 1 || !isResizeDefault(),
       resizeView,
       maxWidth: Number(maxWidthInput.value) || 1200,
       maxHeight: Number(maxHeightInput.value) || 1200,
@@ -550,7 +581,31 @@ applyBtn.addEventListener("click", async () => {
       quality: Number(qualityInput.value) || 0.75
     });
 
+    /*
+      Пушим текущее состояние в историю перед заменой
+    */
+    pushHistory(currentFileBeforeApply);
+
+    /*
+      Показ справа
+    */
     await showResult(processedFile);
+
+    /*
+      И результат становится новым Editor
+    */
+    sourceFile = processedFile;
+    await loadSourceFileIntoEditor(sourceFile);
+
+    /*
+      После apply редактирование начинается с чистого состояния
+    */
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
     setStatus("Применено.");
   } catch (error) {
     setStatus("Ошибка: " + error.message);
@@ -559,7 +614,69 @@ applyBtn.addEventListener("click", async () => {
 
 /*
 ================================
-СКАЧАТЬ РЕЗУЛЬТАТ
+UNDO
+================================
+*/
+
+undoBtn.addEventListener("click", async () => {
+  if (editHistory.length === 0) {
+    setStatus("Нет предыдущей правки.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    const previousFile = editHistory.pop();
+    sourceFile = previousFile;
+
+    await loadSourceFileIntoEditor(sourceFile);
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Откат на один шаг.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+BACK TO ORIGINAL
+================================
+*/
+
+backToOriginalBtn.addEventListener("click", async () => {
+  if (!originalFile) {
+    setStatus("Исходник не найден.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    sourceFile = originalFile;
+    clearHistory();
+
+    await loadSourceFileIntoEditor(sourceFile);
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Возврат к исходнику.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+DOWNLOAD
 ================================
 */
 
@@ -579,11 +696,30 @@ downloadBtn.addEventListener("click", () => {
 
 /*
 ================================
-ЗАГРУЗКА В CANVAS
+HISTORY HELPERS
 ================================
 */
 
-async function loadOriginalIntoCanvas(file) {
+function pushHistory(file) {
+  editHistory.push(file);
+}
+
+function clearHistory() {
+  editHistory.length = 0;
+}
+
+function updateHistoryButtons() {
+  undoBtn.disabled = editHistory.length === 0;
+  backToOriginalBtn.disabled = !originalFile;
+}
+
+/*
+================================
+LOAD SOURCE INTO EDITOR
+================================
+*/
+
+async function loadSourceFileIntoEditor(file) {
   const dataUrl = await readFileAsDataURL(file);
   const img = await loadImage(dataUrl);
 
@@ -610,6 +746,38 @@ async function loadOriginalIntoCanvas(file) {
     "Размер: " + formatSize(file.size) + "\n" +
     "Разрешение: " + img.width + " × " + img.height + "\n" +
     "Canvas: " + editCanvas.width + " × " + editCanvas.height;
+}
+
+/*
+================================
+RESET EDITING STATE
+================================
+*/
+
+function resetAllEditingState() {
+  setDefaultCrop();
+  setDefaultResizeView();
+
+  colorState.brightness = 0;
+  colorState.saturation = 0;
+  colorState.contrast = 0;
+  colorState.temperature = 0;
+
+  brightnessRange.value = 0;
+  saturationRange.value = 0;
+  contrastRange.value = 0;
+  temperatureRange.value = 0;
+
+  brightnessValue.textContent = "0";
+  saturationValue.textContent = "0";
+  contrastValue.textContent = "0";
+  temperatureValue.textContent = "0";
+
+  isSelectingCrop = false;
+  isPanningResize = false;
+  pinchStartDistance = null;
+  pinchStartZoom = 1;
+  suppressResizeClick = false;
 }
 
 /*
@@ -659,7 +827,7 @@ function isResizeDefault() {
 
 /*
 ================================
-DRAW EDITOR
+DRAW
 ================================
 */
 
@@ -734,6 +902,7 @@ function drawCropOverlay() {
   editCtx.restore();
 
   editCtx.filter = buildCanvasFilterString(colorState);
+
   editCtx.save();
   editCtx.beginPath();
   editCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
@@ -796,7 +965,7 @@ function applyTemperatureOverlay(ctx, width, height, temperature) {
 
 /*
 ================================
-RESIZE RECT
+RESIZE SOURCE RECT
 ================================
 */
 
@@ -826,7 +995,7 @@ function getResizeSourceRect() {
 
 /*
 ================================
-ФИНАЛЬНЫЙ ФАЙЛ
+BUILD FINAL FILE
 ================================
 */
 
@@ -854,12 +1023,6 @@ async function buildFinalFile(file, options = {}) {
   let srcW = imageWidth;
   let srcH = imageHeight;
 
-  /*
-    Приоритет такой:
-    если resize реально изменён — берём resize view
-    иначе если есть crop — берём crop
-    иначе — всё фото
-  */
   if (useResize) {
     const rect = getResizeSourceRect();
     srcX = Math.round(rect.srcX);
@@ -938,8 +1101,9 @@ async function showResult(file) {
 
   const meta = await getImageMetaFromObjectUrl(processedObjectUrl);
 
-  const savedPercent = originalFile && originalFile.size > 0
-    ? (((originalFile.size - file.size) / originalFile.size) * 100).toFixed(1)
+  const referenceSize = sourceFile && sourceFile.size > 0 ? sourceFile.size : file.size;
+  const savedPercent = referenceSize > 0
+    ? (((referenceSize - file.size) / referenceSize) * 100).toFixed(1)
     : "0";
 
   resultInfo.textContent =
@@ -990,6 +1154,7 @@ editCanvas.addEventListener("mousemove", (event) => {
     const pos = getMousePosOnCanvas(event);
     panResizeView(pos.x, pos.y);
     drawEditor();
+    suppressResizeClick = true;
   }
 });
 
@@ -1015,7 +1180,11 @@ RESIZE POINTER
 
 editCanvas.addEventListener("click", (event) => {
   if (!sourceImage || activeMode !== "resize") return;
-  if (isPanningResize) return;
+
+  if (suppressResizeClick) {
+    suppressResizeClick = false;
+    return;
+  }
 
   const pos = getMousePosOnCanvas(event);
   setResizeCenterFromCanvasPoint(pos.x, pos.y);
@@ -1033,6 +1202,7 @@ editCanvas.addEventListener("mousedown", (event) => {
   resizePanStartCanvasY = pos.y;
   resizePanStartCenterX = resizeView.centerX;
   resizePanStartCenterY = resizeView.centerY;
+  suppressResizeClick = false;
 
   editCanvas.style.cursor = "grabbing";
 });
@@ -1042,8 +1212,24 @@ editCanvas.addEventListener("wheel", (event) => {
 
   event.preventDefault();
 
+  const mousePos = getMousePosOnCanvas(event);
+  const beforeRect = getResizeSourceRect();
+
+  const focusX = beforeRect.srcX + beforeRect.srcW * (mousePos.x / editCanvas.width);
+  const focusY = beforeRect.srcY + beforeRect.srcH * (mousePos.y / editCanvas.height);
+
   const delta = event.deltaY < 0 ? 1.12 : 0.89;
-  resizeView.zoom = clamp(resizeView.zoom * delta, 1, 20);
+  const newZoom = clamp(resizeView.zoom * delta, 1, 20);
+
+  resizeView.zoom = newZoom;
+
+  const afterRect = getResizeSourceRect();
+
+  resizeView.centerX += focusX - (afterRect.srcX + afterRect.srcW * (mousePos.x / editCanvas.width));
+  resizeView.centerY += focusY - (afterRect.srcY + afterRect.srcH * (mousePos.y / editCanvas.height));
+
+  resizeView.centerX = clamp(resizeView.centerX, 0, imageNaturalWidth);
+  resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
 
   updateModeUI();
   drawEditor();
@@ -1093,6 +1279,7 @@ editCanvas.addEventListener("touchstart", (event) => {
         resizePanStartCanvasY = pos.y;
         resizePanStartCenterX = resizeView.centerX;
         resizePanStartCenterY = resizeView.centerY;
+        suppressResizeClick = false;
       }
 
       drawEditor();
@@ -1127,6 +1314,7 @@ editCanvas.addEventListener("touchmove", (event) => {
       const pos = getTouchPosOnCanvas(event);
       panResizeView(pos.x, pos.y);
       drawEditor();
+      suppressResizeClick = true;
       return;
     }
 
@@ -1253,13 +1441,29 @@ function setResizeCenterFromCanvasPoint(canvasX, canvasY) {
 }
 
 function panResizeView(currentCanvasX, currentCanvasY) {
-  const rect = getResizeSourceRect();
+  /*
+    Важно: используем rect, построенный от стартового центра,
+    а не от уже изменённого — так drag работает стабильно
+  */
+  const zoom = Math.max(1, resizeView.zoom);
+
+  let srcW = imageNaturalWidth / zoom;
+  let srcH = imageNaturalHeight / zoom;
+
+  const canvasRatio = editCanvas.width / editCanvas.height;
+  const srcRatio = srcW / srcH;
+
+  if (srcRatio > canvasRatio) {
+    srcW = srcH * canvasRatio;
+  } else {
+    srcH = srcW / canvasRatio;
+  }
+
+  const imagePerCanvasX = srcW / editCanvas.width;
+  const imagePerCanvasY = srcH / editCanvas.height;
 
   const dxCanvas = currentCanvasX - resizePanStartCanvasX;
   const dyCanvas = currentCanvasY - resizePanStartCanvasY;
-
-  const imagePerCanvasX = rect.srcW / editCanvas.width;
-  const imagePerCanvasY = rect.srcH / editCanvas.height;
 
   resizeView.centerX = resizePanStartCenterX - dxCanvas * imagePerCanvasX;
   resizeView.centerY = resizePanStartCenterY - dyCanvas * imagePerCanvasY;
@@ -1391,6 +1595,7 @@ function resetResult() {
 </script>
 
 
+
 <!-- ========================================
      SERVICE CONSOLE
      Верхняя строка редактируется вручную
@@ -1404,7 +1609,22 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-Цвет| v1.3.0
+Apply теперь делает результат новым содержимым окна Editor — можно продолжать править уже обработанную картинку
+слева от Apply добавлена кнопка Вернуться к исходнику
+по центру добавлена кнопка Отменить правку
+кнопки режимов:
+Crop
+Resize
+Color
+настройки Crop показываются только когда нажата кнопка Crop
+исправлена логика resize:
+клик задаёт центр
+колесо / pinch меняют zoom
+перетягивание работает через drag viewport
+есть история:
+Применить пушит состояние в стек
+Отменить правку откатывает на 1 шаг назад
+Вернуться к исходнику возвращает к самому первому файлу| v1.4.0
 
   </div>
 
