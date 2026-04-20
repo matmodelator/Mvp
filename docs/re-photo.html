@@ -1,20 +1,17 @@
-
-  <!DOCTYPE html>
+  
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-
 <meta charset="UTF-8">
-
-<!-- Адаптация под мобильные устройства -->
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Upload Photo</title>
 
+<!-- СТИЛЬ КОНСОЛИ -->
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
 <style>
-
-/* Общий стиль страницы */
-
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f8;
@@ -22,10 +19,8 @@ body {
   padding: 40px;
 }
 
-/* Контейнер формы */
-
 .container {
-  max-width: 600px;
+  max-width: 1000px;
   margin: auto;
   background: white;
   padding: 24px;
@@ -33,20 +28,45 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Блок preview */
+.controls {
+  margin-bottom: 20px;
+}
 
-.preview {
+.row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
   margin-top: 20px;
 }
 
-/* Картинка */
-
-img {
-  max-width: 100%;
-  border-radius: 8px;
+.panel {
+  flex: 1 1 420px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
 }
 
-/* Информация о размере */
+.panel h3 {
+  margin-top: 0;
+}
+
+.preview-box {
+  width: 100%;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-box img {
+  max-width: 100%;
+  max-height: 500px;
+  display: block;
+}
 
 .info {
   margin-top: 12px;
@@ -55,8 +75,6 @@ img {
   white-space: pre-line;
 }
 
-/* Статус / ошибки */
-
 .status {
   margin-top: 12px;
   font-size: 14px;
@@ -64,10 +82,14 @@ img {
   white-space: pre-line;
 }
 
-/* Кнопка */
+.buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
 
 button {
-  margin-top: 16px;
   padding: 10px 18px;
   border: none;
   border-radius: 6px;
@@ -80,539 +102,355 @@ button:hover {
   background: #1d4ed8;
 }
 
+button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+input[type="number"],
+select {
+  margin-top: 4px;
+  padding: 8px;
+  width: 180px;
+}
+
+.note {
+  font-size: 13px;
+  color: #666;
+  margin-top: 6px;
+}
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
 
-<h2>
-Загрузка фото
-</h2>
+  <h2>Загрузка и обработка фото</h2>
 
-<!-- Выбор файла -->
+  <div class="controls">
+    <input id="photoInput" type="file" accept="image/*">
 
-<input
-  id="photoInput"
-  type="file"
-  accept="image/*"
-/>
+    <label>
+      Режим обрезки
+      <select id="cropMode">
+        <option value="none">Без обрезки</option>
+        <option value="square">Квадрат</option>
+        <option value="avatar">Аватар 1:1</option>
+        <option value="landscape">Горизонтально 4:3</option>
+        <option value="portrait">Вертикально 3:4</option>
+      </select>
+    </label>
 
-<div class="preview">
+    <label>
+      Max width
+      <input id="maxWidth" type="number" value="1200" min="100" step="50">
+    </label>
 
-<!-- Превью изображения -->
+    <label>
+      Max height
+      <input id="maxHeight" type="number" value="1200" min="100" step="50">
+    </label>
 
-<img
-  id="preview"
-  src=""
-  style="display:none"
-/>
+    <label>
+      Quality (0.1–1)
+      <input id="quality" type="number" value="0.75" min="0.1" max="1" step="0.05">
+    </label>
 
-<!-- Информация о размере -->
+    <div class="buttons">
+      <button id="processBtn" type="button">Обработать фото</button>
+      <button id="downloadBtn" type="button" disabled>Скачать результат</button>
+    </div>
 
-<div
-  class="info"
-  id="info">
-</div>
+    <div class="status" id="status"></div>
+  </div>
 
-<!-- Сообщения / ошибки -->
+  <div class="row">
+    <div class="panel">
+      <h3>Исходник</h3>
+      <div class="preview-box">
+        <img id="originalPreview" src="" style="display:none">
+      </div>
+      <div class="info" id="originalInfo"></div>
+    </div>
 
-<div
-  class="status"
-  id="status">
-</div>
-
-</div>
-
-<!-- Кнопка обработки -->
-
-<button
-  id="processBtn"
-  type="button">
-Обработать фото
-</button>
+    <div class="panel">
+      <h3>Результат</h3>
+      <div class="preview-box">
+        <img id="resultPreview" src="" style="display:none">
+      </div>
+      <div class="info" id="resultInfo"></div>
+      <div class="note">
+        Результат можно скачать локально. Для сохранения в Supabase этот файл потом надо upload'ить в Storage.
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <script>
+let originalFile = null;
+let processedFile = null;
+let processedUrl = null;
+let originalUrl = null;
 
-/*
-================================
-Глобальные переменные
-================================
-*/
+const photoInput = document.getElementById("photoInput");
+const processBtn = document.getElementById("processBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
-let originalFile = null;   // исходный файл
-let processedFile = null;  // обработанный файл
+const originalPreview = document.getElementById("originalPreview");
+const resultPreview = document.getElementById("resultPreview");
 
-/*
-================================
-DOM элементы
-================================
-*/
+const originalInfo = document.getElementById("originalInfo");
+const resultInfo = document.getElementById("resultInfo");
+const statusBox = document.getElementById("status");
 
-const photoInput =
-  document.getElementById("photoInput");
+photoInput.addEventListener("change", handleFileSelect);
+processBtn.addEventListener("click", processPhoto);
+downloadBtn.addEventListener("click", downloadProcessedFile);
 
-const preview =
-  document.getElementById("preview");
-
-const info =
-  document.getElementById("info");
-
-const status =
-  document.getElementById("status");
-
-const processBtn =
-  document.getElementById("processBtn");
-
-/*
-================================
-Выбор файла пользователем
-================================
-*/
-
-photoInput.addEventListener(
-  "change",
-  function(event) {
-
-    clearStatus();
-
-    originalFile =
-      event.target.files[0];
-
-    processedFile = null;
-
-    if (!originalFile) return;
-
-    /*
-    Создаем preview
-    */
-
-    const url =
-      URL.createObjectURL(
-        originalFile
-      );
-
-    preview.src = url;
-
-    preview.style.display =
-      "block";
-
-    /*
-    Показываем информацию
-    */
-
-    info.textContent =
-      "Original size: " +
-      formatSize(
-        originalFile.size
-      );
-
-  }
-);
-
-/*
-================================
-Кнопка обработки
-================================
-*/
-
-processBtn.addEventListener(
-  "click",
-  processPhoto
-);
-
-/*
-================================
-Главная функция обработки
-================================
-*/
-
-async function processPhoto() {
-
+function handleFileSelect(event) {
   clearStatus();
+  processedFile = null;
+  downloadBtn.disabled = true;
+  resultPreview.style.display = "none";
+  resultPreview.src = "";
+  resultInfo.textContent = "";
 
-  /*
-  Проверка файла
-  */
-
+  originalFile = event.target.files[0] || null;
   if (!originalFile) {
-
-    setStatus(
-      "Сначала выберите фото"
-    );
-
+    originalPreview.style.display = "none";
+    originalPreview.src = "";
+    originalInfo.textContent = "";
     return;
   }
 
-  processBtn.disabled =
-    true;
+  if (originalUrl) URL.revokeObjectURL(originalUrl);
+  originalUrl = URL.createObjectURL(originalFile);
 
-  processBtn.textContent =
-    "Обработка...";
+  originalPreview.src = originalUrl;
+  originalPreview.style.display = "block";
 
-  try {
-
-    /*
-    Сжатие + конвертация
-    */
-
-    processedFile =
-      await resizeAndConvertToWebp(
-        originalFile,
-        {
-          maxWidth: 1200,
-          maxHeight: 1200,
-          quality: 0.75
-        }
-      );
-
-    /*
-    Показываем preview
-    */
-
-    const url =
-      URL.createObjectURL(
-        processedFile
-      );
-
-    preview.src = url;
-
-    /*
-    Показываем размеры
-    */
-
-    info.textContent =
-      "Original: " +
-      formatSize(
-        originalFile.size
-      ) +
-      "\nWebP: " +
-      formatSize(
-        processedFile.size
-      );
-
-    setStatus(
-      "Фото обработано"
-    );
-
-  }
-  catch(error) {
-
-    console.error(error);
-
-    setStatus(
-      "Ошибка: " +
-      error.message
-    );
-
-  }
-  finally {
-
-    processBtn.disabled =
-      false;
-
-    processBtn.textContent =
-      "Обработать фото";
-
-  }
-
+  const img = new Image();
+  img.onload = function () {
+    originalInfo.textContent =
+      "Имя: " + originalFile.name + "\n" +
+      "Тип: " + originalFile.type + "\n" +
+      "Размер: " + formatSize(originalFile.size) + "\n" +
+      "Разрешение: " + img.width + " × " + img.height;
+  };
+  img.src = originalUrl;
 }
 
-/*
-================================
-Resize + Convert to WebP
-================================
-*/
+async function processPhoto() {
+  clearStatus();
 
-async function resizeAndConvertToWebp(
-  file,
-  options = {}
-) {
+  if (!originalFile) {
+    setStatus("Сначала выбери фото.");
+    return;
+  }
 
+  processBtn.disabled = true;
+  processBtn.textContent = "Обработка...";
+  downloadBtn.disabled = true;
+
+  try {
+    const cropMode = document.getElementById("cropMode").value;
+    const maxWidth = Number(document.getElementById("maxWidth").value) || 1200;
+    const maxHeight = Number(document.getElementById("maxHeight").value) || 1200;
+    const quality = Number(document.getElementById("quality").value) || 0.75;
+
+    processedFile = await resizeCropAndConvertToWebp(originalFile, {
+      cropMode,
+      maxWidth,
+      maxHeight,
+      quality
+    });
+
+    if (processedUrl) URL.revokeObjectURL(processedUrl);
+    processedUrl = URL.createObjectURL(processedFile);
+
+    resultPreview.src = processedUrl;
+    resultPreview.style.display = "block";
+
+    const resultImg = new Image();
+    resultImg.onload = function () {
+      const percent = originalFile.size > 0
+        ? (((originalFile.size - processedFile.size) / originalFile.size) * 100).toFixed(1)
+        : "0";
+
+      resultInfo.textContent =
+        "Имя: " + processedFile.name + "\n" +
+        "Тип: " + processedFile.type + "\n" +
+        "Размер: " + formatSize(processedFile.size) + "\n" +
+        "Разрешение: " + resultImg.width + " × " + resultImg.height + "\n" +
+        "Экономия: " + percent + "%";
+    };
+    resultImg.src = processedUrl;
+
+    downloadBtn.disabled = false;
+    setStatus("Фото обработано.");
+  } catch (error) {
+    console.error(error);
+    setStatus("Ошибка: " + error.message);
+  } finally {
+    processBtn.disabled = false;
+    processBtn.textContent = "Обработать фото";
+  }
+}
+
+async function resizeCropAndConvertToWebp(file, options = {}) {
   const {
+    cropMode = "none",
     maxWidth = 1200,
     maxHeight = 1200,
     quality = 0.8
   } = options;
 
-  /*
-  Читаем файл
-  */
+  if (!file) {
+    throw new Error("Файл не передан");
+  }
 
-  const dataUrl =
-    await readFileAsDataURL(
-      file
-    );
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Нужен файл изображения");
+  }
 
-  /*
-  Загружаем изображение
-  */
+  const dataUrl = await readFileAsDataURL(file);
+  const image = await loadImage(dataUrl);
 
-  const image =
-    await loadImage(
-      dataUrl
-    );
+  let srcX = 0;
+  let srcY = 0;
+  let srcW = image.width;
+  let srcH = image.height;
 
-  let width =
-    image.width;
+  if (cropMode !== "none") {
+    const targetRatio = getCropRatio(cropMode);
+    ({ srcX, srcY, srcW, srcH } = getCenteredCrop(image.width, image.height, targetRatio));
+  }
 
-  let height =
-    image.height;
+  const scale = Math.min(maxWidth / srcW, maxHeight / srcH, 1);
+  const targetWidth = Math.round(srcW * scale);
+  const targetHeight = Math.round(srcH * scale);
 
-  /*
-  Расчет масштаба
-  */
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
 
-  const ratio =
-    Math.min(
-      maxWidth / width,
-      maxHeight / height,
-      1
-    );
-
-  const targetWidth =
-    Math.round(
-      width * ratio
-    );
-
-  const targetHeight =
-    Math.round(
-      height * ratio
-    );
-
-  /*
-  Создаем canvas
-  */
-
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
-
-  canvas.width =
-    targetWidth;
-
-  canvas.height =
-    targetHeight;
-
-  const ctx =
-    canvas.getContext(
-      "2d"
-    );
-
-  /*
-  Рисуем изображение
-  */
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas context недоступен");
+  }
 
   ctx.drawImage(
     image,
-    0,
-    0,
-    targetWidth,
-    targetHeight
+    srcX, srcY, srcW, srcH,
+    0, 0, targetWidth, targetHeight
   );
 
-  /*
-  Конвертируем в WebP
-  */
-
-  const blob =
-    await canvasToBlob(
-      canvas,
-      "image/webp",
-      quality
-    );
-
-  /*
-  Новое имя файла
-  */
-
-  const baseName =
-    file.name.replace(
-      /\.[^/.]+$/,
-      ""
-    );
+  const blob = await canvasToBlob(canvas, "image/webp", quality);
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
 
   return new File(
     [blob],
-    baseName +
-    ".webp",
-    {
-      type:
-        "image/webp"
-    }
+    baseName + ".webp",
+    { type: "image/webp" }
   );
-
 }
 
-/*
-================================
-File → base64
-================================
-*/
-
-function readFileAsDataURL(
-  file
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      const reader =
-        new FileReader();
-
-      reader.onload =
-        () => resolve(
-          reader.result
-        );
-
-      reader.onerror =
-        () => reject(
-          new Error(
-            "Read error"
-          )
-        );
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
+function getCropRatio(mode) {
+  if (mode === "square" || mode === "avatar") return 1 / 1;
+  if (mode === "landscape") return 4 / 3;
+  if (mode === "portrait") return 3 / 4;
+  return null;
 }
 
-/*
-================================
-Load image
-================================
-*/
+function getCenteredCrop(width, height, ratio) {
+  if (!ratio) {
+    return { srcX: 0, srcY: 0, srcW: width, srcH: height };
+  }
 
-function loadImage(
-  src
-) {
+  const currentRatio = width / height;
 
-  return new Promise(
-    (resolve, reject) => {
+  let srcW, srcH, srcX, srcY;
 
-      const img =
-        new Image();
+  if (currentRatio > ratio) {
+    srcH = height;
+    srcW = Math.round(height * ratio);
+    srcX = Math.round((width - srcW) / 2);
+    srcY = 0;
+  } else {
+    srcW = width;
+    srcH = Math.round(width / ratio);
+    srcX = 0;
+    srcY = Math.round((height - srcH) / 2);
+  }
 
-      img.onload =
-        () => resolve(
-          img
-        );
-
-      img.onerror =
-        () => reject(
-          new Error(
-            "Image load error"
-          )
-        );
-
-      img.src = src;
-
-    }
-  );
-
+  return { srcX, srcY, srcW, srcH };
 }
 
-/*
-================================
-Canvas → Blob
-================================
-*/
-
-function canvasToBlob(
-  canvas,
-  type,
-  quality
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      canvas.toBlob(
-        function(blob) {
-
-          if (!blob)
-            reject(
-              new Error(
-                "Blob error"
-              )
-            );
-
-          else
-            resolve(
-              blob
-            );
-
-        },
-        type,
-        quality
-      );
-
-    }
-  );
-
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Ошибка чтения файла"));
+    reader.readAsDataURL(file);
+  });
 }
 
-/*
-================================
-Формат размера файла
-================================
-*/
-
-function formatSize(
-  bytes
-) {
-
-  if (bytes < 1024)
-    return bytes + " B";
-
-  if (bytes < 1024 * 1024)
-    return (
-      (bytes / 1024)
-      .toFixed(1) +
-      " KB"
-    );
-
-  return (
-    (bytes / 1024 / 1024)
-    .toFixed(2) +
-    " MB"
-  );
-
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Ошибка загрузки изображения"));
+    img.src = src;
+  });
 }
 
-/*
-================================
-Status helpers
-================================
-*/
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Не удалось создать Blob"));
+        return;
+      }
+      resolve(blob);
+    }, type, quality);
+  });
+}
 
-function setStatus(
-  text
-) {
+function downloadProcessedFile() {
+  if (!processedFile || !processedUrl) {
+    setStatus("Нет обработанного файла для сохранения.");
+    return;
+  }
 
-  status.textContent =
-    text;
+  const a = document.createElement("a");
+  a.href = processedUrl;
+  a.download = processedFile.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+}
+
+function setStatus(text) {
+  statusBox.textContent = text;
 }
 
 function clearStatus() {
-
-  status.textContent =
-    "";
-
+  statusBox.textContent = "";
 }
-
 </script>
-
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -627,12 +465,13 @@ function clearStatus() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-убрал onclick="processPhoto()" и повесил нормальный addEventListener
-добавил try/catch
-заменил createImageBitmap на более совместимый вариант
-добавил вывод ошибки на экран
-добавил type="button", чтобы кнопка не вела себя странно рядом с формами
-        COMMENTS| v1.0.1
+preview исходника
+preview результата
+обрезка по центру
+resize
+convert to webp
+кнопка Скачать результат
+        CONSOLE| v1.1.0
 
   </div>
 
