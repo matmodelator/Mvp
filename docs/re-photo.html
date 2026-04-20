@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>re-photo</title>
+<title>up-photo</title>
 
 <!-- СТИЛЬ КОНСОЛИ -->
 
@@ -92,6 +92,7 @@ button:disabled {
   margin-top: 14px;
   color: #b91c1c;
   min-height: 20px;
+  white-space: pre-line;
 }
 
 .row {
@@ -141,11 +142,14 @@ button:disabled {
   <div class="controls">
 
     <div class="controls-row">
+
+      <!-- Выбор файла -->
       <div class="field">
         <label for="photoInput">Файл</label>
         <input id="photoInput" type="file" accept="image/*">
       </div>
 
+      <!-- Режим кропа -->
       <div class="field">
         <label for="cropMode">Кроп</label>
         <select id="cropMode">
@@ -156,58 +160,70 @@ button:disabled {
         </select>
       </div>
 
+      <!-- Ограничение ширины -->
       <div class="field">
         <label for="maxWidth">Max width</label>
         <input id="maxWidth" type="number" value="1200" min="100" step="50">
       </div>
 
+      <!-- Ограничение высоты -->
       <div class="field">
         <label for="maxHeight">Max height</label>
         <input id="maxHeight" type="number" value="1200" min="100" step="50">
       </div>
 
+      <!-- Качество WebP -->
       <div class="field">
         <label for="quality">Quality</label>
         <input id="quality" type="number" value="0.75" min="0.1" max="1" step="0.05">
       </div>
+
     </div>
 
     <div class="buttons">
-      <!-- Кнопка просто показывает выбранный исходник -->
-      <button id="showOriginalBtn" type="button">Показать исходник</button>
 
-      <!-- Только кроп по центру, без изменения формата -->
+      <!-- Применить выбранные настройки -->
+      <button id="applyBtn" type="button">Применить</button>
+
+      <!-- Только кроп -->
       <button id="cropBtn" type="button">Кроп по центру</button>
 
-      <!-- Только resize, без кропа -->
+      <!-- Только resize -->
       <button id="resizeBtn" type="button">Resize</button>
 
       <!-- Полная обработка: crop + resize + webp -->
       <button id="fullProcessBtn" type="button">Кроп + Resize + WebP</button>
 
-      <!-- Скачать результат -->
+      <!-- Скачать готовый результат -->
       <button id="downloadBtn" type="button" disabled>Скачать результат</button>
+
     </div>
 
     <div class="status" id="status"></div>
   </div>
 
   <div class="row">
+
     <div class="panel">
       <h3>Исходник</h3>
+
       <div class="preview-box">
         <img id="originalPreview" alt="Исходник">
       </div>
+
       <div class="info" id="originalInfo"></div>
     </div>
 
     <div class="panel">
       <h3>Результат</h3>
+
       <div class="preview-box">
         <img id="resultPreview" alt="Результат">
       </div>
+
       <div class="info" id="resultInfo"></div>
     </div>
+
   </div>
 
 </div>
@@ -226,7 +242,7 @@ let processedObjectUrl = null;
 
 /*
 ================================
-DOM
+DOM элементы
 ================================
 */
 
@@ -236,7 +252,7 @@ const maxWidthInput = document.getElementById("maxWidth");
 const maxHeightInput = document.getElementById("maxHeight");
 const qualityInput = document.getElementById("quality");
 
-const showOriginalBtn = document.getElementById("showOriginalBtn");
+const applyBtn = document.getElementById("applyBtn");
 const cropBtn = document.getElementById("cropBtn");
 const resizeBtn = document.getElementById("resizeBtn");
 const fullProcessBtn = document.getElementById("fullProcessBtn");
@@ -270,17 +286,47 @@ photoInput.addEventListener("change", async (event) => {
 
 /*
 ================================
-Кнопки
+Кнопка "Применить"
+Делает выбранные настройки:
+- если выбран кроп -> применяет кроп
+- resize
+- webp
 ================================
 */
 
-showOriginalBtn.addEventListener("click", async () => {
+applyBtn.addEventListener("click", async () => {
   if (!originalFile) {
     setStatus("Сначала выбери фото.");
     return;
   }
-  await showOriginal();
+
+  try {
+    clearStatus();
+
+    processedFile = await processImage(originalFile, {
+      doCrop: cropMode.value !== "none",
+      cropMode: cropMode.value,
+      doResize: true,
+      maxWidth: Number(maxWidthInput.value) || 1200,
+      maxHeight: Number(maxHeightInput.value) || 1200,
+      outputType: "image/webp",
+      quality: Number(qualityInput.value) || 0.75,
+      forceOutputExtension: "webp"
+    });
+
+    await showResult(processedFile);
+    setStatus("Применено.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
 });
+
+/*
+================================
+Кнопка "Кроп по центру"
+Только кроп без resize
+================================
+*/
 
 cropBtn.addEventListener("click", async () => {
   if (!originalFile) {
@@ -309,6 +355,13 @@ cropBtn.addEventListener("click", async () => {
   }
 });
 
+/*
+================================
+Кнопка "Resize"
+Только изменение размеров без кропа
+================================
+*/
+
 resizeBtn.addEventListener("click", async () => {
   if (!originalFile) {
     setStatus("Сначала выбери фото.");
@@ -335,6 +388,13 @@ resizeBtn.addEventListener("click", async () => {
     setStatus("Ошибка: " + error.message);
   }
 });
+
+/*
+================================
+Кнопка "Кроп + Resize + WebP"
+Полная обработка отдельной кнопкой
+================================
+*/
 
 fullProcessBtn.addEventListener("click", async () => {
   if (!originalFile) {
@@ -363,6 +423,12 @@ fullProcessBtn.addEventListener("click", async () => {
   }
 });
 
+/*
+================================
+Скачать результат локально
+================================
+*/
+
 downloadBtn.addEventListener("click", () => {
   if (!processedFile || !processedObjectUrl) {
     setStatus("Нет результата для скачивания.");
@@ -379,7 +445,7 @@ downloadBtn.addEventListener("click", () => {
 
 /*
 ================================
-Показ исходника
+Показать исходник
 ================================
 */
 
@@ -404,7 +470,7 @@ async function showOriginal() {
 
 /*
 ================================
-Показ результата
+Показать результат
 ================================
 */
 
@@ -436,7 +502,7 @@ async function showResult(file) {
 
 /*
 ================================
-Главная обработка
+Главная универсальная функция обработки
 ================================
 */
 
@@ -471,12 +537,13 @@ async function processImage(file, options = {}) {
   /*
   ================================================
   КРОП ПО ЦЕНТРУ
-  Если doCrop=true, берём центральную область
+  Если включен, вырезаем центральную область
   ================================================
   */
   if (doCrop && cropMode !== "none") {
     const ratio = getCropRatio(cropMode);
     const crop = getCenteredCrop(image.width, image.height, ratio);
+
     srcX = crop.srcX;
     srcY = crop.srcY;
     srcW = crop.srcW;
@@ -486,8 +553,7 @@ async function processImage(file, options = {}) {
   /*
   ================================================
   RESIZE
-  Если doResize=true, уменьшаем до лимитов
-  Если false — сохраняем размер вырезанной области
+  Если включен, уменьшаем до лимитов
   ================================================
   */
   let targetWidth = srcW;
@@ -504,6 +570,11 @@ async function processImage(file, options = {}) {
     targetHeight = Math.round(srcH * scale);
   }
 
+  /*
+  ================================================
+  Создаём canvas и рисуем туда нужную область
+  ================================================
+  */
   const canvas = document.createElement("canvas");
   canvas.width = targetWidth;
   canvas.height = targetHeight;
@@ -514,19 +585,17 @@ async function processImage(file, options = {}) {
     throw new Error("Canvas context недоступен.");
   }
 
-  /*
-  ================================================
-  Рисуем:
-  srcX/srcY/srcW/srcH — какую область взять из исходника
-  0/0/targetWidth/targetHeight — в какой размер вывести
-  ================================================
-  */
   ctx.drawImage(
     image,
     srcX, srcY, srcW, srcH,
     0, 0, targetWidth, targetHeight
   );
 
+  /*
+  ================================================
+  Конвертируем в нужный формат
+  ================================================
+  */
   const blob = await canvasToBlob(canvas, outputType, quality);
 
   const baseName = file.name.replace(/\.[^/.]+$/, "");
@@ -540,7 +609,7 @@ async function processImage(file, options = {}) {
 
 /*
 ================================
-Пропорции кропа
+Пропорции для кропа
 ================================
 */
 
@@ -575,8 +644,8 @@ function getCenteredCrop(width, height, ratio) {
   let srcY;
 
   /*
-  Если картинка слишком широкая —
-  режем слева и справа поровну
+  Если исходник слишком широкий,
+  режем края слева и справа
   */
   if (currentRatio > ratio) {
     srcH = height;
@@ -585,8 +654,8 @@ function getCenteredCrop(width, height, ratio) {
     srcY = 0;
   }
   /*
-  Если картинка слишком высокая —
-  режем сверху и снизу поровну
+  Если исходник слишком высокий,
+  режем верх и низ
   */
   else {
     srcW = width;
@@ -600,27 +669,43 @@ function getCenteredCrop(width, height, ratio) {
 
 /*
 ================================
-Helpers
+Прочитать файл как dataURL
 ================================
 */
 
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
+
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error("Ошибка чтения файла."));
+
     reader.readAsDataURL(file);
   });
 }
 
+/*
+================================
+Загрузить картинку
+================================
+*/
+
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
+
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error("Ошибка загрузки изображения."));
+
     img.src = src;
   });
 }
+
+/*
+================================
+Canvas -> Blob
+================================
+*/
 
 function canvasToBlob(canvas, type, quality) {
   return new Promise((resolve, reject) => {
@@ -634,23 +719,43 @@ function canvasToBlob(canvas, type, quality) {
   });
 }
 
+/*
+================================
+Получить размеры картинки по object URL
+================================
+*/
+
 function getImageMetaFromObjectUrl(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
+
     img.onload = () => resolve({
       width: img.width,
       height: img.height
     });
+
     img.onerror = () => reject(new Error("Не удалось прочитать размер изображения."));
     img.src = url;
   });
 }
+
+/*
+================================
+Красивый формат размера файла
+================================
+*/
 
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + " B";
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
   return (bytes / 1024 / 1024).toFixed(2) + " MB";
 }
+
+/*
+================================
+Статус
+================================
+*/
 
 function setStatus(text) {
   statusBox.textContent = text;
@@ -660,17 +765,35 @@ function clearStatus() {
   statusBox.textContent = "";
 }
 
+/*
+================================
+Очистить исходник
+================================
+*/
+
 function clearOriginal() {
+  if (originalObjectUrl) {
+    URL.revokeObjectURL(originalObjectUrl);
+    originalObjectUrl = null;
+  }
+
   originalPreview.src = "";
   originalPreview.style.display = "none";
   originalInfo.textContent = "";
 }
+
+/*
+================================
+Сбросить результат
+================================
+*/
 
 function resetResult() {
   if (processedObjectUrl) {
     URL.revokeObjectURL(processedObjectUrl);
     processedObjectUrl = null;
   }
+
   processedFile = null;
   resultPreview.src = "";
   resultPreview.style.display = "none";
@@ -694,9 +817,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-кроп по центру (разные режимы)
-resize с сохранением пропорций
-    с кнопками| v1.2.1
+ кнопка ПРИМЕНИТЬ| v1.2.2
 
   </div>
 
