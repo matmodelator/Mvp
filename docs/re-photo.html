@@ -13,7 +13,6 @@
 
   <link rel="stylesheet"
         href="styles/console.css" />
-    
 
 <style>
 body {
@@ -24,7 +23,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   background: #fff;
   padding: 24px;
@@ -67,11 +66,20 @@ h2, h3 {
   min-width: 130px;
 }
 
-.buttons {
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.left-tools,
+.right-tools {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 12px;
+  align-items: center;
 }
 
 button {
@@ -92,6 +100,10 @@ button:disabled {
   cursor: not-allowed;
 }
 
+button.active {
+  background: #0f766e;
+}
+
 .status {
   margin-top: 14px;
   color: #b91c1c;
@@ -106,7 +118,7 @@ button:disabled {
 }
 
 .panel {
-  flex: 1 1 520px;
+  flex: 1 1 540px;
   background: #fafafa;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -131,17 +143,17 @@ button:disabled {
   white-space: pre-line;
 }
 
-#cropCanvas {
+#editCanvas {
   max-width: 100%;
   display: none;
   background: #ddd;
-  cursor: crosshair;
+  cursor: default;
   touch-action: none;
 }
 
 #resultPreview {
   max-width: 100%;
-  max-height: 700px;
+  max-height: 720px;
   display: none;
 }
 
@@ -150,6 +162,61 @@ button:disabled {
   font-size: 13px;
   color: #555;
   white-space: pre-line;
+}
+
+.color-panel {
+  margin-top: 14px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  display: none;
+}
+
+.color-panel.visible {
+  display: block;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px 18px;
+}
+
+.slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slider-wrap label {
+  font-size: 14px;
+  color: #333;
+}
+
+.slider-wrap input[type="range"] {
+  width: 100%;
+}
+
+.slider-value {
+  font-size: 13px;
+  color: #555;
+}
+
+@media (max-width: 800px) {
+  body {
+    padding: 12px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left-tools,
+  .right-tools {
+    width: 100%;
+  }
 }
 </style>
 </head>
@@ -193,28 +260,63 @@ button:disabled {
       </div>
     </div>
 
-    <div class="buttons">
-      <button id="applyBtn" type="button">Применить</button>
-      <button id="cropBtn" type="button">Кроп</button>
-      <button id="resizeBtn" type="button">Resize</button>
-      <button id="downloadBtn" type="button" disabled>Скачать результат</button>
+    <div class="toolbar">
+      <div class="left-tools">
+        <button id="cropModeBtn" type="button">Кроп</button>
+        <button id="resizeModeBtn" type="button">Resize</button>
+        <button id="colorModeBtn" type="button">Цвет</button>
+      </div>
+
+      <div class="right-tools">
+        <button id="applyBtn" type="button">Применить</button>
+        <button id="downloadBtn" type="button" disabled>Скачать результат</button>
+      </div>
+    </div>
+
+    <div id="colorPanel" class="color-panel">
+      <div class="color-grid">
+        <div class="slider-wrap">
+          <label for="brightnessRange">Яркость</label>
+          <input id="brightnessRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="brightnessValue">0</div>
+        </div>
+
+        <div class="slider-wrap">
+          <label for="saturationRange">Цветность</label>
+          <input id="saturationRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="saturationValue">0</div>
+        </div>
+
+        <div class="slider-wrap">
+          <label for="contrastRange">Контрастность</label>
+          <input id="contrastRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="contrastValue">0</div>
+        </div>
+
+        <div class="slider-wrap">
+          <label for="temperatureRange">Температура</label>
+          <input id="temperatureRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="temperatureValue">0</div>
+        </div>
+      </div>
     </div>
 
     <div class="status" id="status"></div>
 
     <div class="note">
-Кроп: выделяешь прямоугольник мышью или пальцем.
-Resize: ткни в точку — это центр. Колесо мыши или pinch меняют масштаб.
-Применить: берет текущий resize-view и сохраняет результат в webp.
+Кроп: включи кнопку «Кроп» и выделяй прямоугольник.
+Resize: включи кнопку «Resize», кликни в точку — это центр, колесо или pinch меняют масштаб, при увеличении картинку можно тянуть.
+Цвет: включи кнопку «Цвет» и крути ползунки.
+Применить: сохраняет текущий результат в WebP.
     </div>
 
   </div>
 
   <div class="row">
     <div class="panel">
-      <h3>Исходник / управление</h3>
+      <h3>Редактор</h3>
       <div class="preview-box">
-        <canvas id="cropCanvas"></canvas>
+        <canvas id="editCanvas"></canvas>
       </div>
       <div class="info" id="originalInfo"></div>
     </div>
@@ -233,7 +335,7 @@ Resize: ткни в точку — это центр. Колесо мыши ил
 <script>
 /*
 ================================
-ГЛОБАЛЬНОЕ
+ГЛОБАЛЬНОЕ СОСТОЯНИЕ
 ================================
 */
 
@@ -245,22 +347,20 @@ let sourceImage = null;
 let imageNaturalWidth = 0;
 let imageNaturalHeight = 0;
 
-let cropRect = null;
-let isSelecting = false;
-let startX = 0;
-let startY = 0;
+let activeMode = null; // null | crop | resize | color
 
 /*
-  Режимы:
-  crop   = прямоугольное выделение
-  resize = центр + zoom
+  КРОП
 */
-let activeTool = "crop";
+let cropRect = null;
+let isSelectingCrop = false;
+let cropStartX = 0;
+let cropStartY = 0;
 
 /*
-  Resize-view
-  centerX / centerY — центр в координатах ИСХОДНОГО изображения
-  zoom > 1 означает приближение
+  RESIZE VIEW
+  centerX / centerY — центр в координатах исходного изображения
+  zoom = 1 — без приближения
 */
 let resizeView = {
   centerX: 0,
@@ -268,8 +368,24 @@ let resizeView = {
   zoom: 1
 };
 
+let isPanningResize = false;
+let resizePanStartCanvasX = 0;
+let resizePanStartCanvasY = 0;
+let resizePanStartCenterX = 0;
+let resizePanStartCenterY = 0;
+
 let pinchStartDistance = null;
 let pinchStartZoom = 1;
+
+/*
+  ЦВЕТ
+*/
+const colorState = {
+  brightness: 0,
+  saturation: 0,
+  contrast: 0,
+  temperature: 0
+};
 
 /*
 ================================
@@ -278,18 +394,32 @@ DOM
 */
 
 const photoInput = document.getElementById("photoInput");
-const cropMode = document.getElementById("cropMode");
+const cropModeSelect = document.getElementById("cropMode");
 const maxWidthInput = document.getElementById("maxWidth");
 const maxHeightInput = document.getElementById("maxHeight");
 const qualityInput = document.getElementById("quality");
 
+const cropModeBtn = document.getElementById("cropModeBtn");
+const resizeModeBtn = document.getElementById("resizeModeBtn");
+const colorModeBtn = document.getElementById("colorModeBtn");
+
 const applyBtn = document.getElementById("applyBtn");
-const cropBtn = document.getElementById("cropBtn");
-const resizeBtn = document.getElementById("resizeBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 
-const cropCanvas = document.getElementById("cropCanvas");
-const cropCtx = cropCanvas.getContext("2d");
+const colorPanel = document.getElementById("colorPanel");
+
+const brightnessRange = document.getElementById("brightnessRange");
+const saturationRange = document.getElementById("saturationRange");
+const contrastRange = document.getElementById("contrastRange");
+const temperatureRange = document.getElementById("temperatureRange");
+
+const brightnessValue = document.getElementById("brightnessValue");
+const saturationValue = document.getElementById("saturationValue");
+const contrastValue = document.getElementById("contrastValue");
+const temperatureValue = document.getElementById("temperatureValue");
+
+const editCanvas = document.getElementById("editCanvas");
+const editCtx = editCanvas.getContext("2d");
 
 const resultPreview = document.getElementById("resultPreview");
 const originalInfo = document.getElementById("originalInfo");
@@ -321,13 +451,11 @@ photoInput.addEventListener("change", async (event) => {
 
   try {
     await loadOriginalIntoCanvas(originalFile);
-
     setDefaultCrop();
     setDefaultResizeView();
-
-    activeTool = "crop";
-    drawCanvas();
-
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
     setStatus("Фото загружено.");
   } catch (error) {
     setStatus("Ошибка: " + error.message);
@@ -336,75 +464,70 @@ photoInput.addEventListener("change", async (event) => {
 
 /*
 ================================
-КНОПКИ РЕЖИМОВ
+TOGGLE КНОПКИ РЕЖИМОВ
 ================================
 */
 
-cropBtn.addEventListener("click", async () => {
+cropModeBtn.addEventListener("click", () => toggleMode("crop"));
+resizeModeBtn.addEventListener("click", () => toggleMode("resize"));
+colorModeBtn.addEventListener("click", () => toggleMode("color"));
+
+function toggleMode(mode) {
   if (!sourceImage) {
     setStatus("Сначала выбери фото.");
     return;
   }
 
-  if (!cropRect || cropRect.width < 2 || cropRect.height < 2) {
-    setStatus("Сначала выдели область.");
-    return;
+  activeMode = (activeMode === mode) ? null : mode;
+  updateModeUI();
+  drawEditor();
+}
+
+function updateModeUI() {
+  cropModeBtn.classList.toggle("active", activeMode === "crop");
+  resizeModeBtn.classList.toggle("active", activeMode === "resize");
+  colorModeBtn.classList.toggle("active", activeMode === "color");
+
+  colorPanel.classList.toggle("visible", activeMode === "color");
+
+  if (activeMode === "crop") {
+    editCanvas.style.cursor = "crosshair";
+  } else if (activeMode === "resize") {
+    editCanvas.style.cursor = resizeView.zoom > 1 ? "grab" : "pointer";
+  } else {
+    editCanvas.style.cursor = "default";
   }
+}
 
-  try {
-    clearStatus();
+/*
+================================
+ПОЛЗУНКИ ЦВЕТА
+================================
+*/
 
-    processedFile = await cropSelectionToFile(originalFile, {
-      cropRectCanvas: cropRect,
-      canvasWidth: cropCanvas.width,
-      canvasHeight: cropCanvas.height,
-      imageWidth: imageNaturalWidth,
-      imageHeight: imageNaturalHeight,
-      outputType: "image/jpeg",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "jpg"
-    });
-
-    await showResult(processedFile);
-    activeTool = "crop";
-    drawCanvas();
-    setStatus("Кроп выполнен.");
-  } catch (error) {
-    setStatus("Ошибка: " + error.message);
-  }
+[
+  [brightnessRange, brightnessValue, "brightness"],
+  [saturationRange, saturationValue, "saturation"],
+  [contrastRange, contrastValue, "contrast"],
+  [temperatureRange, temperatureValue, "temperature"]
+].forEach(([range, valueBox, key]) => {
+  range.addEventListener("input", () => {
+    colorState[key] = Number(range.value);
+    valueBox.textContent = range.value;
+    if (sourceImage) {
+      drawEditor();
+    }
+  });
 });
 
-resizeBtn.addEventListener("click", async () => {
-  if (!sourceImage) {
-    setStatus("Сначала выбери фото.");
-    return;
-  }
-
-  try {
-    clearStatus();
-
-    processedFile = await resizeViewToFile(originalFile, {
-      view: resizeView,
-      maxWidth: Number(maxWidthInput.value) || 1200,
-      maxHeight: Number(maxHeightInput.value) || 1200,
-      imageWidth: imageNaturalWidth,
-      imageHeight: imageNaturalHeight,
-      outputType: "image/jpeg",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "jpg"
-    });
-
-    await showResult(processedFile);
-    activeTool = "resize";
-    drawCanvas();
-    setStatus("Resize выполнен.");
-  } catch (error) {
-    setStatus("Ошибка: " + error.message);
-  }
-});
+/*
+================================
+КНОПКА ПРИМЕНИТЬ
+================================
+*/
 
 applyBtn.addEventListener("click", async () => {
-  if (!sourceImage) {
+  if (!sourceImage || !originalFile) {
     setStatus("Сначала выбери фото.");
     return;
   }
@@ -412,25 +535,33 @@ applyBtn.addEventListener("click", async () => {
   try {
     clearStatus();
 
-    processedFile = await resizeViewToFile(originalFile, {
-      view: resizeView,
-      maxWidth: Number(maxWidthInput.value) || 1200,
-      maxHeight: Number(maxHeightInput.value) || 1200,
+    processedFile = await buildFinalFile(originalFile, {
+      useCrop: !!cropRect,
+      cropRectCanvas: cropRect,
+      canvasWidth: editCanvas.width,
+      canvasHeight: editCanvas.height,
       imageWidth: imageNaturalWidth,
       imageHeight: imageNaturalHeight,
-      outputType: "image/webp",
-      quality: Number(qualityInput.value) || 0.75,
-      forceOutputExtension: "webp"
+      useResize: resizeView.zoom > 1 || !isResizeDefault(),
+      resizeView,
+      maxWidth: Number(maxWidthInput.value) || 1200,
+      maxHeight: Number(maxHeightInput.value) || 1200,
+      colorState,
+      quality: Number(qualityInput.value) || 0.75
     });
 
     await showResult(processedFile);
-    activeTool = "resize";
-    drawCanvas();
     setStatus("Применено.");
   } catch (error) {
     setStatus("Ошибка: " + error.message);
   }
 });
+
+/*
+================================
+СКАЧАТЬ РЕЗУЛЬТАТ
+================================
+*/
 
 downloadBtn.addEventListener("click", () => {
   if (!processedFile || !processedObjectUrl) {
@@ -460,8 +591,8 @@ async function loadOriginalIntoCanvas(file) {
   imageNaturalWidth = img.width;
   imageNaturalHeight = img.height;
 
-  const maxCanvasWidth = 520;
-  const maxCanvasHeight = 700;
+  const maxCanvasWidth = 540;
+  const maxCanvasHeight = 720;
 
   const scale = Math.min(
     maxCanvasWidth / img.width,
@@ -469,31 +600,31 @@ async function loadOriginalIntoCanvas(file) {
     1
   );
 
-  cropCanvas.width = Math.round(img.width * scale);
-  cropCanvas.height = Math.round(img.height * scale);
-  cropCanvas.style.display = "block";
+  editCanvas.width = Math.round(img.width * scale);
+  editCanvas.height = Math.round(img.height * scale);
+  editCanvas.style.display = "block";
 
   originalInfo.textContent =
     "Имя: " + file.name + "\n" +
     "Тип: " + file.type + "\n" +
     "Размер: " + formatSize(file.size) + "\n" +
     "Разрешение: " + img.width + " × " + img.height + "\n" +
-    "Canvas: " + cropCanvas.width + " × " + cropCanvas.height;
+    "Canvas: " + editCanvas.width + " × " + editCanvas.height;
 }
 
 /*
 ================================
-DEFAULT CROP
+DEFAULT CROP / RESIZE
 ================================
 */
 
 function setDefaultCrop() {
-  const w = Math.round(cropCanvas.width * 0.6);
+  const w = Math.round(editCanvas.width * 0.6);
   const h = getDefaultHeightByMode(w);
 
   cropRect = {
-    x: Math.round((cropCanvas.width - w) / 2),
-    y: Math.round((cropCanvas.height - h) / 2),
+    x: Math.round((editCanvas.width - w) / 2),
+    y: Math.round((editCanvas.height - h) / 2),
     width: w,
     height: h
   };
@@ -503,7 +634,7 @@ function setDefaultCrop() {
 }
 
 function getDefaultHeightByMode(width) {
-  const mode = cropMode.value;
+  const mode = cropModeSelect.value;
 
   if (mode === "square") return width;
   if (mode === "landscape") return Math.round(width * 3 / 4);
@@ -512,88 +643,155 @@ function getDefaultHeightByMode(width) {
   return Math.round(width * 0.7);
 }
 
-/*
-================================
-DEFAULT RESIZE VIEW
-================================
-*/
-
 function setDefaultResizeView() {
   resizeView.centerX = imageNaturalWidth / 2;
   resizeView.centerY = imageNaturalHeight / 2;
   resizeView.zoom = 1;
 }
 
+function isResizeDefault() {
+  return (
+    Math.abs(resizeView.centerX - imageNaturalWidth / 2) < 1 &&
+    Math.abs(resizeView.centerY - imageNaturalHeight / 2) < 1 &&
+    Math.abs(resizeView.zoom - 1) < 0.0001
+  );
+}
+
 /*
 ================================
-DRAW
+DRAW EDITOR
 ================================
 */
 
-function drawCanvas() {
+function drawEditor() {
   if (!sourceImage) return;
 
-  cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+  editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
 
-  if (activeTool === "resize") {
-    drawResizeView();
+  if (activeMode === "resize") {
+    drawResizeEditor();
   } else {
-    drawCropView();
+    drawNormalEditor();
   }
 }
 
-function drawCropView() {
-  cropCtx.drawImage(
+function drawNormalEditor() {
+  editCtx.filter = buildCanvasFilterString(colorState);
+
+  editCtx.drawImage(
     sourceImage,
     0, 0, imageNaturalWidth, imageNaturalHeight,
-    0, 0, cropCanvas.width, cropCanvas.height
+    0, 0, editCanvas.width, editCanvas.height
   );
 
-  if (!cropRect) return;
+  editCtx.filter = "none";
 
-  cropCtx.save();
-  cropCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
-  cropCtx.fillRect(0, 0, cropCanvas.width, cropCanvas.height);
-  cropCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
-  cropCtx.restore();
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
+  }
 
-  cropCtx.save();
-  cropCtx.beginPath();
-  cropCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
-  cropCtx.clip();
-  cropCtx.drawImage(
-    sourceImage,
-    0, 0, imageNaturalWidth, imageNaturalHeight,
-    0, 0, cropCanvas.width, cropCanvas.height
-  );
-  cropCtx.restore();
-
-  cropCtx.strokeStyle = "#2563eb";
-  cropCtx.lineWidth = 2;
-  cropCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  if (activeMode === "crop" && cropRect) {
+    drawCropOverlay();
+  }
 }
 
-function drawResizeView() {
+function drawResizeEditor() {
   const view = getResizeSourceRect();
 
-  cropCtx.drawImage(
+  editCtx.filter = buildCanvasFilterString(colorState);
+
+  editCtx.drawImage(
     sourceImage,
     view.srcX, view.srcY, view.srcW, view.srcH,
-    0, 0, cropCanvas.width, cropCanvas.height
+    0, 0, editCanvas.width, editCanvas.height
   );
 
-  cropCtx.save();
-  cropCtx.strokeStyle = "#2563eb";
-  cropCtx.lineWidth = 2;
-  cropCtx.strokeRect(1, 1, cropCanvas.width - 2, cropCanvas.height - 2);
+  editCtx.filter = "none";
 
-  cropCtx.beginPath();
-  cropCtx.moveTo(cropCanvas.width / 2 - 15, cropCanvas.height / 2);
-  cropCtx.lineTo(cropCanvas.width / 2 + 15, cropCanvas.height / 2);
-  cropCtx.moveTo(cropCanvas.width / 2, cropCanvas.height / 2 - 15);
-  cropCtx.lineTo(cropCanvas.width / 2, cropCanvas.height / 2 + 15);
-  cropCtx.stroke();
-  cropCtx.restore();
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
+  }
+
+  editCtx.save();
+  editCtx.strokeStyle = "#2563eb";
+  editCtx.lineWidth = 2;
+  editCtx.strokeRect(1, 1, editCanvas.width - 2, editCanvas.height - 2);
+
+  editCtx.beginPath();
+  editCtx.moveTo(editCanvas.width / 2 - 16, editCanvas.height / 2);
+  editCtx.lineTo(editCanvas.width / 2 + 16, editCanvas.height / 2);
+  editCtx.moveTo(editCanvas.width / 2, editCanvas.height / 2 - 16);
+  editCtx.lineTo(editCanvas.width / 2, editCanvas.height / 2 + 16);
+  editCtx.stroke();
+  editCtx.restore();
+}
+
+function drawCropOverlay() {
+  editCtx.save();
+  editCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
+  editCtx.fillRect(0, 0, editCanvas.width, editCanvas.height);
+  editCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  editCtx.restore();
+
+  editCtx.filter = buildCanvasFilterString(colorState);
+  editCtx.save();
+  editCtx.beginPath();
+  editCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  editCtx.clip();
+
+  editCtx.drawImage(
+    sourceImage,
+    0, 0, imageNaturalWidth, imageNaturalHeight,
+    0, 0, editCanvas.width, editCanvas.height
+  );
+
+  editCtx.restore();
+  editCtx.filter = "none";
+
+  if (colorState.temperature !== 0) {
+    editCtx.save();
+    editCtx.beginPath();
+    editCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+    editCtx.clip();
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
+    editCtx.restore();
+  }
+
+  editCtx.strokeStyle = "#2563eb";
+  editCtx.lineWidth = 2;
+  editCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+}
+
+/*
+================================
+FILTERS
+================================
+*/
+
+function buildCanvasFilterString(color) {
+  const brightness = 100 + color.brightness;
+  const contrast = 100 + color.contrast;
+  const saturation = 100 + color.saturation;
+
+  return `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+}
+
+function applyTemperatureOverlay(ctx, width, height, temperature) {
+  const t = clamp(temperature, -100, 100);
+
+  ctx.save();
+
+  if (t > 0) {
+    const alpha = t / 250;
+    ctx.fillStyle = `rgba(255, 140, 0, ${alpha})`;
+    ctx.fillRect(0, 0, width, height);
+  } else if (t < 0) {
+    const alpha = Math.abs(t) / 250;
+    ctx.fillStyle = `rgba(0, 140, 255, ${alpha})`;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  ctx.restore();
 }
 
 /*
@@ -608,7 +806,7 @@ function getResizeSourceRect() {
   let srcW = imageNaturalWidth / zoom;
   let srcH = imageNaturalHeight / zoom;
 
-  const canvasRatio = cropCanvas.width / cropCanvas.height;
+  const canvasRatio = editCanvas.width / editCanvas.height;
   const srcRatio = srcW / srcH;
 
   if (srcRatio > canvasRatio) {
@@ -628,93 +826,60 @@ function getResizeSourceRect() {
 
 /*
 ================================
-CROP FILE
+ФИНАЛЬНЫЙ ФАЙЛ
 ================================
 */
 
-async function cropSelectionToFile(file, options = {}) {
+async function buildFinalFile(file, options = {}) {
   const {
+    useCrop,
     cropRectCanvas,
     canvasWidth,
     canvasHeight,
     imageWidth,
     imageHeight,
-    outputType = "image/jpeg",
-    quality = 0.8,
-    forceOutputExtension = "jpg"
-  } = options;
-
-  const dataUrl = await readFileAsDataURL(file);
-  const image = await loadImage(dataUrl);
-
-  const scaleX = imageWidth / canvasWidth;
-  const scaleY = imageHeight / canvasHeight;
-
-  let srcX = Math.round(cropRectCanvas.x * scaleX);
-  let srcY = Math.round(cropRectCanvas.y * scaleY);
-  let srcW = Math.round(cropRectCanvas.width * scaleX);
-  let srcH = Math.round(cropRectCanvas.height * scaleY);
-
-  srcX = Math.max(0, Math.min(srcX, imageWidth - 1));
-  srcY = Math.max(0, Math.min(srcY, imageHeight - 1));
-  srcW = Math.max(1, Math.min(srcW, imageWidth - srcX));
-  srcH = Math.max(1, Math.min(srcH, imageHeight - srcY));
-
-  const outCanvas = document.createElement("canvas");
-  outCanvas.width = srcW;
-  outCanvas.height = srcH;
-
-  const outCtx = outCanvas.getContext("2d");
-  if (!outCtx) throw new Error("Canvas context недоступен.");
-
-  outCtx.drawImage(
-    image,
-    srcX, srcY, srcW, srcH,
-    0, 0, srcW, srcH
-  );
-
-  const blob = await canvasToBlob(outCanvas, outputType, quality);
-  const baseName = file.name.replace(/\.[^/.]+$/, "");
-
-  return new File(
-    [blob],
-    baseName + "." + forceOutputExtension,
-    { type: outputType }
-  );
-}
-
-/*
-================================
-RESIZE FILE
-================================
-*/
-
-async function resizeViewToFile(file, options = {}) {
-  const {
-    view,
+    useResize,
+    resizeView,
     maxWidth = 1200,
     maxHeight = 1200,
-    imageWidth,
-    imageHeight,
-    outputType = "image/webp",
-    quality = 0.8,
-    forceOutputExtension = "webp"
+    colorState,
+    quality = 0.8
   } = options;
 
   const dataUrl = await readFileAsDataURL(file);
   const image = await loadImage(dataUrl);
 
-  const rect = getResizeSourceRect();
+  let srcX = 0;
+  let srcY = 0;
+  let srcW = imageWidth;
+  let srcH = imageHeight;
 
-  let srcX = Math.round(rect.srcX);
-  let srcY = Math.round(rect.srcY);
-  let srcW = Math.round(rect.srcW);
-  let srcH = Math.round(rect.srcH);
+  /*
+    Приоритет такой:
+    если resize реально изменён — берём resize view
+    иначе если есть crop — берём crop
+    иначе — всё фото
+  */
+  if (useResize) {
+    const rect = getResizeSourceRect();
+    srcX = Math.round(rect.srcX);
+    srcY = Math.round(rect.srcY);
+    srcW = Math.round(rect.srcW);
+    srcH = Math.round(rect.srcH);
+  } else if (useCrop && cropRectCanvas) {
+    const scaleX = imageWidth / canvasWidth;
+    const scaleY = imageHeight / canvasHeight;
 
-  srcX = Math.max(0, Math.min(srcX, imageWidth - 1));
-  srcY = Math.max(0, Math.min(srcY, imageHeight - 1));
-  srcW = Math.max(1, Math.min(srcW, imageWidth - srcX));
-  srcH = Math.max(1, Math.min(srcH, imageHeight - srcY));
+    srcX = Math.round(cropRectCanvas.x * scaleX);
+    srcY = Math.round(cropRectCanvas.y * scaleY);
+    srcW = Math.round(cropRectCanvas.width * scaleX);
+    srcH = Math.round(cropRectCanvas.height * scaleY);
+  }
+
+  srcX = clamp(srcX, 0, imageWidth - 1);
+  srcY = clamp(srcY, 0, imageHeight - 1);
+  srcW = clamp(srcW, 1, imageWidth - srcX);
+  srcH = clamp(srcH, 1, imageHeight - srcY);
 
   const scale = Math.min(
     maxWidth / srcW,
@@ -732,19 +897,27 @@ async function resizeViewToFile(file, options = {}) {
   const outCtx = outCanvas.getContext("2d");
   if (!outCtx) throw new Error("Canvas context недоступен.");
 
+  outCtx.filter = buildCanvasFilterString(colorState);
+
   outCtx.drawImage(
     image,
     srcX, srcY, srcW, srcH,
     0, 0, targetWidth, targetHeight
   );
 
-  const blob = await canvasToBlob(outCanvas, outputType, quality);
+  outCtx.filter = "none";
+
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(outCtx, targetWidth, targetHeight, colorState.temperature);
+  }
+
+  const blob = await canvasToBlob(outCanvas, "image/webp", quality);
   const baseName = file.name.replace(/\.[^/.]+$/, "");
 
   return new File(
     [blob],
-    baseName + "." + forceOutputExtension,
-    { type: outputType }
+    baseName + ".webp",
+    { type: "image/webp" }
   );
 }
 
@@ -785,15 +958,14 @@ CROP POINTER
 ================================
 */
 
-cropCanvas.addEventListener("mousedown", (event) => {
-  if (!sourceImage) return;
-  if (activeTool !== "crop") return;
+editCanvas.addEventListener("mousedown", (event) => {
+  if (!sourceImage || activeMode !== "crop") return;
 
   const pos = getMousePosOnCanvas(event);
 
-  isSelecting = true;
-  startX = pos.x;
-  startY = pos.y;
+  isSelectingCrop = true;
+  cropStartX = pos.x;
+  cropStartY = pos.y;
 
   cropRect = {
     x: pos.x,
@@ -802,168 +974,208 @@ cropCanvas.addEventListener("mousedown", (event) => {
     height: 0
   };
 
-  drawCanvas();
+  drawEditor();
 });
 
-cropCanvas.addEventListener("mousemove", (event) => {
+editCanvas.addEventListener("mousemove", (event) => {
   if (!sourceImage) return;
-  if (activeTool !== "crop") return;
-  if (!isSelecting) return;
 
-  const pos = getMousePosOnCanvas(event);
-  updateCropByCurrentPoint(pos.x, pos.y);
-  drawCanvas();
+  if (activeMode === "crop" && isSelectingCrop) {
+    const pos = getMousePosOnCanvas(event);
+    updateCropByCurrentPoint(pos.x, pos.y);
+    drawEditor();
+  }
+
+  if (activeMode === "resize" && isPanningResize) {
+    const pos = getMousePosOnCanvas(event);
+    panResizeView(pos.x, pos.y);
+    drawEditor();
+  }
 });
 
 window.addEventListener("mouseup", () => {
-  if (activeTool !== "crop") return;
-  if (!isSelecting) return;
+  if (activeMode === "crop" && isSelectingCrop) {
+    isSelectingCrop = false;
+    normalizeCropRect();
+    clampCropRectToCanvas();
+    drawEditor();
+  }
 
-  isSelecting = false;
-  normalizeCropRect();
-  clampCropRectToCanvas();
-  drawCanvas();
+  if (activeMode === "resize" && isPanningResize) {
+    isPanningResize = false;
+    updateModeUI();
+  }
 });
 
 /*
 ================================
-CROP TOUCH
+RESIZE POINTER
 ================================
 */
 
-cropCanvas.addEventListener("touchstart", (event) => {
-  if (!sourceImage) return;
-  if (activeTool !== "crop") return;
-  if (event.touches.length !== 1) return;
+editCanvas.addEventListener("click", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
+  if (isPanningResize) return;
+
+  const pos = getMousePosOnCanvas(event);
+  setResizeCenterFromCanvasPoint(pos.x, pos.y);
+  drawEditor();
+});
+
+editCanvas.addEventListener("mousedown", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
+  if (resizeView.zoom <= 1) return;
+
+  const pos = getMousePosOnCanvas(event);
+
+  isPanningResize = true;
+  resizePanStartCanvasX = pos.x;
+  resizePanStartCanvasY = pos.y;
+  resizePanStartCenterX = resizeView.centerX;
+  resizePanStartCenterY = resizeView.centerY;
+
+  editCanvas.style.cursor = "grabbing";
+});
+
+editCanvas.addEventListener("wheel", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
 
   event.preventDefault();
 
-  const pos = getTouchPosOnCanvas(event);
+  const delta = event.deltaY < 0 ? 1.12 : 0.89;
+  resizeView.zoom = clamp(resizeView.zoom * delta, 1, 20);
 
-  isSelecting = true;
-  startX = pos.x;
-  startY = pos.y;
-
-  cropRect = {
-    x: pos.x,
-    y: pos.y,
-    width: 0,
-    height: 0
-  };
-
-  drawCanvas();
+  updateModeUI();
+  drawEditor();
 }, { passive: false });
 
-cropCanvas.addEventListener("touchmove", (event) => {
+/*
+================================
+TOUCH
+================================
+*/
+
+editCanvas.addEventListener("touchstart", (event) => {
   if (!sourceImage) return;
 
-  if (activeTool === "crop") {
-    if (!isSelecting || event.touches.length !== 1) return;
+  if (activeMode === "crop") {
+    if (event.touches.length !== 1) return;
+
+    event.preventDefault();
+
+    const pos = getTouchPosOnCanvas(event);
+
+    isSelectingCrop = true;
+    cropStartX = pos.x;
+    cropStartY = pos.y;
+
+    cropRect = {
+      x: pos.x,
+      y: pos.y,
+      width: 0,
+      height: 0
+    };
+
+    drawEditor();
+    return;
+  }
+
+  if (activeMode === "resize") {
+    if (event.touches.length === 1) {
+      event.preventDefault();
+
+      const pos = getTouchPosOnCanvas(event);
+      setResizeCenterFromCanvasPoint(pos.x, pos.y);
+
+      if (resizeView.zoom > 1) {
+        isPanningResize = true;
+        resizePanStartCanvasX = pos.x;
+        resizePanStartCanvasY = pos.y;
+        resizePanStartCenterX = resizeView.centerX;
+        resizePanStartCenterY = resizeView.centerY;
+      }
+
+      drawEditor();
+    }
+
+    if (event.touches.length === 2) {
+      event.preventDefault();
+      pinchStartDistance = getTouchDistance(event);
+      pinchStartZoom = resizeView.zoom;
+    }
+  }
+}, { passive: false });
+
+editCanvas.addEventListener("touchmove", (event) => {
+  if (!sourceImage) return;
+
+  if (activeMode === "crop") {
+    if (!isSelectingCrop || event.touches.length !== 1) return;
 
     event.preventDefault();
 
     const pos = getTouchPosOnCanvas(event);
     updateCropByCurrentPoint(pos.x, pos.y);
-    drawCanvas();
+    drawEditor();
     return;
   }
 
-  if (activeTool === "resize" && event.touches.length === 2) {
-    event.preventDefault();
+  if (activeMode === "resize") {
+    if (event.touches.length === 1 && isPanningResize && resizeView.zoom > 1) {
+      event.preventDefault();
 
-    const distance = getTouchDistance(event);
-    if (pinchStartDistance === null) return;
+      const pos = getTouchPosOnCanvas(event);
+      panResizeView(pos.x, pos.y);
+      drawEditor();
+      return;
+    }
 
-    const ratio = distance / pinchStartDistance;
-    resizeView.zoom = clamp(resizeView.zoom = pinchStartZoom * ratio, 1, 20);
-    drawCanvas();
+    if (event.touches.length === 2 && pinchStartDistance !== null) {
+      event.preventDefault();
+
+      const distance = getTouchDistance(event);
+      const ratio = distance / pinchStartDistance;
+      resizeView.zoom = clamp(pinchStartZoom * ratio, 1, 20);
+
+      updateModeUI();
+      drawEditor();
+    }
   }
 }, { passive: false });
 
 window.addEventListener("touchend", (event) => {
-  if (activeTool === "crop" && isSelecting) {
-    isSelecting = false;
+  if (activeMode === "crop" && isSelectingCrop) {
+    isSelectingCrop = false;
     normalizeCropRect();
     clampCropRectToCanvas();
-    drawCanvas();
+    drawEditor();
   }
 
-  if (activeTool === "resize") {
-    if (event.touches && event.touches.length < 2) {
+  if (activeMode === "resize") {
+    if (!event.touches || event.touches.length < 2) {
       pinchStartDistance = null;
+    }
+
+    if (!event.touches || event.touches.length === 0) {
+      isPanningResize = false;
+      updateModeUI();
     }
   }
 }, { passive: false });
 
 /*
 ================================
-RESIZE CLICK CENTER
-================================
-*/
-
-cropCanvas.addEventListener("click", (event) => {
-  if (!sourceImage) return;
-  if (activeTool !== "resize") return;
-
-  const pos = getMousePosOnCanvas(event);
-  setResizeCenterFromCanvasPoint(pos.x, pos.y);
-  drawCanvas();
-});
-
-/*
-================================
-RESIZE WHEEL
-================================
-*/
-
-cropCanvas.addEventListener("wheel", (event) => {
-  if (!sourceImage) return;
-  if (activeTool !== "resize") return;
-
-  event.preventDefault();
-
-  const delta = event.deltaY < 0 ? 1.1 : 0.9;
-  resizeView.zoom = clamp(resizeView.zoom * delta, 1, 20);
-  drawCanvas();
-}, { passive: false });
-
-/*
-================================
-RESIZE PINCH START
-================================
-*/
-
-cropCanvas.addEventListener("touchstart", (event) => {
-  if (!sourceImage) return;
-  if (activeTool !== "resize") return;
-
-  if (event.touches.length === 1) {
-    event.preventDefault();
-    const pos = getTouchPosOnCanvas(event);
-    setResizeCenterFromCanvasPoint(pos.x, pos.y);
-    drawCanvas();
-  }
-
-  if (event.touches.length === 2) {
-    event.preventDefault();
-    pinchStartDistance = getTouchDistance(event);
-    pinchStartZoom = resizeView.zoom;
-  }
-}, { passive: false });
-
-/*
-================================
-HELPERS FOR CROP
+HELPERS CROP
 ================================
 */
 
 function updateCropByCurrentPoint(currentX, currentY) {
-  let x = startX;
-  let y = startY;
-  let width = currentX - startX;
-  let height = currentY - startY;
+  let x = cropStartX;
+  let y = cropStartY;
+  let width = currentX - cropStartX;
+  let height = currentY - cropStartY;
 
-  const mode = cropMode.value;
+  const mode = cropModeSelect.value;
 
   if (mode !== "free") {
     const ratio = getCropRatio(mode);
@@ -1009,12 +1221,12 @@ function clampCropRectToCanvas() {
     cropRect.y = 0;
   }
 
-  if (cropRect.x + cropRect.width > cropCanvas.width) {
-    cropRect.width = cropCanvas.width - cropRect.x;
+  if (cropRect.x + cropRect.width > editCanvas.width) {
+    cropRect.width = editCanvas.width - cropRect.x;
   }
 
-  if (cropRect.y + cropRect.height > cropCanvas.height) {
-    cropRect.height = cropCanvas.height - cropRect.y;
+  if (cropRect.y + cropRect.height > editCanvas.height) {
+    cropRect.height = editCanvas.height - cropRect.y;
   }
 
   cropRect.width = Math.max(1, cropRect.width);
@@ -1023,15 +1235,15 @@ function clampCropRectToCanvas() {
 
 /*
 ================================
-HELPERS FOR RESIZE
+HELPERS RESIZE
 ================================
 */
 
 function setResizeCenterFromCanvasPoint(canvasX, canvasY) {
   const rect = getResizeSourceRect();
 
-  const relX = canvasX / cropCanvas.width;
-  const relY = canvasY / cropCanvas.height;
+  const relX = canvasX / editCanvas.width;
+  const relY = canvasY / editCanvas.height;
 
   resizeView.centerX = rect.srcX + rect.srcW * relX;
   resizeView.centerY = rect.srcY + rect.srcH * relY;
@@ -1040,9 +1252,27 @@ function setResizeCenterFromCanvasPoint(canvasX, canvasY) {
   resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
 }
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
+function panResizeView(currentCanvasX, currentCanvasY) {
+  const rect = getResizeSourceRect();
+
+  const dxCanvas = currentCanvasX - resizePanStartCanvasX;
+  const dyCanvas = currentCanvasY - resizePanStartCanvasY;
+
+  const imagePerCanvasX = rect.srcW / editCanvas.width;
+  const imagePerCanvasY = rect.srcH / editCanvas.height;
+
+  resizeView.centerX = resizePanStartCenterX - dxCanvas * imagePerCanvasX;
+  resizeView.centerY = resizePanStartCenterY - dyCanvas * imagePerCanvasY;
+
+  resizeView.centerX = clamp(resizeView.centerX, 0, imageNaturalWidth);
+  resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
 }
+
+/*
+================================
+COMMON HELPERS
+================================
+*/
 
 function getCropRatio(mode) {
   if (mode === "square") return 1 / 1;
@@ -1052,9 +1282,9 @@ function getCropRatio(mode) {
 }
 
 function getMousePosOnCanvas(event) {
-  const rect = cropCanvas.getBoundingClientRect();
-  const scaleX = cropCanvas.width / rect.width;
-  const scaleY = cropCanvas.height / rect.height;
+  const rect = editCanvas.getBoundingClientRect();
+  const scaleX = editCanvas.width / rect.width;
+  const scaleY = editCanvas.height / rect.height;
 
   return {
     x: Math.round((event.clientX - rect.left) * scaleX),
@@ -1064,9 +1294,9 @@ function getMousePosOnCanvas(event) {
 
 function getTouchPosOnCanvas(event) {
   const touch = event.touches[0] || event.changedTouches[0];
-  const rect = cropCanvas.getBoundingClientRect();
-  const scaleX = cropCanvas.width / rect.width;
-  const scaleY = cropCanvas.height / rect.height;
+  const rect = editCanvas.getBoundingClientRect();
+  const scaleX = editCanvas.width / rect.width;
+  const scaleY = editCanvas.height / rect.height;
 
   return {
     x: Math.round((touch.clientX - rect.left) * scaleX),
@@ -1082,11 +1312,9 @@ function getTouchDistance(event) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/*
-================================
-COMMON HELPERS
-================================
-*/
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
@@ -1142,8 +1370,8 @@ function clearStatus() {
 }
 
 function clearCanvas() {
-  cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
-  cropCanvas.style.display = "none";
+  editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+  editCanvas.style.display = "none";
   sourceImage = null;
   cropRect = null;
 }
@@ -1176,7 +1404,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-РеСайз| v1.2.4
+Цвет| v1.3.0
 
   </div>
 
