@@ -1,88 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 
-<head>  
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Профиль - теннис, падель</title>
+<head>
 
-  <!-- СТИЛЬ КОНСОЛИ -->
+<meta charset="UTF-8" />
 
-  <link rel="stylesheet"
-        href="styles/console.css" />
-  
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0; 
-    }
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0" />
 
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 16px;
-      text-align: center;
-    }
+<title>Профиль - теннис, падель</title>
 
-    .container {
-      max-width: 500px;
-      margin: 40px auto;
-      background: white;
-      padding: 24px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+<link rel="stylesheet"
+      href="styles/console.css" />
 
-    h2 {
-      text-align: center;
-      margin-top: 0;
-    }
+<style>
 
-    input, select, textarea, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+}
 
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
+header {
+  background: #2563eb;
+  color: white;
+  padding: 16px;
+  text-align: center;
+}
 
-    button {
-      border: none;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-    }
+.container {
+  max-width: 500px;
+  margin: 40px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
-    button:hover {
-      background: #1d4ed8;
-    }
+h2 {
+  text-align: center;
+  margin-top: 0;
+}
 
-    .msg {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 14px;
-    }
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
 
-    .error {
-      color: #b91c1c;
-    }
+button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
 
-    .success {
-      color: #15803d;
-    }
+button:hover {
+  background: #1d4ed8;
+}
 
-    
-/* ========================= */
-/* LOGO BOTTOM */
-/* ========================= */
+.msg {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.success {
+  color: #15803d;
+}
+
+/* LOGO */
 
 .logo-bottom {
   width: 100%;
@@ -96,276 +93,335 @@
   width: auto;
   opacity: 0.9;
 }
-    
-  </style>
-  
+
+</style>
+
 </head>
+
 <body>
-  <header>
-    <h1>Tennis App MVP</h1>
-  </header>
 
-  <div class="container">
-    <h2>Изменить профиль</h2>
+<header>
+<h1>Tennis App MVP</h1>
+</header>
 
-    <form id="profileForm">
+<div class="container">
 
-      <select id="game">
-        <select id="game">
-  <option value="tennis_padel">tennis + padel</option>
-  <option value="tennis">tennis</option>
-  <option value="padel">padel</option>
+<h2>Изменить профиль</h2>
+
+<form id="profileForm">
+
+<label>Game</label>
+
+<select id="game" required>
+
+<option value=""
+        disabled
+        selected
+        hidden>
+
+choose game
+
+</option>
+
+<option value="both">
+tennis + padel
+</option>
+
+<option value="tennis">
+tennis
+</option>
+
+<option value="padel">
+padel
+</option>
+
 </select>
-      </select>
 
-      <input id="nickname" type="text" placeholder="nickname" required />
+<input id="nickname"
+       type="text"
+       placeholder="nickname"
+       required />
 
-      <input id="country" type="text" placeholder="country" />
+<input id="country"
+       type="text"
+       placeholder="country" />
 
-      <input id="city" type="text" placeholder="city" />
+<input id="city"
+       type="text"
+       placeholder="city" />
 
-      <select id="level">
-       
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-      </select>
+<label>Level</label>
 
-      <select id="experience">
-        <option value="">beginner</option>
-        <option value="less_1_year">Less than 1 year</option>
-        <option value="1_3_years">1–3 years</option>
-        <option value="3_5_years">3–5 years</option>
-        <option value="5_plus_years">5+ years</option>
-      </select>
+<select id="level" required>
 
-      <input id="events" type="text" placeholder="events" />
+<option value=""
+        disabled
+        selected
+        hidden>
+choose level
+</option>
 
-      <button type="submit">Сохранить профиль</button>
+<option value="10">10 — Beginner</option>
+<option value="9">9 — Rookie</option>
+<option value="8">8 — Amateur</option>
+<option value="7">7 — Advanced</option>
+<option value="6">6 — Skilled</option>
+<option value="5">5 — Medium</option>
+<option value="4">4 — Strong</option>
+<option value="3">3 — Expert</option>
+<option value="2">2 — Master</option>
+<option value="1">1 — Profi</option>
 
-    </form>
+</select>
 
-    <div id="message" class="msg"></div>
-  </div>
+<label>Experience</label>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+<select id="experience" required>
 
-    const supabase = createClient(
-      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+<option value=""
+        disabled
+        selected
+        hidden>
+choose experience
+</option>
+
+<option value="less_1_year">
+Less than 1 year
+</option>
+
+<option value="1_3_years">
+1–3 years
+</option>
+
+<option value="3_5_years">
+3–5 years
+</option>
+
+<option value="5_plus_years">
+5+ years
+</option>
+
+</select>
+
+<input id="events"
+       type="text"
+       placeholder="events" />
+
+<button type="submit">
+Сохранить профиль
+</button>
+
+</form>
+
+<div id="message"
+     class="msg">
+</div>
+
+</div>
+
+<script type="module">
+
+import { createClient }
+from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase =
+  createClient(
+    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+  )
+
+const form =
+  document.getElementById('profileForm')
+
+const message =
+  document.getElementById('message')
+
+function showMessage(text, type = '') {
+
+  message.textContent = text
+  message.className = `msg ${type}`
+
+}
+
+async function loadProfile() {
+
+  const {
+    data: { user }
+  } =
+    await supabase
+      .auth
+      .getUser()
+
+  if (!user) {
+
+    window.location.href =
+      'log.html'
+
+    return
+
+  }
+
+  const {
+    data
+  } =
+    await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle()
+
+  if (!data) return
+
+  game.value =
+    data.game || ''
+
+  nickname.value =
+    data.nickname || ''
+
+  country.value =
+    data.country || ''
+
+  city.value =
+    data.city || ''
+
+  level.value =
+    data.level || ''
+
+  experience.value =
+    data.experience || ''
+
+  events.value =
+    data.events || ''
+
+}
+
+form.addEventListener(
+  'submit',
+  async function (event) {
+
+    event.preventDefault()
+
+    const {
+      data: { user }
+    } =
+      await supabase
+        .auth
+        .getUser()
+
+    if (!user) return
+
+    const payload = {
+
+      id:
+        user.id,
+
+      game:
+        game.value,
+
+      nickname:
+        nickname.value.trim(),
+
+      country:
+        country.value.trim(),
+
+      city:
+        city.value.trim(),
+
+      level:
+        Number(level.value),
+
+      experience:
+        experience.value,
+
+      events:
+        events.value.trim(),
+
+      updated_at:
+        new Date()
+          .toISOString()
+
+    }
+
+    const { error } =
+      await supabase
+        .from('profiles')
+        .upsert(
+          payload,
+          {
+            onConflict: 'id'
+          }
+        )
+
+    if (error) {
+
+      showMessage(
+        error.message,
+        'error'
+      )
+
+      return
+
+    }
+
+    showMessage(
+      'Профиль сохранен',
+      'success'
     )
 
-    const form = document.getElementById('profileForm')
-    const message = document.getElementById('message')
+  }
 
-    function showMessage(text, type = '') {
-      message.textContent = text
-      message.className = `msg ${type}`
-    }
+)
 
-   
-   // ЗАГРУЗКА ПРОФИЛЯ 
-    async function loadProfile() {
+loadProfile()
 
-      // получаем пользователя
+</script>
 
-      const { data: userData } =
-        await supabase.auth.getUser()
-
-      const user = userData.user
-
-      // если не вошел — отправляем на логин
-
-      if (!user) {
-        window.location.href = 'log.html'
-        return
-      }
-
-      // читаем профиль
-
-      const { data: profile, error } =
-        await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-
-      if (error) {
-        console.log(error.message)
-        return
-      }
-
-      // если профиль есть — просто подставляем данные
-
-      if (profile) {
-
-        document.getElementById('game').value =
-          profile.game || ''
-
-        document.getElementById('nickname').value =
-          profile.nickname || ''
-
-        document.getElementById('country').value =
-          profile.country || ''
-
-        document.getElementById('city').value =
-          profile.city || ''
-
-        document.getElementById('level').value =
-          profile.level || ''
-
-        document.getElementById('experience').value =
-          profile.experience || ''
-
-        document.getElementById('events').value =
-          profile.events || ''
-      }
-
-    }
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault()
-
-      const { data: userData } = await supabase.auth.getUser()
-      const user = userData.user
-
-      if (!user) {
-        showMessage('Сессия не найдена. Войди заново.', 'error')
-        return
-      }
-
-      const game =
-        document.getElementById('game').value
-
-      const nickname =
-        document.getElementById('nickname').value.trim()
-
-      const country =
-        document.getElementById('country').value.trim()
-
-      const city =
-        document.getElementById('city').value.trim()
-
-      const levelValue =
-        document.getElementById('level').value
-
-      const level =
-        levelValue ? Number(levelValue) : null
-
-      const experience =
-        document.getElementById('experience').value
-
-      const events =
-        document.getElementById('events').value.trim()
-
-      const { error } =
-        await supabase
-          .from('profiles')
-          .update({
-            game,
-            nickname,
-            country,
-            city,
-            level,
-            experience,
-            events
-          })
-          .eq('id', user.id)
-
-      if (error) {
-        showMessage(error.message, 'error')
-        return
-      }
-
-      showMessage('Профиль сохранен', 'success')
-    })
-
-    loadProfile()
-
-/* ========================= */
-/* LOGO */
-/* ========================= */
-    
-  </script>
-
-  <div class="logo-bottom">
-  <img src="images/logo.svg" alt="MVP logo">
+<div class="logo-bottom">
+<img src="images/logo.svg"
+     alt="MVP logo">
 </div>
-  
-
 
 <!-- ========================================
      SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
 ======================================== -->
 
 <div id="service-console">
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-  2 games  | v1.1.2
+  forms/save | v1.1.3
 
   </div>
 
   <div class="row" id="build-down">
 
-    deploy: --
+  deploy: --
 
   </div>
 
 </div>
 
-<!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
-======================================== -->
-
 <script>
 
 (function () {
 
-  /* Текущая дата и время */
+  const now = new Date()
 
-  const now = new Date();
-
-  /* Добавляет ведущий ноль */
-
-  const pad = n =>
-    String(n).padStart(2, '0');
-
-  /* Формат даты */
+  const pad =
+    n => String(n)
+      .padStart(2, '0')
 
   const date =
       pad(now.getDate())
     + '.'
     + pad(now.getMonth() + 1)
     + '.'
-    + now.getFullYear();
-
-  /* Формат времени */
+    + now.getFullYear()
 
   const time =
       pad(now.getHours())
     + ':'
-    + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
+    + pad(now.getMinutes())
 
   document
     .getElementById('build-down')
@@ -373,10 +429,11 @@
       'deploy: '
       + date
       + ' '
-      + time;
+      + time
 
 })();
 
 </script>
+
 </body>
 </html>
