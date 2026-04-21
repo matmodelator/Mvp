@@ -3,433 +3,597 @@
 
 <head>
 
-<meta charset="UTF-8" />
+  <meta charset="UTF-8" />
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
 
-<title>Профиль - теннис, падель</title>
+  <title>Профиль - теннис, падель</title>
 
-<link rel="stylesheet"
-      href="styles/console.css" />
+  <!-- СТИЛЬ КОНСОЛИ -->
+  <link rel="stylesheet"
+        href="styles/console.css" />
 
-<style>
+  <style>
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  margin: 0;
-}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
 
-header {
-  background: #2563eb;
-  color: white;
-  padding: 16px;
-  text-align: center;
-}
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
 
-.container {
-  max-width: 500px;
-  margin: 40px auto;
-  background: white;
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-h2 {
-  text-align: center;
-  margin-top: 0;
-}
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
 
-input,
-select,
-textarea,
-button {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
 
-button {
-  border: none;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
-}
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
 
-button:hover {
-  background: #1d4ed8;
-}
+    button:hover {
+      background: #1d4ed8;
+    }
 
-.msg {
-  margin-top: 14px;
-  text-align: center;
-}
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
 
-.error {
-  color: #b91c1c;
-}
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
 
-.success {
-  color: #15803d;
-}
+    .error {
+      color: #b91c1c;
+    }
 
-/* LOGO */
+    .success {
+      color: #15803d;
+    }
 
-.logo-bottom {
-  width: 100%;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
+    /* ========================= */
+    /* LOGO BOTTOM */
+    /* ========================= */
 
-.logo-bottom img {
-  height: 60px;
-  width: auto;
-  opacity: 0.9;
-}
+    .logo-bottom {
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
 
-</style>
+    .logo-bottom img {
+      height: 60px;
+      width: auto;
+      opacity: 0.9;
+    }
+
+  </style>
 
 </head>
 
 <body>
 
-<header>
-<h1>Tennis App MVP</h1>
-</header>
+  <header>
+    <h1>Tennis App MVP</h1>
+  </header>
 
-<div class="container">
+  <div class="container">
 
-<h2>Изменить профиль</h2>
+    <h2>Изменить профиль</h2>
 
-<form id="profileForm">
+    <form id="profileForm">
 
-<label>Game</label>
-<select id="game" required>
-  <option value="" disabled selected hidden>
-    choose game
-  </option>
-  <option value="both">tennis + padel</option>
-  <option value="tennis">tennis</option>
-  <option value="padel">padel</option>
-</select>
+      <!-- ========================= -->
+      <!-- GAME -->
+      <!-- ========================= -->
 
-<label>Events</label>
-<select id="events" required>
-  <option value="" disabled selected hidden>
-    choose events
-  </option>
-  <option value="both">singles + doubles</option>
-  <option value="singles">singles</option>
-  <option value="doubles">doubles</option>
-</select>
+      <label for="game">Game</label>
 
-<input id="nickname"
-       type="text"
-       placeholder="nickname"
-       required />
+      <select id="game" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose game
+        </option>
 
-<input id="country"
-       type="text"
-       placeholder="country" />
+        <option value="both">
+          tennis + padel
+        </option>
 
-<input id="city"
-       type="text"
-       placeholder="city" />
+        <option value="tennis">
+          tennis
+        </option>
 
-<label>Level</label>
-<select id="level" required>
-  <option value="" disabled selected hidden>
-    choose level
-  </option>
-  <option value="10">10 — Beginner</option>
-  <option value="9">9 — Rookie</option>
-  <option value="8">8 — Amateur</option>
-  <option value="7">7 — Advanced</option>
-  <option value="6">6 — Skilled</option>
-  <option value="5">5 — Medium</option>
-  <option value="4">4 — Strong</option>
-  <option value="3">3 — Expert</option>
-  <option value="2">2 — Master</option>
-  <option value="1">1 — Profi</option>
-</select>
+        <option value="padel">
+          padel
+        </option>
+      </select>
 
-<label>Experience</label>
-<select id="experience" required>
-  <option value="" disabled selected hidden>
-    choose experience
-  </option>
-  <option value="less_1_year">
-    Less than 1 year
-  </option>
-  <option value="1_3_years">
-    1–3 years
-  </option>
-  <option value="3_5_years">
-    3–5 years
-  </option>
-  <option value="5_plus_years">
-    5+ years
-  </option>
-</select>
+      <!-- ========================= -->
+      <!-- EVENTS -->
+      <!-- ========================= -->
 
-<label>Photo slot</label>
-<select id="photoSlot">
-  <option value="0">0 — avatar</option>
-  <option value="1">1 — base</option>
-  <option value="2">2 — base</option>
-  <option value="3">3 — base</option>
-  <option value="4">4 — advanced</option>
-  <option value="5">5 — advanced</option>
-  <option value="6">6 — advanced</option>
-  <option value="7">7 — private</option>
-  <option value="8">8 — private</option>
-  <option value="9">9 — private</option>
-  <option value="10">10 — bonus</option>
-</select>
+      <label for="events">Events</label>
 
-<button type="button" onclick="goRePhoto()">
-  Go to re-photo
-</button>
-      
-<button type="submit">
-Сохранить профиль
-</button>
+      <select id="events" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose events
+        </option>
 
-</form>
+        <option value="both">
+          singles + doubles
+        </option>
 
-<div id="message"
-     class="msg">
-</div>
+        <option value="singles">
+          singles
+        </option>
 
-</div>
+        <option value="doubles">
+          doubles
+        </option>
+      </select>
 
-<script type="module">
+      <!-- ========================= -->
+      <!-- NICKNAME -->
+      <!-- ========================= -->
 
-import { createClient }
-from 'https://esm.sh/@supabase/supabase-js@2'
+      <input id="nickname"
+             type="text"
+             placeholder="nickname"
+             required />
 
-const supabase =
-  createClient(
-    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-  )
+      <!-- ========================= -->
+      <!-- COUNTRY -->
+      <!-- ========================= -->
 
-const form =
-  document.getElementById('profileForm')
+      <input id="country"
+             type="text"
+             placeholder="country" />
 
-const message =
-  document.getElementById('message')
+      <!-- ========================= -->
+      <!-- CITY -->
+      <!-- ========================= -->
 
-const game =
-  document.getElementById('game')
+      <input id="city"
+             type="text"
+             placeholder="city" />
 
-const events =
-  document.getElementById('events')
+      <!-- ========================= -->
+      <!-- LEVEL -->
+      <!-- ========================= -->
 
-const nickname =
-  document.getElementById('nickname')
+      <label for="level">Level</label>
 
-const country =
-  document.getElementById('country')
+      <select id="level" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose level
+        </option>
 
-const city =
-  document.getElementById('city')
+        <option value="10">10 — Beginner</option>
+        <option value="9">9 — Rookie</option>
+        <option value="8">8 — Amateur</option>
+        <option value="7">7 — Advanced</option>
+        <option value="6">6 — Skilled</option>
+        <option value="5">5 — Medium</option>
+        <option value="4">4 — Strong</option>
+        <option value="3">3 — Expert</option>
+        <option value="2">2 — Master</option>
+        <option value="1">1 — Profi</option>
+      </select>
 
-const level =
-  document.getElementById('level')
+      <!-- ========================= -->
+      <!-- EXPERIENCE -->
+      <!-- ========================= -->
 
-const experience =
-  document.getElementById('experience')
+      <label for="experience">Experience</label>
 
-function showMessage(text, type = '') {
-  message.textContent = text
-  message.className = `msg ${type}`
-}
+      <select id="experience" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose experience
+        </option>
 
-async function loadProfile() {
+        <option value="less_1_year">
+          Less than 1 year
+        </option>
 
-  const {
-    data: { user }
-  } =
-    await supabase
-      .auth
-      .getUser()
+        <option value="1_3_years">
+          1–3 years
+        </option>
 
-  if (!user) {
-    window.location.href = 'log.html'
-    return
-  }
+        <option value="3_5_years">
+          3–5 years
+        </option>
 
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle()
+        <option value="5_plus_years">
+          5+ years
+        </option>
+      </select>
 
-  if (error) {
-    showMessage(error.message, 'error')
-    return
-  }
+      <!-- ========================= -->
+      <!-- BUTTONS -->
+      <!-- ========================= -->
 
-  if (!data) return
+      <button type="submit">
+        Сохранить профиль
+      </button>
 
-  game.value =
-    data.game || ''
+      <button type="button"
+              id="photoButton"
+              onclick="goPhotoEditor()"
+              disabled>
+        Редактировать фото
+      </button>
 
-  events.value =
-    data.events || ''
+    </form>
 
-  nickname.value =
-    data.nickname || ''
+    <div id="message"
+         class="msg"></div>
 
-  country.value =
-    data.country || ''
+  </div>
 
-  city.value =
-    data.city || ''
+  <script type="module">
 
-  level.value =
-    data.level || ''
+    import { createClient }
+    from 'https://esm.sh/@supabase/supabase-js@2'
 
-  experience.value =
-    data.experience || ''
-}
+    const supabase =
+      createClient(
+        'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+        'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+      )
 
-form.addEventListener(
-  'submit',
-  async function (event) {
+    /* ========================================
+       ЭЛЕМЕНТЫ СТРАНИЦЫ
+    ======================================== */
 
-    event.preventDefault()
+    const form =
+      document.getElementById('profileForm')
 
-    const {
-      data: { user }
-    } =
-      await supabase
-        .auth
-        .getUser()
+    const message =
+      document.getElementById('message')
 
-    if (!user) {
-      showMessage('Сессия не найдена', 'error')
-      return
+    const photoButton =
+      document.getElementById('photoButton')
+
+    const game =
+      document.getElementById('game')
+
+    const events =
+      document.getElementById('events')
+
+    const nickname =
+      document.getElementById('nickname')
+
+    const country =
+      document.getElementById('country')
+
+    const city =
+      document.getElementById('city')
+
+    const level =
+      document.getElementById('level')
+
+    const experience =
+      document.getElementById('experience')
+
+    /* ========================================
+       СООБЩЕНИЕ
+    ======================================== */
+
+    function showMessage(text, type = '') {
+
+      message.textContent = text
+      message.className = `msg ${type}`
+
     }
 
-    const payload = {
-      id: user.id,
-      game: game.value,
-      events: events.value,
-      nickname: nickname.value.trim(),
-      country: country.value.trim(),
-      city: city.value.trim(),
-      level: Number(level.value),
-      experience: experience.value,
-      updated_at: new Date().toISOString()
+    /* ========================================
+       РАЗБЛОКИРОВАТЬ КНОПКУ ФОТО
+    ======================================== */
+
+    function enablePhotoButton() {
+
+      photoButton.disabled = false
+
     }
 
-    const { error } =
-      await supabase
-        .from('profiles')
-        .upsert(
-          payload,
-          {
-            onConflict: 'id'
-          }
+    /* ========================================
+       ПЕРЕХОД НА СТРАНИЦУ ФОТО
+       СЛОТЫ ВЫБИРАЮТСЯ УЖЕ ТАМ
+    ======================================== */
+
+    function goPhotoEditor() {
+
+      window.location.href = 'gallery.html'
+
+    }
+
+    window.goPhotoEditor =
+      goPhotoEditor
+
+    /* ========================================
+       ЗАГРУЗКА ПРОФИЛЯ
+    ======================================== */
+
+    async function loadProfile() {
+
+      const {
+        data: { user },
+        error: userError
+      } =
+        await supabase.auth.getUser()
+
+      if (userError || !user) {
+
+        window.location.href = 'log.html'
+        return
+
+      }
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          'error'
         )
 
-    if (error) {
-      showMessage(error.message, 'error')
-      return
+        return
+
+      }
+
+      /* если профиль уже есть —
+         подставляем данные
+         и разрешаем переход к фото */
+
+      if (data) {
+
+        game.value =
+          data.game || ''
+
+        events.value =
+          data.events || ''
+
+        nickname.value =
+          data.nickname || ''
+
+        country.value =
+          data.country || ''
+
+        city.value =
+          data.city || ''
+
+        level.value =
+          data.level || ''
+
+        experience.value =
+          data.experience || ''
+
+        enablePhotoButton()
+
+      }
+
     }
 
-    showMessage('Профиль сохранен', 'success')
-  }
-)
+    /* ========================================
+       СОХРАНЕНИЕ ПРОФИЛЯ
+    ======================================== */
 
-      
-function goRePhoto() {
-  const slot =
-    document.getElementById('photoSlot').value
+    form.addEventListener(
+      'submit',
+      async function (event) {
 
-  localStorage.setItem(
-    'mvp_photo_slot',
-    slot
-  )
+        event.preventDefault()
 
-  localStorage.setItem(
-    'mvp_photo_return',
-    'pro-tennis.html'
-  )
+        const {
+          data: { user },
+          error: userError
+        } =
+          await supabase.auth.getUser()
 
-  window.location.href =
-    `re-photo.html?slot=${encodeURIComponent(slot)}&from=pro-tennis`
-}
+        if (userError || !user) {
 
-window.goRePhoto = goRePhoto
-      
-loadProfile()
+          showMessage(
+            'Сессия не найдена',
+            'error'
+          )
 
-</script>
+          return
 
-<div class="logo-bottom">
-<img src="images/logo.svg"
-     alt="MVP logo">
-</div>
+        }
 
-<div id="service-console">
+        const payload = {
+          id: user.id,
+          game: game.value,
+          events: events.value,
+          nickname: nickname.value.trim(),
+          country: country.value.trim(),
+          city: city.value.trim(),
+          level: Number(level.value),
+          experience: experience.value,
+          updated_at: new Date().toISOString()
+        }
 
-  <div class="row" id="build-top">
-   go to re-photo | v1.1.6
+        const { error } =
+          await supabase
+            .from('profiles')
+            .upsert(
+              payload,
+              {
+                onConflict: 'id'
+              }
+            )
+
+        if (error) {
+
+          showMessage(
+            error.message,
+            'error'
+          )
+
+          return
+
+        }
+
+        showMessage(
+          'Профиль сохранен. Теперь можно перейти к фото.',
+          'success'
+        )
+
+        /* после успешного сохранения
+           открываем доступ к фото */
+
+        enablePhotoButton()
+
+      }
+    )
+
+    /* ========================================
+       СТАРТ
+    ======================================== */
+
+    loadProfile()
+
+  </script>
+
+  <div class="logo-bottom">
+    <img src="images/logo.svg"
+         alt="MVP logo">
   </div>
 
-  <div class="row" id="build-down">
-    deploy: --
+  <!-- ========================================
+       SERVICE CONSOLE
+       Верхняя строка редактируется вручную
+       Здесь задается:
+       - название страницы
+       - номер версии
+  ======================================== -->
+
+  <div id="service-console">
+
+    <div class="row" id="build-top">
+
+      сначала сохраняется профиль
+потом становится доступна кнопка Редактировать фото
+слотов в этой форме нет
+слоты должны быть уже на gallery.html
+комментарии возвращены в твоем стиле | v1.1.7
+
+    </div>
+
+    <div class="row" id="build-down">
+
+      deploy: --
+
+    </div>
+
   </div>
 
-</div>
+  <!-- ========================================
+       SCRIPT
+       Автоматически выводит:
+       - дату
+       - время
+       Момент загрузки страницы
+  ======================================== -->
 
-<script>
+  <script>
 
-(function () {
+    (function () {
 
-  const now = new Date()
+      /* Текущая дата и время */
 
-  const pad =
-    n => String(n)
-      .padStart(2, '0')
+      const now = new Date()
 
-  const date =
-      pad(now.getDate())
-    + '.'
-    + pad(now.getMonth() + 1)
-    + '.'
-    + now.getFullYear()
+      /* Добавляет ведущий ноль */
 
-  const time =
-      pad(now.getHours())
-    + ':'
-    + pad(now.getMinutes())
+      const pad = n =>
+        String(n).padStart(2, '0')
 
-  document
-    .getElementById('build-down')
-    .textContent =
-      'deploy: '
-      + date
-      + ' '
-      + time
+      /* Формат даты */
 
-})();
+      const date =
+          pad(now.getDate())
+        + '.'
+        + pad(now.getMonth() + 1)
+        + '.'
+        + now.getFullYear()
 
-</script>
+      /* Формат времени */
+
+      const time =
+          pad(now.getHours())
+        + ':'
+        + pad(now.getMinutes())
+
+      /* Вывод в нижнюю строку */
+
+      document
+        .getElementById('build-down')
+        .textContent =
+          'deploy: '
+          + date
+          + ' '
+          + time
+
+    })();
+
+  </script>
 
 </body>
 </html>
