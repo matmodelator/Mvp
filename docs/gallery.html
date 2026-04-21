@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,11 +6,10 @@
         content="width=device-width, initial-scale=1.0" />
   <title>Gallery</title>
 
-<!-- СТИЛЬ КОНСОЛИ -->
-
+  <!-- СТИЛЬ КОНСОЛИ -->
   <link rel="stylesheet"
         href="styles/console.css" />
-  
+
   <style>
     * {
       box-sizing: border-box;
@@ -32,36 +30,35 @@
     }
 
     .page {
-      max-width: 1100px;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 16px;
     }
 
     .topbar {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      align-items: center;
+      margin-bottom: 16px;
     }
 
     .topbar-left,
     .topbar-right {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      align-items: center;
     }
 
     button {
       border: none;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       background: #2563eb;
       color: white;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     button:hover {
@@ -84,60 +81,75 @@
       background: #b91c1c;
     }
 
+    button.rephoto {
+      background: #7c3aed;
+    }
+
+    button.rephoto:hover {
+      background: #6d28d9;
+    }
+
     .status-box {
       background: white;
       border-radius: 12px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-      line-height: 1.5;
+      margin-bottom: 16px;
+      line-height: 1.45;
       white-space: pre-line;
+      font-size: 13px;
     }
 
     .section {
-      margin-bottom: 28px;
+      margin-bottom: 18px;
       background: white;
       border-radius: 14px;
-      padding: 18px;
+      padding: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
     }
 
     .section h2 {
-      margin: 0 0 14px 0;
-      font-size: 20px;
+      margin: 0 0 12px 0;
+      font-size: 18px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
     }
 
     .slot {
       border: 1px solid #d1d5db;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
       background: #fafafa;
+    }
+
+    .slot.avatar-slot {
+      border: 2px solid #93c5fd;
+      background: #f8fbff;
     }
 
     .slot-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
       gap: 8px;
+      margin-bottom: 8px;
     }
 
     .slot-title {
       font-weight: 700;
-      font-size: 15px;
+      font-size: 13px;
+      line-height: 1.2;
     }
 
     .slot-number {
-      font-size: 12px;
+      font-size: 11px;
       color: #6b7280;
       background: #e5e7eb;
-      padding: 4px 8px;
+      padding: 3px 7px;
       border-radius: 999px;
       white-space: nowrap;
     }
@@ -146,12 +158,12 @@
       width: 100%;
       aspect-ratio: 1 / 1;
       background: #e5e7eb;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       position: relative;
     }
 
@@ -164,30 +176,38 @@
 
     .empty-text {
       color: #6b7280;
-      font-size: 14px;
+      font-size: 12px;
       text-align: center;
-      padding: 10px;
+      padding: 8px;
     }
 
     .slot-actions {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .slot-actions input[type="file"] {
       width: 100%;
-      font-size: 13px;
+      font-size: 12px;
+      padding: 6px;
+      margin-top: 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: white;
     }
 
     .slot-actions button {
       width: 100%;
+      padding: 8px 10px;
+      font-size: 12px;
     }
 
     .private-note {
-      margin-top: 10px;
-      font-size: 12px;
+      margin-top: 8px;
+      font-size: 11px;
       color: #6b7280;
+      text-align: center;
     }
 
     .loading {
@@ -199,13 +219,30 @@
       display: none !important;
     }
 
+    .logo-bottom {
+      width: 100%;
+      text-align: center;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    .logo-bottom img {
+      height: 56px;
+      width: auto;
+      opacity: 0.9;
+    }
+
     @media (max-width: 640px) {
       .page {
-        padding: 14px;
+        padding: 12px;
       }
 
       .section {
-        padding: 14px;
+        padding: 12px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
@@ -217,6 +254,10 @@
   </header>
 
   <div class="page">
+
+    <!-- ========================================
+         ВЕРХНЯЯ ПАНЕЛЬ
+    ======================================== -->
 
     <div class="topbar">
       <div class="topbar-left">
@@ -238,24 +279,36 @@
       </div>
     </div>
 
+    <!-- ========================================
+         СТАТУС
+    ======================================== -->
+
     <div id="statusBox" class="status-box">
       Проверяем сессию...
     </div>
 
-    <!-- AVATAR -->
+    <!-- ========================================
+         AVATAR
+    ======================================== -->
+
     <div class="section">
       <h2>Avatar</h2>
 
       <div class="grid">
-        <div class="slot" id="slot-0">
+        <div class="slot avatar-slot" id="slot-0">
+
           <div class="slot-top">
             <div class="slot-title">Avatar</div>
             <div class="slot-number">0</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-0" class="hidden" alt="photo 0" />
-            <div id="empty-0" class="empty-text">
+            <img id="photo-0"
+                 class="hidden"
+                 alt="photo 0" />
+
+            <div id="empty-0"
+                 class="empty-text">
               Нет фото
             </div>
           </div>
@@ -266,29 +319,44 @@
                    accept="image/*"
                    onchange="uploadPhoto(0, this)" />
 
+            <button class="rephoto"
+                    onclick="goRePhoto(0)">
+              Re-photo
+            </button>
+
             <button class="danger"
                     onclick="deletePhoto(0)">
               Delete
             </button>
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- BASE -->
+    <!-- ========================================
+         BASE
+    ======================================== -->
+
     <div class="section">
       <h2>Base</h2>
 
       <div class="grid">
+
         <div class="slot" id="slot-1">
           <div class="slot-top">
-            <div class="slot-title">Base 1</div>
+            <div class="slot-title">Base</div>
             <div class="slot-number">1</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-1" class="hidden" alt="photo 1" />
-            <div id="empty-1" class="empty-text">Нет фото</div>
+            <img id="photo-1"
+                 class="hidden"
+                 alt="photo 1" />
+            <div id="empty-1"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -296,7 +364,14 @@
                    id="input-1"
                    accept="image/*"
                    onchange="uploadPhoto(1, this)" />
-            <button class="danger" onclick="deletePhoto(1)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(1)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(1)">
               Delete
             </button>
           </div>
@@ -304,13 +379,18 @@
 
         <div class="slot" id="slot-2">
           <div class="slot-top">
-            <div class="slot-title">Base 2</div>
+            <div class="slot-title">Base</div>
             <div class="slot-number">2</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-2" class="hidden" alt="photo 2" />
-            <div id="empty-2" class="empty-text">Нет фото</div>
+            <img id="photo-2"
+                 class="hidden"
+                 alt="photo 2" />
+            <div id="empty-2"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -318,7 +398,14 @@
                    id="input-2"
                    accept="image/*"
                    onchange="uploadPhoto(2, this)" />
-            <button class="danger" onclick="deletePhoto(2)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(2)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(2)">
               Delete
             </button>
           </div>
@@ -326,13 +413,18 @@
 
         <div class="slot" id="slot-3">
           <div class="slot-top">
-            <div class="slot-title">Base 3</div>
+            <div class="slot-title">Base</div>
             <div class="slot-number">3</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-3" class="hidden" alt="photo 3" />
-            <div id="empty-3" class="empty-text">Нет фото</div>
+            <img id="photo-3"
+                 class="hidden"
+                 alt="photo 3" />
+            <div id="empty-3"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -340,28 +432,45 @@
                    id="input-3"
                    accept="image/*"
                    onchange="uploadPhoto(3, this)" />
-            <button class="danger" onclick="deletePhoto(3)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(3)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(3)">
               Delete
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- ADVANCED -->
+    <!-- ========================================
+         ADVANCED
+    ======================================== -->
+
     <div class="section">
       <h2>Advanced</h2>
 
       <div class="grid">
+
         <div class="slot" id="slot-4">
           <div class="slot-top">
-            <div class="slot-title">Advanced 4</div>
+            <div class="slot-title">Advanced</div>
             <div class="slot-number">4</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-4" class="hidden" alt="photo 4" />
-            <div id="empty-4" class="empty-text">Нет фото</div>
+            <img id="photo-4"
+                 class="hidden"
+                 alt="photo 4" />
+            <div id="empty-4"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -369,7 +478,14 @@
                    id="input-4"
                    accept="image/*"
                    onchange="uploadPhoto(4, this)" />
-            <button class="danger" onclick="deletePhoto(4)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(4)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(4)">
               Delete
             </button>
           </div>
@@ -377,13 +493,18 @@
 
         <div class="slot" id="slot-5">
           <div class="slot-top">
-            <div class="slot-title">Advanced 5</div>
+            <div class="slot-title">Advanced</div>
             <div class="slot-number">5</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-5" class="hidden" alt="photo 5" />
-            <div id="empty-5" class="empty-text">Нет фото</div>
+            <img id="photo-5"
+                 class="hidden"
+                 alt="photo 5" />
+            <div id="empty-5"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -391,7 +512,14 @@
                    id="input-5"
                    accept="image/*"
                    onchange="uploadPhoto(5, this)" />
-            <button class="danger" onclick="deletePhoto(5)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(5)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(5)">
               Delete
             </button>
           </div>
@@ -399,13 +527,18 @@
 
         <div class="slot" id="slot-6">
           <div class="slot-top">
-            <div class="slot-title">Advanced 6</div>
+            <div class="slot-title">Advanced</div>
             <div class="slot-number">6</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-6" class="hidden" alt="photo 6" />
-            <div id="empty-6" class="empty-text">Нет фото</div>
+            <img id="photo-6"
+                 class="hidden"
+                 alt="photo 6" />
+            <div id="empty-6"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -413,28 +546,45 @@
                    id="input-6"
                    accept="image/*"
                    onchange="uploadPhoto(6, this)" />
-            <button class="danger" onclick="deletePhoto(6)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(6)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(6)">
               Delete
             </button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- PRIVATE -->
+    <!-- ========================================
+         PRIVATE
+    ======================================== -->
+
     <div class="section">
       <h2>Private</h2>
 
       <div class="grid">
+
         <div class="slot" id="slot-7">
           <div class="slot-top">
-            <div class="slot-title">Private 7</div>
+            <div class="slot-title">Private</div>
             <div class="slot-number">7</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-7" class="hidden" alt="photo 7" />
-            <div id="empty-7" class="empty-text">Нет фото</div>
+            <img id="photo-7"
+                 class="hidden"
+                 alt="photo 7" />
+            <div id="empty-7"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -442,7 +592,14 @@
                    id="input-7"
                    accept="image/*"
                    onchange="uploadPhoto(7, this)" />
-            <button class="danger" onclick="deletePhoto(7)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(7)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(7)">
               Delete
             </button>
           </div>
@@ -454,13 +611,18 @@
 
         <div class="slot" id="slot-8">
           <div class="slot-top">
-            <div class="slot-title">Private 8</div>
+            <div class="slot-title">Private</div>
             <div class="slot-number">8</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-8" class="hidden" alt="photo 8" />
-            <div id="empty-8" class="empty-text">Нет фото</div>
+            <img id="photo-8"
+                 class="hidden"
+                 alt="photo 8" />
+            <div id="empty-8"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -468,7 +630,14 @@
                    id="input-8"
                    accept="image/*"
                    onchange="uploadPhoto(8, this)" />
-            <button class="danger" onclick="deletePhoto(8)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(8)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(8)">
               Delete
             </button>
           </div>
@@ -480,13 +649,18 @@
 
         <div class="slot" id="slot-9">
           <div class="slot-top">
-            <div class="slot-title">Private 9</div>
+            <div class="slot-title">Private</div>
             <div class="slot-number">9</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-9" class="hidden" alt="photo 9" />
-            <div id="empty-9" class="empty-text">Нет фото</div>
+            <img id="photo-9"
+                 class="hidden"
+                 alt="photo 9" />
+            <div id="empty-9"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -494,7 +668,14 @@
                    id="input-9"
                    accept="image/*"
                    onchange="uploadPhoto(9, this)" />
-            <button class="danger" onclick="deletePhoto(9)">
+
+            <button class="rephoto"
+                    onclick="goRePhoto(9)">
+              Re-photo
+            </button>
+
+            <button class="danger"
+                    onclick="deletePhoto(9)">
               Delete
             </button>
           </div>
@@ -503,23 +684,33 @@
             private
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- BONUS -->
+    <!-- ========================================
+         BONUS
+    ======================================== -->
+
     <div class="section">
       <h2>Bonus</h2>
 
       <div class="grid">
         <div class="slot" id="slot-10">
+
           <div class="slot-top">
             <div class="slot-title">Bonus</div>
             <div class="slot-number">10</div>
           </div>
 
           <div class="preview-wrap">
-            <img id="photo-10" class="hidden" alt="photo 10" />
-            <div id="empty-10" class="empty-text">Нет фото</div>
+            <img id="photo-10"
+                 class="hidden"
+                 alt="photo 10" />
+            <div id="empty-10"
+                 class="empty-text">
+              Нет фото
+            </div>
           </div>
 
           <div class="slot-actions">
@@ -527,55 +718,82 @@
                    id="input-10"
                    accept="image/*"
                    onchange="uploadPhoto(10, this)" />
+
+            <button class="rephoto"
+                    onclick="goRePhoto(10)">
+              Re-photo
+            </button>
+
             <button class="danger"
                     onclick="deletePhoto(10)">
               Delete
             </button>
           </div>
+
         </div>
       </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- LOGO BOTTOM -->
+    <!-- ========================= -->
+
+    <div class="logo-bottom">
+      <img src="images/logo.svg" alt="MVP logo">
     </div>
 
   </div>
 
   <script type="module">
+
+    /* ========================================
+       ПОДКЛЮЧЕНИЕ SUPABASE
+    ======================================== */
+
     import { createClient }
     from 'https://esm.sh/@supabase/supabase-js@2'
 
-    const SUPABASE_URL =
-      'https://YOUR-PROJECT.supabase.co'
+    const supabase = createClient(
+      'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+      'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
+    )
 
-    const SUPABASE_ANON_KEY =
-      'YOUR_ANON_KEY'
-
-    const supabase =
-      createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      )
+    /* ========================================
+       НАСТРОЙКИ
+    ======================================== */
 
     const BUCKET_NAME = 'photos'
 
     let currentUser = null
 
+    /* ========================================
+       СТАТУС
+    ======================================== */
+
     function setStatus(text) {
       document.getElementById('statusBox').textContent = text
     }
 
+    /* ========================================
+       СОСТОЯНИЕ СЛОТА
+    ======================================== */
+
     function setSlotLoading(number, isLoading) {
+
       const slot =
         document.getElementById(`slot-${number}`)
 
       if (!slot) return
 
-      if (isLoading) {
-        slot.classList.add('loading')
-      } else {
-        slot.classList.remove('loading')
-      }
+      slot.classList.toggle('loading', isLoading)
     }
 
+    /* ========================================
+       ПОКАЗАТЬ ФОТО
+    ======================================== */
+
     function showPhoto(number, url) {
+
       const img =
         document.getElementById(`photo-${number}`)
 
@@ -595,34 +813,55 @@
       }
     }
 
+    /* ========================================
+       ОЧИСТИТЬ ВСЕ ФОТО
+    ======================================== */
+
     function clearAllPhotos() {
       for (let i = 0; i <= 10; i++) {
         showPhoto(i, '')
       }
     }
 
-    function getFilePath(userId, number, file) {
-      const ext =
-        (file.name.split('.').pop() || 'jpg')
-          .toLowerCase()
+    /* ========================================
+       ПРОВЕРКА СЕССИИ
+    ======================================== */
 
-      return `${userId}/${number}.${ext}`
-    }
+    async function ensureSession() {
 
-    async function checkSession() {
       setStatus('Проверяем сессию...')
+
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      if (sessionError) {
+        setStatus(
+          'Ошибка сессии:\n' +
+          sessionError.message
+        )
+        return false
+      }
+
+      const sessionUser =
+        sessionData?.session?.user || null
+
+      if (sessionUser) {
+        currentUser = sessionUser
+        setStatus(
+          `User: ${sessionUser.email || 'no email'}\n` +
+          `ID: ${sessionUser.id}`
+        )
+        return true
+      }
 
       const {
         data: { user },
-        error
+        error: userError
       } = await supabase.auth.getUser()
 
-      if (error || !user) {
+      if (userError || !user) {
         currentUser = null
-        setStatus(
-          'Пользователь не найден.\nСначала войди в аккаунт.'
-        )
-        clearAllPhotos()
+        window.location.href = 'log.html'
         return false
       }
 
@@ -636,8 +875,13 @@
       return true
     }
 
+    /* ========================================
+       СОЗДАНИЕ ПУСТЫХ СЛОТОВ
+    ======================================== */
+
     async function fillEmptySlots() {
-      const ok = await checkSession()
+
+      const ok = await ensureSession()
 
       if (!ok) return
 
@@ -655,7 +899,7 @@
 
       const { error } =
         await supabase
-          .from('profile_photos')
+          .from('gallery')
           .upsert(
             rows,
             {
@@ -680,8 +924,13 @@
       await loadGallery()
     }
 
+    /* ========================================
+       ЗАГРУЗКА GALLERY
+    ======================================== */
+
     async function loadGallery() {
-      const ok = await checkSession()
+
+      const ok = await ensureSession()
 
       if (!ok) return
 
@@ -691,7 +940,7 @@
 
       const { data, error } =
         await supabase
-          .from('profile_photos')
+          .from('gallery')
           .select('photo_number, photo_url')
           .eq('user_id', currentUser.id)
           .order('photo_number', { ascending: true })
@@ -702,10 +951,6 @@
           error.message
         )
         return
-      }
-
-      for (let i = 0; i <= 10; i++) {
-        showPhoto(i, '')
       }
 
       if (data && data.length) {
@@ -724,23 +969,36 @@
       )
     }
 
+    /* ========================================
+       ПУТЬ ФАЙЛА В STORAGE
+    ======================================== */
+
+    function getFilePath(userId, number, file) {
+
+      const ext =
+        (file.name.split('.').pop() || 'jpg')
+          .toLowerCase()
+
+      return `${userId}/${number}.${ext}`
+    }
+
+    /* ========================================
+       ЗАГРУЗКА ФОТО
+    ======================================== */
+
     async function uploadPhoto(number, input) {
-      const ok = await checkSession()
+
+      const ok = await ensureSession()
 
       if (!ok) return
 
-      const file = input.files?.[0]
+      const file =
+        input.files?.[0]
 
       if (!file) return
 
       if (!file.type.startsWith('image/')) {
         setStatus('Можно загружать только image/*')
-        input.value = ''
-        return
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        setStatus('Файл слишком большой. Максимум 10MB')
         input.value = ''
         return
       }
@@ -771,9 +1029,8 @@
         return
       }
 
-      const {
-        data: publicData
-      } = supabase
+      const { data: publicData } =
+        supabase
           .storage
           .from(BUCKET_NAME)
           .getPublicUrl(filePath)
@@ -783,7 +1040,7 @@
 
       const { error: dbError } =
         await supabase
-          .from('profile_photos')
+          .from('gallery')
           .upsert(
             {
               user_id: currentUser.id,
@@ -808,6 +1065,7 @@
       showPhoto(number, publicUrl)
 
       setSlotLoading(number, false)
+
       setStatus(
         `User: ${currentUser.email || 'no email'}\n` +
         `ID: ${currentUser.id}\n` +
@@ -817,55 +1075,22 @@
       input.value = ''
     }
 
+    /* ========================================
+       УДАЛЕНИЕ ФОТО
+    ======================================== */
+
     async function deletePhoto(number) {
-      const ok = await checkSession()
+
+      const ok = await ensureSession()
 
       if (!ok) return
 
       setSlotLoading(number, true)
       setStatus(`Удаляю фото ${number}...`)
 
-      const { data: row, error: rowError } =
+      const { error } =
         await supabase
-          .from('profile_photos')
-          .select('photo_url')
-          .eq('user_id', currentUser.id)
-          .eq('photo_number', number)
-          .maybeSingle()
-
-      if (rowError) {
-        setSlotLoading(number, false)
-        setStatus(
-          `Ошибка чтения слота ${number}:\n` +
-          rowError.message
-        )
-        return
-      }
-
-      if (row?.photo_url) {
-        try {
-          const url = new URL(row.photo_url)
-          const marker = `/storage/v1/object/public/${BUCKET_NAME}/`
-          const idx = url.pathname.indexOf(marker)
-
-          if (idx !== -1) {
-            const filePath =
-              decodeURIComponent(
-                url.pathname.slice(idx + marker.length)
-              )
-
-            await supabase
-              .storage
-              .from(BUCKET_NAME)
-              .remove([filePath])
-          }
-        } catch (e) {
-        }
-      }
-
-      const { error: dbError } =
-        await supabase
-          .from('profile_photos')
+          .from('gallery')
           .upsert(
             {
               user_id: currentUser.id,
@@ -877,18 +1102,18 @@
             }
           )
 
-      if (dbError) {
+      if (error) {
         setSlotLoading(number, false)
         setStatus(
           `Ошибка очистки слота ${number}:\n` +
-          dbError.message
+          error.message
         )
         return
       }
 
       showPhoto(number, '')
-
       setSlotLoading(number, false)
+
       setStatus(
         `User: ${currentUser.email || 'no email'}\n` +
         `ID: ${currentUser.id}\n` +
@@ -896,96 +1121,127 @@
       )
     }
 
+    /* ========================================
+       ПЕРЕХОД В RE-PHOTO
+    ======================================== */
+
+    function goRePhoto(number) {
+
+      localStorage.setItem(
+        'mvp_photo_slot',
+        String(number)
+      )
+
+      localStorage.setItem(
+        'mvp_photo_return',
+        'gallery.html'
+      )
+
+      window.location.href =
+        `re-photo.html?slot=${encodeURIComponent(number)}&from=gallery`
+    }
+
+    /* ========================================
+       НАЗАД
+    ======================================== */
+
     function goBack() {
       window.history.back()
     }
+
+    /* ========================================
+       ЭКСПОРТ В WINDOW
+    ======================================== */
 
     window.loadGallery = loadGallery
     window.uploadPhoto = uploadPhoto
     window.deletePhoto = deletePhoto
     window.fillEmptySlots = fillEmptySlots
     window.goBack = goBack
+    window.goRePhoto = goRePhoto
+
+    /* ========================================
+       СТАРТ
+    ======================================== */
 
     loadGallery()
+
   </script>
- 
-<!-- ========================================
-     SERVICE CONSOLE
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
-======================================== -->
 
-<div id="service-console">
+  <!-- ========================================
+       SERVICE CONSOLE
+       Верхняя строка редактируется вручную
+       Здесь задается:
+       - название страницы
+       - номер версии
+  ======================================== -->
 
-  <div class="row" id="build-top">
+  <div id="service-console">
 
-    <!-- ВВОД ВРУЧНУЮ -->
+    <div class="row" id="build-top">
 
-    start | v1.0.0
+      slots & account | v1.0.1
+
+    </div>
+
+    <div class="row" id="build-down">
+
+      deploy: --
+
+    </div>
 
   </div>
 
-  <div class="row" id="build-down">
+  <!-- ========================================
+       SCRIPT
+       Автоматически выводит:
+       - дату
+       - время
+       Момент загрузки страницы
+  ======================================== -->
 
-    deploy: --
+  <script>
 
-  </div>
+    (function () {
 
-</div>
+      /* Текущая дата и время */
 
-<!-- ========================================
-     SCRIPT
-     Автоматически выводит:
-     - дату
-     - время
-     Момент загрузки страницы
-======================================== -->
+      const now = new Date();
 
-<script>
+      /* Добавляет ведущий ноль */
 
-(function () {
+      const pad = n =>
+        String(n).padStart(2, '0');
 
-  /* Текущая дата и время */
+      /* Формат даты */
 
-  const now = new Date();
+      const date =
+          pad(now.getDate())
+        + '.'
+        + pad(now.getMonth() + 1)
+        + '.'
+        + now.getFullYear();
 
-  /* Добавляет ведущий ноль */
+      /* Формат времени */
 
-  const pad = n =>
-    String(n).padStart(2, '0');
+      const time =
+          pad(now.getHours())
+        + ':'
+        + pad(now.getMinutes());
 
-  /* Формат даты */
+      /* Вывод в нижнюю строку */
 
-  const date =
-      pad(now.getDate())
-    + '.'
-    + pad(now.getMonth() + 1)
-    + '.'
-    + now.getFullYear();
+      document
+        .getElementById('build-down')
+        .textContent =
+          'deploy: '
+          + date
+          + ' '
+          + time;
 
-  /* Формат времени */
+    })();
 
-  const time =
-      pad(now.getHours())
-    + ':'
-    + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
-
-  document
-    .getElementById('build-down')
-    .textContent =
-      'deploy: '
-      + date
-      + ' '
-      + time;
-
-})();
-
-</script>
-
+  </script>
 
 </body>
-</html>  
+</html>
