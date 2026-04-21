@@ -179,6 +179,25 @@ button:hover {
   </option>
 </select>
 
+<label>Photo slot</label>
+<select id="photoSlot">
+  <option value="0">0 — avatar</option>
+  <option value="1">1 — base</option>
+  <option value="2">2 — base</option>
+  <option value="3">3 — base</option>
+  <option value="4">4 — advanced</option>
+  <option value="5">5 — advanced</option>
+  <option value="6">6 — advanced</option>
+  <option value="7">7 — private</option>
+  <option value="8">8 — private</option>
+  <option value="9">9 — private</option>
+  <option value="10">10 — bonus</option>
+</select>
+
+<button type="button" onclick="goRePhoto()">
+  Go to re-photo
+</button>
+      
 <button type="submit">
 Сохранить профиль
 </button>
@@ -336,6 +355,27 @@ form.addEventListener(
   }
 )
 
+      
+function goRePhoto() {
+  const slot =
+    document.getElementById('photoSlot').value
+
+  localStorage.setItem(
+    'mvp_photo_slot',
+    slot
+  )
+
+  localStorage.setItem(
+    'mvp_photo_return',
+    'pro-tennis.html'
+  )
+
+  window.location.href =
+    `re-photo.html?slot=${encodeURIComponent(slot)}&from=pro-tennis`
+}
+
+window.goRePhoto = goRePhoto
+      
 loadProfile()
 
 </script>
@@ -348,7 +388,7 @@ loadProfile()
 <div id="service-console">
 
   <div class="row" id="build-top">
-   fix events | v1.1.5
+   go to re-photo | v1.1.6
   </div>
 
   <div class="row" id="build-down">
