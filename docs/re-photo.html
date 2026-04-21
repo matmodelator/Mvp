@@ -753,7 +753,7 @@ colorModeBtn.addEventListener("click", () => toggleMode("color"));
 
 function toggleMode(mode) {
   if (!sourceImage) {
-    setStatus(first, select a photo");
+    setStatus("first, select a photo");
     return;
   }
 
@@ -2048,6 +2048,11 @@ function setStatus(text) {
 
 function clearStatus() {
   statusBox.textContent = "";
+  statusBox.classList.remove(
+    "status-ok",
+    "status-error",
+    "status-warn"
+  );
 }
 
 function clearCanvas() {
@@ -2071,65 +2076,6 @@ function resetResult() {
 }
 </script>
 
-<!-- ========================================
-     СЕРВИСНАЯ КОНСОЛЬ
-     Верхняя строка редактируется вручную
-     Здесь задается:
-     - название страницы
-     - номер версии
-======================================== -->
-
-<div id="service-console">
-
-  <div class="row" id="build-top">
-    <!-- ВВОД ВРУЧНУЮ -->
-    <span class="warn">Avatar button</span>
-    <span class="ok"> | v1.6.0</span>
-  </div>
-
-  <div class="row" id="build-down">
-    <span class="warn">deploy:</span>
-    <span class="ok"> --</span>
-  </div>
-
-</div>
-
-<!-- ========================================
-     СКРИПТ ДЛЯ ДАТЫ И ВРЕМЕНИ
-======================================== -->
-
-<script>
-(function () {
-
-  /* Текущая дата и время */
-  const now = new Date();
-
-  /* Добавляет ведущий ноль */
-  const pad = n => String(n).padStart(2, '0');
-
-  /* Формат даты */
-  const date =
-      pad(now.getDate())
-    + '.'
-    + pad(now.getMonth() + 1)
-    + '.'
-    + now.getFullYear();
-
-  /* Формат времени */
-  const time =
-      pad(now.getHours())
-    + ':'
-    + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
-  document
-    .getElementById('build-down')
-    .innerHTML =
-      '<span class="warn">deploy:</span> ' +
-      '<span class="ok">' + date + ' ' + time + '</span>';
-
-})();
-</script>
 
 
 
@@ -2146,7 +2092,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-fix syntaxErr| v1.5.5
+fix syntaxErr& function clearStatus| v1.5.6
 
   </div>
 
