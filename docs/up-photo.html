@@ -1,0 +1,832 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+  <title>Upload Photo</title>
+
+<!-- СТИЛЬ КОНСОЛИ -->
+
+  <link rel="stylesheet"
+        href="styles/console.css" />
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #111827;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 24px auto;
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .label {
+      font-weight: 700;
+      min-width: 120px;
+    }
+
+    .value {
+      color: #374151;
+      word-break: break-word;
+    }
+
+    .preview-wrap {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      background: #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 18px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #d1d5db;
+      display: none;
+    }
+
+    .empty {
+      color: #6b7280;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.secondary:hover {
+      background: #4b5563;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    input[type="file"],
+    select {
+      width: 100%;
+      max-width: 360px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .status {
+      margin-top: 18px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-line;
+      color: #111827;
+      min-height: 80px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .ok {
+      color: #065f46;
+    }
+
+    .warn {
+      color: #92400e;
+    }
+
+    .err {
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Upload photo to gallery</h1>
+  </header>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="label">Slot</div>
+      <div class="value">
+        <select id="slotSelect"></select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">Section</div>
+      <div class="value" id="sectionLabel">—</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Source</div>
+      <div class="value" id="sourceLabel">—</div>
+    </div>
+
+    <div class="row">
+      <div class="label">Manual file</div>
+      <div class="value">
+        <input type="file"
+               id="fileInput"
+               accept="image/*" />
+        <div class="small">
+          Если в localStorage нет результата re-photo — можно выбрать файл вручную
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-wrap">
+      <img id="preview" alt="preview" />
+      <div id="emptyPreview" class="empty">
+        Нет картинки для загрузки
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="readFromRePhoto()">
+        Read from re-photo
+      </button>
+
+      <button onclick="uploadPhoto()">
+        Upload
+      </button>
+
+      <button class="secondary"
+              onclick="loadCurrentSlotPhoto()">
+        Load current slot
+      </button>
+
+      <button class="secondary"
+              onclick="goBack()">
+        Back
+      </button>
+
+      <button class="danger"
+              onclick="clearRePhotoBuffer()">
+        Clear re-photo buffer
+      </button>
+    </div>
+
+    <div id="status" class="status">
+      Проверяем сессию...
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { createClient }
+    from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const SUPABASE_URL =
+      'https://YOUR-PROJECT.supabase.co'
+
+    const SUPABASE_ANON_KEY =
+      'YOUR_ANON_KEY'
+
+    const supabase =
+      createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      )
+
+    const BUCKET_NAME = 'photos'
+
+    /*
+    ========================================
+    КЛЮЧ БУФЕРА ИЗ RE-PHOTO
+    ========================================
+    */
+
+    const REPHOTO_STORAGE_KEY = 'rephoto_result'
+
+    let currentUser = null
+    let currentImageBlob = null
+    let currentImageUrl = ''
+    let currentSource = 'none'
+
+    const preview =
+      document.getElementById('preview')
+
+    const emptyPreview =
+      document.getElementById('emptyPreview')
+
+    const statusBox =
+      document.getElementById('status')
+
+    const fileInput =
+      document.getElementById('fileInput')
+
+    const slotSelect =
+      document.getElementById('slotSelect')
+
+    const sectionLabel =
+      document.getElementById('sectionLabel')
+
+    const sourceLabel =
+      document.getElementById('sourceLabel')
+
+    /*
+    ========================================
+    UTILS
+    ========================================
+    */
+
+    function setStatus(text, cls = '') {
+      statusBox.className = 'status'
+      if (cls) statusBox.classList.add(cls)
+      statusBox.textContent = text
+    }
+
+    function getSectionBySlot(slot) {
+      if (slot === 0) return 'avatar'
+      if (slot >= 1 && slot <= 3) return 'base'
+      if (slot >= 4 && slot <= 6) return 'advanced'
+      if (slot >= 7 && slot <= 9) return 'private'
+      if (slot === 10) return 'bonus'
+      return 'unknown'
+    }
+
+    function refreshSectionLabel() {
+      const slot = Number(slotSelect.value)
+      sectionLabel.textContent =
+        getSectionBySlot(slot)
+    }
+
+    function setSourceLabel() {
+      sourceLabel.textContent = currentSource
+    }
+
+    function showPreview(url) {
+      currentImageUrl = url || ''
+
+      if (url) {
+        preview.src = url
+        preview.style.display = 'block'
+        emptyPreview.style.display = 'none'
+      } else {
+        preview.removeAttribute('src')
+        preview.style.display = 'none'
+        emptyPreview.style.display = 'block'
+      }
+    }
+
+    function parseSlotFromUrl() {
+      const params =
+        new URLSearchParams(window.location.search)
+
+      const slot =
+        Number(params.get('slot'))
+
+      if (Number.isInteger(slot) &&
+          slot >= 0 &&
+          slot <= 10) {
+        return slot
+      }
+
+      return 0
+    }
+
+    function buildSlotOptions() {
+      slotSelect.innerHTML = ''
+
+      for (let i = 0; i <= 10; i++) {
+        const option =
+          document.createElement('option')
+
+        option.value = String(i)
+        option.textContent =
+          `${i} — ${getSectionBySlot(i)}`
+
+        slotSelect.appendChild(option)
+      }
+
+      slotSelect.value = String(parseSlotFromUrl())
+      refreshSectionLabel()
+    }
+
+    async function ensureSession() {
+      const {
+        data: { user },
+        error
+      } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        currentUser = null
+        setStatus(
+          'Нет активной сессии.\nСначала войди в MVP.',
+          'err'
+        )
+        return false
+      }
+
+      currentUser = user
+
+      setStatus(
+        `User: ${user.email || 'no email'}\n` +
+        `ID: ${user.id}\n` +
+        `Slot: ${slotSelect.value} (${getSectionBySlot(Number(slotSelect.value))})`
+      )
+
+      return true
+    }
+
+    async function dataUrlToBlob(dataUrl) {
+      const response = await fetch(dataUrl)
+      return await response.blob()
+    }
+
+    function getFileExtFromBlob(blob) {
+      const type = blob.type || ''
+
+      if (type.includes('png')) return 'png'
+      if (type.includes('webp')) return 'webp'
+      if (type.includes('jpeg')) return 'jpg'
+      if (type.includes('jpg')) return 'jpg'
+      return 'jpg'
+    }
+
+    function buildStoragePath(userId, slot, blob) {
+      const ext = getFileExtFromBlob(blob)
+      return `${userId}/${slot}.${ext}`
+    }
+
+    /*
+    ========================================
+    RE-PHOTO BUFFER
+    ========================================
+    */
+
+    async function readFromRePhoto() {
+      const raw =
+        localStorage.getItem(REPHOTO_STORAGE_KEY)
+
+      if (!raw) {
+        currentImageBlob = null
+        currentSource = 'none'
+        setSourceLabel()
+        showPreview('')
+        setStatus(
+          `В localStorage нет ключа "${REPHOTO_STORAGE_KEY}".\n` +
+          `Сначала сохрани результат re-photo в этот ключ\n` +
+          `или выбери файл вручную.`,
+          'warn'
+        )
+        return
+      }
+
+      try {
+        /*
+        Поддерживаем два варианта:
+        1. строка data:image/...;base64,...
+        2. JSON: { dataUrl: "...", name: "...", type: "..." }
+        */
+
+        let dataUrl = ''
+
+        if (raw.startsWith('data:image/')) {
+          dataUrl = raw
+        } else {
+          const parsed = JSON.parse(raw)
+          dataUrl = parsed.dataUrl || ''
+        }
+
+        if (!dataUrl.startsWith('data:image/')) {
+          throw new Error('invalid image data')
+        }
+
+        const blob =
+          await dataUrlToBlob(dataUrl)
+
+        currentImageBlob = blob
+        currentSource = `re-photo localStorage: ${REPHOTO_STORAGE_KEY}`
+        setSourceLabel()
+        showPreview(dataUrl)
+
+        setStatus(
+          `Результат re-photo прочитан.\n` +
+          `Размер: ${Math.round(blob.size / 1024)} KB\n` +
+          `Тип: ${blob.type || 'unknown'}`
+        )
+
+      } catch (error) {
+        currentImageBlob = null
+        currentSource = 'none'
+        setSourceLabel()
+        showPreview('')
+
+        setStatus(
+          'Не удалось прочитать буфер re-photo.\n' +
+          String(error.message || error),
+          'err'
+        )
+      }
+    }
+
+    function clearRePhotoBuffer() {
+      localStorage.removeItem(REPHOTO_STORAGE_KEY)
+
+      if (currentSource.startsWith('re-photo')) {
+        currentImageBlob = null
+        currentSource = 'none'
+        setSourceLabel()
+        showPreview('')
+      }
+
+      setStatus(
+        `Ключ "${REPHOTO_STORAGE_KEY}" очищен`
+      )
+    }
+
+    /*
+    ========================================
+    MANUAL FILE
+    ========================================
+    */
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0]
+
+      if (!file) return
+
+      if (!file.type.startsWith('image/')) {
+        setStatus(
+          'Можно выбрать только image/*',
+          'err'
+        )
+        return
+      }
+
+      currentImageBlob = file
+      currentSource = `manual file: ${file.name}`
+      setSourceLabel()
+
+      const objectUrl =
+        URL.createObjectURL(file)
+
+      showPreview(objectUrl)
+
+      setStatus(
+        `Выбран файл вручную.\n` +
+        `Имя: ${file.name}\n` +
+        `Размер: ${Math.round(file.size / 1024)} KB\n` +
+        `Тип: ${file.type}`
+      )
+    })
+
+    /*
+    ========================================
+    LOAD CURRENT SLOT PHOTO
+    ========================================
+    */
+
+    async function loadCurrentSlotPhoto() {
+      const ok = await ensureSession()
+      if (!ok) return
+
+      const slot = Number(slotSelect.value)
+
+      setStatus(
+        `Читаю текущий слот ${slot}...`
+      )
+
+      const { data, error } =
+        await supabase
+          .from('gallery')
+          .select('photo_url')
+          .eq('user_id', currentUser.id)
+          .eq('photo_number', slot)
+          .maybeSingle()
+
+      if (error) {
+        setStatus(
+          'Ошибка чтения gallery:\n' +
+          error.message,
+          'err'
+        )
+        return
+      }
+
+      if (!data || !data.photo_url) {
+        setStatus(
+          `Слот ${slot} пуст`
+        )
+        return
+      }
+
+      currentImageBlob = null
+      currentSource = `gallery slot ${slot}`
+      setSourceLabel()
+      showPreview(data.photo_url)
+
+      setStatus(
+        `Загружено текущее фото из gallery.\n` +
+        `Slot: ${slot}\n` +
+        `URL: ${data.photo_url}`
+      )
+    }
+
+    /*
+    ========================================
+    UPLOAD
+    ========================================
+    */
+
+    async function uploadPhoto() {
+      const ok = await ensureSession()
+      if (!ok) return
+
+      const slot = Number(slotSelect.value)
+
+      if (!Number.isInteger(slot) || slot < 0 || slot > 10) {
+        setStatus(
+          'Некорректный slot',
+          'err'
+        )
+        return
+      }
+
+      if (!currentImageBlob) {
+        setStatus(
+          'Нет картинки для upload.\n' +
+          'Сначала нажми Read from re-photo\n' +
+          'или выбери файл вручную.',
+          'warn'
+        )
+        return
+      }
+
+      if (currentImageBlob.size > 15 * 1024 * 1024) {
+        setStatus(
+          'Файл слишком большой. Максимум 15MB',
+          'err'
+        )
+        return
+      }
+
+      setStatus(
+        `Upload slot ${slot}...\n` +
+        `Section: ${getSectionBySlot(slot)}`
+      )
+
+      const path =
+        buildStoragePath(
+          currentUser.id,
+          slot,
+          currentImageBlob
+        )
+
+      const { error: storageError } =
+        await supabase
+          .storage
+          .from('photos')
+          .upload(
+            path,
+            currentImageBlob,
+            { upsert: true }
+          )
+
+      if (storageError) {
+        setStatus(
+          'Ошибка upload в Storage:\n' +
+          storageError.message,
+          'err'
+        )
+        return
+      }
+
+      const { data: publicData } =
+        supabase
+          .storage
+          .from('photos')
+          .getPublicUrl(path)
+
+      const photoUrl =
+        publicData?.publicUrl || null
+
+      if (!photoUrl) {
+        setStatus(
+          'Не удалось получить public URL',
+          'err'
+        )
+        return
+      }
+
+      const { error: dbError } =
+        await supabase
+          .from('gallery')
+          .upsert(
+            {
+              user_id: currentUser.id,
+              photo_number: slot,
+              photo_url: photoUrl
+            },
+            {
+              onConflict: 'user_id,photo_number'
+            }
+          )
+
+      if (dbError) {
+        setStatus(
+          'Ошибка записи в gallery:\n' +
+          dbError.message,
+          'err'
+        )
+        return
+      }
+
+      showPreview(photoUrl)
+      currentSource = `uploaded to gallery slot ${slot}`
+      setSourceLabel()
+
+      setStatus(
+        `Успешно загружено.\n` +
+        `User: ${currentUser.email || 'no email'}\n` +
+        `Slot: ${slot}\n` +
+        `Section: ${getSectionBySlot(slot)}\n` +
+        `Path: ${path}`
+      )
+    }
+
+    /*
+    ========================================
+    NAV
+    ========================================
+    */
+
+    function goBack() {
+      window.history.back()
+    }
+
+    slotSelect.addEventListener('change', () => {
+      refreshSectionLabel()
+
+      const slot = Number(slotSelect.value)
+      const url = new URL(window.location.href)
+      url.searchParams.set('slot', String(slot))
+      window.history.replaceState({}, '', url)
+    })
+
+    /*
+    ========================================
+    START
+    ========================================
+    */
+
+    window.readFromRePhoto = readFromRePhoto
+    window.uploadPhoto = uploadPhoto
+    window.goBack = goBack
+    window.clearRePhotoBuffer = clearRePhotoBuffer
+    window.loadCurrentSlotPhoto = loadCurrentSlotPhoto
+
+    buildSlotOptions()
+    setSourceLabel()
+    ensureSession()
+    readFromRePhoto()
+  </script>
+
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+Start | v1.0.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
+
+  </body>
+</html>
