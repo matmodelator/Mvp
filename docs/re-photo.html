@@ -217,6 +217,32 @@ button.active {
 }
 
 /* ========================================
+   ЦВЕТА СТАТУСА
+======================================== */
+
+/* ========================================
+   ЦВЕТА СТАТУСА
+======================================== */
+
+.status-ok {
+
+  color: #15803d;   /* зеленый */
+
+}
+
+.status-error {
+
+  color: #b91c1c;   /* красный */
+
+}
+
+.status-warn {
+
+  color: #ca8a04;   /* желтый */
+
+}
+  
+/* ========================================
    ОБЛАСТИ РЕДАКТОРА
 ======================================== */
 
@@ -695,7 +721,7 @@ photoInput.addEventListener("change", async (event) => {
   }
 
   if (!file.type.startsWith("image/")) {
-    setStatus("Нужен файл изображения.");
+    setStatus("image file required");
     return;
   }
 
@@ -712,9 +738,9 @@ photoInput.addEventListener("change", async (event) => {
     updateHistoryButtons();
 
     backToOriginalBtn.disabled = false;
-    setStatus("Фото загружено.");
+    setStatus("file loaded OK");
   } catch (error) {
-    setStatus("Ошибка: " + error.message);
+    setStatus("ERROR" + error.message);
   }
 });
 
@@ -730,7 +756,7 @@ colorModeBtn.addEventListener("click", () => toggleMode("color"));
 
 function toggleMode(mode) {
   if (!sourceImage) {
-    setStatus("Сначала выбери фото.");
+    setStatus(first, select a photo");
     return;
   }
 
@@ -786,7 +812,7 @@ function updateModeUI() {
 
 applyBtn.addEventListener("click", async () => {
   if (!sourceImage || !sourceFile) {
-    setStatus("Сначала выбери фото.");
+    setStatus("first, select a photo");
     return;
   }
 
@@ -826,9 +852,9 @@ applyBtn.addEventListener("click", async () => {
     drawEditor();
     updateHistoryButtons();
 
-    setStatus("Применено.");
+    setStatus("applied OK");
   } catch (error) {
-    setStatus("Ошибка: " + error.message);
+    setStatus("ERROR" + error.message);
   }
 });
 
@@ -840,7 +866,7 @@ applyBtn.addEventListener("click", async () => {
 
 makeAvatarBtn.addEventListener("click", async () => {
   if (!sourceImage || !sourceFile) {
-    setStatus("Сначала выбери фото.");
+    setStatus("first, select a photo");
     return;
   }
 
@@ -879,9 +905,9 @@ makeAvatarBtn.addEventListener("click", async () => {
     drawEditor();
     updateHistoryButtons();
 
-    setStatus("Аватар сделан.");
+    setStatus("Avatar is done OK");
   } catch (error) {
-    setStatus("Ошибка: " + error.message);
+    setStatus("ERROR" + error.message);
   }
 });
 
@@ -893,7 +919,7 @@ makeAvatarBtn.addEventListener("click", async () => {
 
 undoBtn.addEventListener("click", async () => {
   if (editHistory.length === 0) {
-    setStatus("Нет предыдущей правки.");
+    setStatus("there is no previous edit");
     return;
   }
 
@@ -910,9 +936,9 @@ undoBtn.addEventListener("click", async () => {
     drawEditor();
     updateHistoryButtons();
 
-    setStatus("Откат на один шаг.");
+    setStatus("Undo one step OK");
   } catch (error) {
-    setStatus("Ошибка: " + error.message);
+    setStatus("ERROR" + error.message);
   }
 });
 
@@ -924,7 +950,7 @@ undoBtn.addEventListener("click", async () => {
 
 backToOriginalBtn.addEventListener("click", async () => {
   if (!originalFile) {
-    setStatus("Исходник не найден.");
+    setStatus("source not found");
     return;
   }
 
@@ -941,9 +967,9 @@ backToOriginalBtn.addEventListener("click", async () => {
     drawEditor();
     updateHistoryButtons();
 
-    setStatus("Возврат к исходнику.");
+    setStatus("back to source OK");
   } catch (error) {
-    setStatus("Ошибка: " + error.message);
+    setStatus("ERROR" + error.message);
   }
 });
 
@@ -955,7 +981,7 @@ backToOriginalBtn.addEventListener("click", async () => {
 
 downloadBtn.addEventListener("click", () => {
   if (!processedFile || !processedObjectUrl) {
-    setStatus("Нет результата для скачивания.");
+    setStatus("there is no result for download");
     return;
   }
 
@@ -1947,8 +1973,80 @@ function formatSize(bytes) {
   return (bytes / 1024 / 1024).toFixed(2) + " MB";
 }
 
+/*
+================================
+ВЫВОД СТАТУСА
+
+OK     → зеленый
+ERROR  → красный
+иначе  → желтый
+================================
+*/
+
 function setStatus(text) {
+
   statusBox.textContent = text;
+
+  /*
+  убрать старые классы
+  */
+
+  statusBox.classList.remove(
+    "status-ok",
+    "status-error",
+    "status-warn"
+  );
+
+  if (typeof text !== "string") {
+
+    statusBox.classList.add(
+      "status-warn"
+    );
+
+    return;
+
+  }
+
+  const upper =
+    text.toUpperCase();
+
+  /*
+  зеленый
+  */
+
+  if (upper.includes("OK")) {
+
+    statusBox.classList.add(
+      "status-ok"
+    );
+
+    return;
+
+  }
+
+  /*
+  красный
+  */
+
+  if (upper.includes("ERROR")) {
+
+    statusBox.classList.add(
+      "status-error"
+    );
+
+    return;
+
+  }
+
+  /*
+  иначе — желтый
+  */
+
+  statusBox.classList.add(
+    "status-warn"
+
+  );
+
 }
 
 function clearStatus() {
@@ -2053,12 +2151,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-Size: 800 px теперь в одной строке с File и Quality
-Apply / Avatar / Download result стоят в одном ряду с остальными кнопками
-подсказки сделали hover + pin on click
-меню переведены на английский
-комментарии в коде оставил на русском
-консоль сделал двухцветной: красное для указаний, зелёное для подтверждений| v1.5.3
+fix console colour & language| v1.5.4
 
   </div>
 
