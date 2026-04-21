@@ -17,151 +17,159 @@
 
 
 <style>
-
-/* =========================================
-   БАЗОВЫЕ СТИЛИ
-========================================= */
-
 body {
-
   font-family: Arial, sans-serif;
-
   background: #f4f6f8;
-
   margin: 0;
-
-  padding: 30px;
-
+  padding: 24px;
 }
 
 .container {
-
-  max-width: 1100px;
-
-  margin: auto;
-
-  background: white;
-
+  max-width: 1320px;
+  margin: 0 auto;
+  background: #fff;
   padding: 24px;
-
   border-radius: 12px;
-
-  box-shadow:
-    0 4px 14px rgba(0,0,0,0.1);
-
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
 }
 
-h2 {
-
+h2, h3 {
   margin-top: 0;
-
 }
-
-/* =========================================
-   ПАНЕЛЬ УПРАВЛЕНИЯ
-========================================= */
 
 .controls {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  margin-bottom: 20px;
-
+  margin-bottom: 24px;
 }
 
-.left-controls {
-
+.controls-row {
   display: flex;
-
-  align-items: center;
-
-  gap: 16px;
-
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  margin-bottom: 16px;
+  align-items: end;
 }
 
-.right-controls {
-
+.field {
   display: flex;
-
-  align-items: center;
-
-  gap: 16px;
-
-}
-
-/* =========================================
-   СЛАЙДЕР РАЗМЕРА
-========================================= */
-
-.size-field {
-
-  display: flex;
-
   flex-direction: column;
-
+  gap: 6px;
 }
 
-.size-field label {
-
+.field label {
   font-size: 14px;
+  color: #333;
+}
 
-  margin-bottom: 6px;
+.field input,
+.field select {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  min-width: 130px;
+}
 
+#photoSize {
+  width: 240px;
 }
 
 #photoSizeValue {
+  font-size: 13px;
+  color: #555;
+}
 
-  font-size: 14px;
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: start;
+}
 
-  margin-top: 4px;
+.left-tools,
+.center-tools,
+.right-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
 
-  color: #333;
+.center-tools {
+  justify-content: center;
+}
 
+.right-tools {
+  justify-content: flex-end;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+button.active {
+  background: #0f766e;
 }
 
 /* =========================================
-   КНОПКА АВАТАР
+   КРУГЛАЯ КНОПКА АВАТАР
+   Находится в правом блоке toolbar
+   Ничего не ломает, только внешний вид
 ========================================= */
 
 .avatar-btn {
 
-  width: 120px;
+  /* Размер круга */
+  width: 90px;
+  height: 90px;
 
-  height: 120px;
-
+  /* Делаем кнопку круглой */
   border-radius: 50%;
 
+  /* Цвет */
   background: #dc2626;
 
   color: white;
 
-  font-size: 16px;
+  /* Текст по центру */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   font-weight: bold;
+  font-size: 14px;
 
-  border: none;
+  /* Убираем внутренние отступы,
+     чтобы круг был ровный */
+  padding: 0;
 
   cursor: pointer;
 
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
+  /* Небольшая тень */
   box-shadow:
-    0 4px 12px rgba(0,0,0,0.2);
+    0 4px 12px rgba(0,0,0,0.25);
 
+  /* Плавность */
   transition:
     transform 0.15s,
     box-shadow 0.15s,
     background 0.15s;
 
 }
+
+/* Наведение мыши */
 
 .avatar-btn:hover {
 
@@ -171,607 +179,1710 @@ h2 {
 
 }
 
+/* Нажатие */
+
 .avatar-btn:active {
 
   transform: scale(0.96);
 
 }
 
-/* =========================================
-   ОБЛАСТЬ ИЗОБРАЖЕНИЙ
-========================================= */
+.status {
+  margin-top: 14px;
+  color: #b91c1c;
+  min-height: 20px;
+  white-space: pre-line;
+}
 
 .row {
-
   display: flex;
-
-  gap: 20px;
-
   flex-wrap: wrap;
-
+  gap: 20px;
 }
 
 .panel {
-
-  flex: 1;
-
+  flex: 1 1 540px;
   background: #fafafa;
-
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   padding: 16px;
+}
 
+.preview-box {
+  min-height: 420px;
+  background: #e5e7eb;
   border-radius: 10px;
-
-  text-align: center;
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
 }
 
-canvas {
+.info {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #444;
+  white-space: pre-line;
+}
 
+#editCanvas {
   max-width: 100%;
-
-  border-radius: 8px;
-
-  background: white;
-
+  display: none;
+  background: #ddd;
+  cursor: default;
+  touch-action: none;
 }
 
-.status {
+#resultPreview {
+  max-width: 100%;
+  max-height: 720px;
+  display: none;
+}
 
+.note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #555;
+  white-space: pre-line;
+}
+
+.mode-panel {
   margin-top: 14px;
-
-  color: #b91c1c;
-
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  display: none;
 }
 
+.mode-panel.visible {
+  display: block;
+}
+
+.color-grid,
+.crop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px 18px;
+}
+
+.slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slider-wrap label {
+  font-size: 14px;
+  color: #333;
+}
+
+.slider-wrap input[type="range"] {
+  width: 100%;
+}
+
+.slider-value {
+  font-size: 13px;
+  color: #555;
+}
+
+@media (max-width: 900px) {
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .left-tools,
+  .center-tools,
+  .right-tools {
+    justify-content: flex-start;
+  }
+
+  .right-tools {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
 
-<h2>
-Редактор фото
-</h2>
+  <h2>Обработка фото</h2>
 
-<!-- =========================================
-     ПАНЕЛЬ УПРАВЛЕНИЯ
-========================================= -->
+  <div class="controls">
 
-<div class="controls">
+    <div class="controls-row">
 
-<div class="left-controls">
+      <!-- Выбор исходного файла -->
+      <div class="field">
+        <label for="photoInput">Файл</label>
+        <input id="photoInput" type="file" accept="image/*">
+      </div>
 
-<input
-  type="file"
-  id="fileInput"
-  accept="image/*"
->
+      <!-- Один выбор размера: 400–1200 -->
+      <div class="field">
+        <label for="photoSize">Размер фото</label>
+        <input
+          id="photoSize"
+          type="range"
+          min="400"
+          max="1200"
+          step="50"
+          value="800"
+        >
+        <div id="photoSizeValue">800 px</div>
+      </div>
 
-<div class="size-field">
+      <!-- Качество webp -->
+      <div class="field">
+        <label for="quality">Quality</label>
+        <input id="quality" type="number" value="0.75" min="0.1" max="1" step="0.05">
+      </div>
 
-<label>
-Размер фото
-</label>
+    </div>
 
-<input
-  id="photoSize"
-  type="range"
-  min="400"
-  max="1200"
-  step="50"
-  value="800"
->
+    <div class="toolbar">
+      <div class="left-tools">
+        <button id="cropModeBtn" type="button">Crop</button>
+        <button id="resizeModeBtn" type="button">Resize</button>
+        <button id="colorModeBtn" type="button">Color</button>
+        <button id="backToOriginalBtn" type="button" disabled>Вернуться к исходнику</button>
+      </div>
 
-<div id="photoSizeValue">
-800 px
-</div>
+      <div class="center-tools">
+        <button id="undoBtn" type="button" disabled>Отменить правку</button>
+      </div>
 
-</div>
+      <div class="right-tools">
+        <button id="applyBtn" type="button">Применить</button>
+        <button id="makeAvatarBtn" type="button" class="avatar-btn">Сделать аватар</button>
+        <button id="downloadBtn" type="button" disabled>Скачать результат</button>
+      </div>
+    </div>
 
-</div>
+    <!-- Панель Crop видна только при активном режиме Crop -->
+    <div id="cropPanel" class="mode-panel">
+      <div class="crop-grid">
+        <div class="field">
+          <label for="cropMode">Crop mode</label>
+          <select id="cropMode">
+            <option value="free">Свободный прямоугольник</option>
+            <option value="square">Квадрат 1:1</option>
+            <option value="landscape">Горизонтально 4:3</option>
+            <option value="portrait">Вертикально 3:4</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-<div class="right-controls">
+    <!-- Панель Color видна только при активном режиме Color -->
+    <div id="colorPanel" class="mode-panel">
+      <div class="color-grid">
+        <div class="slider-wrap">
+          <label for="brightnessRange">Яркость</label>
+          <input id="brightnessRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="brightnessValue">0</div>
+        </div>
 
-<button
-  id="makeAvatarBtn"
-  class="avatar-btn"
->
-Аватар
-</button>
+        <div class="slider-wrap">
+          <label for="saturationRange">Цветность</label>
+          <input id="saturationRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="saturationValue">0</div>
+        </div>
 
-</div>
+        <div class="slider-wrap">
+          <label for="contrastRange">Контрастность</label>
+          <input id="contrastRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="contrastValue">0</div>
+        </div>
 
-</div>
+        <div class="slider-wrap">
+          <label for="temperatureRange">Температура</label>
+          <input id="temperatureRange" type="range" min="-100" max="100" step="1" value="0">
+          <div class="slider-value" id="temperatureValue">0</div>
+        </div>
+      </div>
+    </div>
 
-<!-- =========================================
-     ОБЛАСТЬ ИЗОБРАЖЕНИЙ
-========================================= -->
+    <div class="status" id="status"></div>
 
-<div class="row">
+    <div class="note">
+Crop: включи кнопку и выделяй прямоугольник.
+Resize: включи кнопку, кликни в точку — это центр. Колесо или pinch меняют масштаб. При увеличении картинку можно тянуть.
+Color: включи кнопку и меняй ползунки.
+Применить: результат становится новым содержимым Editor и одновременно показывается справа.
+Сделать аватар: делает квадратный аватар и тоже подставляет его обратно в Editor.
+    </div>
+  </div>
 
-<div class="panel">
+  <div class="row">
+    <div class="panel">
+      <h3>Editor</h3>
+      <div class="preview-box">
+        <canvas id="editCanvas"></canvas>
+      </div>
+      <div class="info" id="originalInfo"></div>
+    </div>
 
-<h3>
-Редактор
-</h3>
-
-<canvas id="editorCanvas"></canvas>
-
-</div>
-
-<div class="panel">
-
-<h3>
-Результат
-</h3>
-
-<canvas id="resultCanvas"></canvas>
-
-</div>
-
-</div>
-
-<div
-  id="status"
-  class="status"
-></div>
+    <div class="panel">
+      <h3>Result</h3>
+      <div class="preview-box">
+        <img id="resultPreview" alt="Результат">
+      </div>
+      <div class="info" id="resultInfo"></div>
+    </div>
+  </div>
 
 </div>
 
 <script>
+/*
+================================
+ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+================================
+*/
 
-/* =========================================
-   ПОЛУЧАЕМ ЭЛЕМЕНТЫ
-========================================= */
+/* Текущий файл редактора */
+let sourceFile = null;
 
-const fileInput =
-  document.getElementById(
-    "fileInput"
-  );
+/* Самый первый загруженный файл */
+let originalFile = null;
 
-const editorCanvas =
-  document.getElementById(
-    "editorCanvas"
-  );
+/* Последний обработанный результат */
+let processedFile = null;
+let processedObjectUrl = null;
 
-const resultCanvas =
-  document.getElementById(
-    "resultCanvas"
-  );
+/* Текущая картинка редактора */
+let sourceImage = null;
 
-const editorCtx =
-  editorCanvas.getContext(
-    "2d"
-  );
+/* Реальные размеры текущей картинки */
+let imageNaturalWidth = 0;
+let imageNaturalHeight = 0;
 
-const resultCtx =
-  resultCanvas.getContext(
-    "2d"
-  );
+/* Активный режим: null | crop | resize | color */
+let activeMode = null;
 
-const photoSize =
-  document.getElementById(
-    "photoSize"
-  );
+/*
+  ИСТОРИЯ ПРАВОК
+  Сюда кладём предыдущее состояние перед Apply / Avatar
+*/
+const editHistory = [];
 
-const photoSizeValue =
-  document.getElementById(
-    "photoSizeValue"
-  );
+/*
+  CROP STATE
+*/
+let cropRect = null;
+let isSelectingCrop = false;
+let cropStartX = 0;
+let cropStartY = 0;
 
-const makeAvatarBtn =
-  document.getElementById(
-    "makeAvatarBtn"
-  );
+/*
+  RESIZE STATE
+  centerX / centerY — центр в координатах исходного изображения
+  zoom — масштаб
+*/
+let resizeView = {
+  centerX: 0,
+  centerY: 0,
+  zoom: 1
+};
 
-const statusText =
-  document.getElementById(
-    "status"
-  );
+let isPanningResize = false;
+let resizePanStartCanvasX = 0;
+let resizePanStartCanvasY = 0;
+let resizePanStartCenterX = 0;
+let resizePanStartCenterY = 0;
+let suppressResizeClick = false;
 
-/* =========================================
-   ПЕРЕМЕННЫЕ
-========================================= */
+let pinchStartDistance = null;
+let pinchStartZoom = 1;
 
-let sourceFile =
-  null;
+/*
+  COLOR STATE
+*/
+const colorState = {
+  brightness: 0,
+  saturation: 0,
+  contrast: 0,
+  temperature: 0
+};
 
-let sourceImage =
-  null;
+/*
+================================
+DOM
+================================
+*/
 
-/* =========================================
-   ПОКАЗ РАЗМЕРА
-========================================= */
+const photoInput = document.getElementById("photoInput");
+const cropModeSelect = document.getElementById("cropMode");
+const qualityInput = document.getElementById("quality");
+const photoSize = document.getElementById("photoSize");
+const photoSizeValue = document.getElementById("photoSizeValue");
 
-photoSize.addEventListener(
-  "input",
-  () => {
+const cropModeBtn = document.getElementById("cropModeBtn");
+const resizeModeBtn = document.getElementById("resizeModeBtn");
+const colorModeBtn = document.getElementById("colorModeBtn");
 
-    photoSizeValue.textContent =
-      photoSize.value +
-      " px";
+const backToOriginalBtn = document.getElementById("backToOriginalBtn");
+const undoBtn = document.getElementById("undoBtn");
+const applyBtn = document.getElementById("applyBtn");
+const makeAvatarBtn = document.getElementById("makeAvatarBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
+const cropPanel = document.getElementById("cropPanel");
+const colorPanel = document.getElementById("colorPanel");
+
+const brightnessRange = document.getElementById("brightnessRange");
+const saturationRange = document.getElementById("saturationRange");
+const contrastRange = document.getElementById("contrastRange");
+const temperatureRange = document.getElementById("temperatureRange");
+
+const brightnessValue = document.getElementById("brightnessValue");
+const saturationValue = document.getElementById("saturationValue");
+const contrastValue = document.getElementById("contrastValue");
+const temperatureValue = document.getElementById("temperatureValue");
+
+const editCanvas = document.getElementById("editCanvas");
+const editCtx = editCanvas.getContext("2d");
+
+const resultPreview = document.getElementById("resultPreview");
+const originalInfo = document.getElementById("originalInfo");
+const resultInfo = document.getElementById("resultInfo");
+const statusBox = document.getElementById("status");
+
+/*
+================================
+СЛАЙДЕР РАЗМЕРА 400–1200
+================================
+*/
+
+photoSize.addEventListener("input", () => {
+  photoSizeValue.textContent = photoSize.value + " px";
+});
+
+/*
+================================
+ЗАГРУЗКА ФАЙЛА
+================================
+*/
+
+photoInput.addEventListener("change", async (event) => {
+  clearStatus();
+  resetResult();
+  clearHistory();
+
+  const file = event.target.files[0] || null;
+
+  if (!file) {
+    clearCanvas();
+    originalInfo.textContent = "";
+    return;
   }
-);
 
-/* =========================================
-   ЗАГРУЗКА ФАЙЛА
-========================================= */
+  if (!file.type.startsWith("image/")) {
+    setStatus("Нужен файл изображения.");
+    return;
+  }
 
-fileInput.addEventListener(
-  "change",
-  async () => {
+  try {
+    originalFile = file;
+    sourceFile = file;
 
-    const file =
-      fileInput.files[0];
+    await loadSourceFileIntoEditor(sourceFile);
 
-    if (!file)
-      return;
-
-    sourceFile =
-      file;
-
-    const dataUrl =
-      await readFileAsDataURL(
-        file
-      );
-
-    sourceImage =
-      await loadImage(
-        dataUrl
-      );
-
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
     drawEditor();
+    updateHistoryButtons();
 
-    setStatus(
-      "Фото загружено."
-    );
-
+    backToOriginalBtn.disabled = false;
+    setStatus("Фото загружено.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
   }
-);
+});
 
-/* =========================================
-   РИСУЕМ ИСХОДНОЕ ФОТО
-========================================= */
+/*
+================================
+TOGGLE РЕЖИМОВ
+================================
+*/
+
+cropModeBtn.addEventListener("click", () => toggleMode("crop"));
+resizeModeBtn.addEventListener("click", () => toggleMode("resize"));
+colorModeBtn.addEventListener("click", () => toggleMode("color"));
+
+function toggleMode(mode) {
+  if (!sourceImage) {
+    setStatus("Сначала выбери фото.");
+    return;
+  }
+
+  activeMode = (activeMode === mode) ? null : mode;
+  updateModeUI();
+  drawEditor();
+}
+
+function updateModeUI() {
+  cropModeBtn.classList.toggle("active", activeMode === "crop");
+  resizeModeBtn.classList.toggle("active", activeMode === "resize");
+  colorModeBtn.classList.toggle("active", activeMode === "color");
+
+  cropPanel.classList.toggle("visible", activeMode === "crop");
+  colorPanel.classList.toggle("visible", activeMode === "color");
+
+  if (activeMode === "crop") {
+    editCanvas.style.cursor = "crosshair";
+  } else if (activeMode === "resize") {
+    editCanvas.style.cursor = isPanningResize ? "grabbing" : (resizeView.zoom > 1 ? "grab" : "pointer");
+  } else {
+    editCanvas.style.cursor = "default";
+  }
+}
+
+/*
+================================
+ПОЛЗУНКИ ЦВЕТА
+================================
+*/
+
+[
+  [brightnessRange, brightnessValue, "brightness"],
+  [saturationRange, saturationValue, "saturation"],
+  [contrastRange, contrastValue, "contrast"],
+  [temperatureRange, temperatureValue, "temperature"]
+].forEach(([range, valueBox, key]) => {
+  range.addEventListener("input", () => {
+    colorState[key] = Number(range.value);
+    valueBox.textContent = range.value;
+
+    if (sourceImage) {
+      drawEditor();
+    }
+  });
+});
+
+/*
+================================
+APPLY
+================================
+*/
+
+applyBtn.addEventListener("click", async () => {
+  if (!sourceImage || !sourceFile) {
+    setStatus("Сначала выбери фото.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    const currentFileBeforeApply = sourceFile;
+
+    processedFile = await buildFinalFile(sourceFile, {
+      useCrop: activeMode === "crop" && !!cropRect,
+      cropRectCanvas: cropRect,
+      canvasWidth: editCanvas.width,
+      canvasHeight: editCanvas.height,
+      imageWidth: imageNaturalWidth,
+      imageHeight: imageNaturalHeight,
+      useResize: activeMode === "resize" || resizeView.zoom > 1 || !isResizeDefault(),
+      resizeView,
+      targetSize: Number(photoSize.value),
+      colorState,
+      quality: Number(qualityInput.value) || 0.75
+    });
+
+    /* Сохраняем предыдущий шаг в историю */
+    pushHistory(currentFileBeforeApply);
+
+    /* Показать справа */
+    await showResult(processedFile);
+
+    /* И поставить результат обратно в Editor */
+    sourceFile = processedFile;
+    await loadSourceFileIntoEditor(sourceFile);
+
+    /* После Apply сбрасываем инструменты */
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Применено.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+СДЕЛАТЬ АВАТАР
+================================
+*/
+
+makeAvatarBtn.addEventListener("click", async () => {
+  if (!sourceImage || !sourceFile) {
+    setStatus("Сначала выбери фото.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    const currentFileBeforeApply = sourceFile;
+
+    /*
+      Для аватара всегда делаем квадрат.
+      Приоритет:
+      1) если активен Crop и есть выделение -> берём его
+      2) иначе берём квадрат по центру текущей картинки
+    */
+
+    processedFile = await buildAvatarFile(sourceFile, {
+      cropRectCanvas: (activeMode === "crop" && cropRect) ? cropRect : null,
+      canvasWidth: editCanvas.width,
+      canvasHeight: editCanvas.height,
+      imageWidth: imageNaturalWidth,
+      imageHeight: imageNaturalHeight,
+      targetSize: Number(photoSize.value),
+      colorState,
+      quality: Number(qualityInput.value) || 0.75
+    });
+
+    pushHistory(currentFileBeforeApply);
+
+    await showResult(processedFile);
+
+    sourceFile = processedFile;
+    await loadSourceFileIntoEditor(sourceFile);
+
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Аватар сделан.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+UNDO
+================================
+*/
+
+undoBtn.addEventListener("click", async () => {
+  if (editHistory.length === 0) {
+    setStatus("Нет предыдущей правки.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    const previousFile = editHistory.pop();
+    sourceFile = previousFile;
+
+    await loadSourceFileIntoEditor(sourceFile);
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Откат на один шаг.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+BACK TO ORIGINAL
+================================
+*/
+
+backToOriginalBtn.addEventListener("click", async () => {
+  if (!originalFile) {
+    setStatus("Исходник не найден.");
+    return;
+  }
+
+  try {
+    clearStatus();
+
+    sourceFile = originalFile;
+    clearHistory();
+
+    await loadSourceFileIntoEditor(sourceFile);
+    resetAllEditingState();
+    activeMode = null;
+    updateModeUI();
+    drawEditor();
+    updateHistoryButtons();
+
+    setStatus("Возврат к исходнику.");
+  } catch (error) {
+    setStatus("Ошибка: " + error.message);
+  }
+});
+
+/*
+================================
+DOWNLOAD
+================================
+*/
+
+downloadBtn.addEventListener("click", () => {
+  if (!processedFile || !processedObjectUrl) {
+    setStatus("Нет результата для скачивания.");
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.href = processedObjectUrl;
+  a.download = processedFile.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+/*
+================================
+HISTORY HELPERS
+================================
+*/
+
+function pushHistory(file) {
+  editHistory.push(file);
+}
+
+function clearHistory() {
+  editHistory.length = 0;
+}
+
+function updateHistoryButtons() {
+  undoBtn.disabled = editHistory.length === 0;
+  backToOriginalBtn.disabled = !originalFile;
+}
+
+/*
+================================
+LOAD SOURCE INTO EDITOR
+================================
+*/
+
+async function loadSourceFileIntoEditor(file) {
+  const dataUrl = await readFileAsDataURL(file);
+  const img = await loadImage(dataUrl);
+
+  sourceImage = img;
+  imageNaturalWidth = img.width;
+  imageNaturalHeight = img.height;
+
+  const maxCanvasWidth = 540;
+  const maxCanvasHeight = 720;
+
+  const scale = Math.min(
+    maxCanvasWidth / img.width,
+    maxCanvasHeight / img.height,
+    1
+  );
+
+  editCanvas.width = Math.round(img.width * scale);
+  editCanvas.height = Math.round(img.height * scale);
+  editCanvas.style.display = "block";
+
+  originalInfo.textContent =
+    "Имя: " + file.name + "\n" +
+    "Тип: " + file.type + "\n" +
+    "Размер: " + formatSize(file.size) + "\n" +
+    "Разрешение: " + img.width + " × " + img.height + "\n" +
+    "Canvas: " + editCanvas.width + " × " + editCanvas.height;
+}
+
+/*
+================================
+RESET EDITING STATE
+================================
+*/
+
+function resetAllEditingState() {
+  setDefaultCrop();
+  setDefaultResizeView();
+
+  colorState.brightness = 0;
+  colorState.saturation = 0;
+  colorState.contrast = 0;
+  colorState.temperature = 0;
+
+  brightnessRange.value = 0;
+  saturationRange.value = 0;
+  contrastRange.value = 0;
+  temperatureRange.value = 0;
+
+  brightnessValue.textContent = "0";
+  saturationValue.textContent = "0";
+  contrastValue.textContent = "0";
+  temperatureValue.textContent = "0";
+
+  isSelectingCrop = false;
+  isPanningResize = false;
+  pinchStartDistance = null;
+  pinchStartZoom = 1;
+  suppressResizeClick = false;
+}
+
+/*
+================================
+DEFAULT CROP / RESIZE
+================================
+*/
+
+function setDefaultCrop() {
+  const w = Math.round(editCanvas.width * 0.6);
+  const h = getDefaultHeightByMode(w);
+
+  cropRect = {
+    x: Math.round((editCanvas.width - w) / 2),
+    y: Math.round((editCanvas.height - h) / 2),
+    width: w,
+    height: h
+  };
+
+  normalizeCropRect();
+  clampCropRectToCanvas();
+}
+
+function getDefaultHeightByMode(width) {
+  const mode = cropModeSelect.value;
+
+  if (mode === "square") return width;
+  if (mode === "landscape") return Math.round(width * 3 / 4);
+  if (mode === "portrait") return Math.round(width * 4 / 3);
+
+  return Math.round(width * 0.7);
+}
+
+function setDefaultResizeView() {
+  resizeView.centerX = imageNaturalWidth / 2;
+  resizeView.centerY = imageNaturalHeight / 2;
+  resizeView.zoom = 1;
+}
+
+function isResizeDefault() {
+  return (
+    Math.abs(resizeView.centerX - imageNaturalWidth / 2) < 1 &&
+    Math.abs(resizeView.centerY - imageNaturalHeight / 2) < 1 &&
+    Math.abs(resizeView.zoom - 1) < 0.0001
+  );
+}
+
+/*
+================================
+DRAW
+================================
+*/
 
 function drawEditor() {
+  if (!sourceImage) return;
 
-  if (!sourceImage)
-    return;
+  editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
 
-  editorCanvas.width =
-    sourceImage.width;
-
-  editorCanvas.height =
-    sourceImage.height;
-
-  editorCtx.clearRect(
-    0,
-    0,
-    editorCanvas.width,
-    editorCanvas.height
-  );
-
-  editorCtx.drawImage(
-    sourceImage,
-    0,
-    0
-  );
-
+  if (activeMode === "resize") {
+    drawResizeEditor();
+  } else {
+    drawNormalEditor();
+  }
 }
 
-/* =========================================
-   КНОПКА АВАТАР
-========================================= */
+function drawNormalEditor() {
+  editCtx.filter = buildCanvasFilterString(colorState);
 
-makeAvatarBtn.addEventListener(
-  "click",
-  async () => {
+  editCtx.drawImage(
+    sourceImage,
+    0, 0, imageNaturalWidth, imageNaturalHeight,
+    0, 0, editCanvas.width, editCanvas.height
+  );
 
-    if (!sourceFile) {
+  editCtx.filter = "none";
 
-      setStatus(
-        "Сначала выбери фото."
-      );
-
-      return;
-
-    }
-
-    try {
-
-      const size =
-        Number(
-          photoSize.value
-        );
-
-      const avatarFile =
-        await buildRoundAvatarFile(
-          sourceFile,
-          size
-        );
-
-      const dataUrl =
-        await readFileAsDataURL(
-          avatarFile
-        );
-
-      const image =
-        await loadImage(
-          dataUrl
-        );
-
-      resultCanvas.width =
-        size;
-
-      resultCanvas.height =
-        size;
-
-      resultCtx.clearRect(
-        0,
-        0,
-        size,
-        size
-      );
-
-      resultCtx.drawImage(
-        image,
-        0,
-        0
-      );
-
-      setStatus(
-        "Аватар создан."
-      );
-
-    }
-
-    catch (error) {
-
-      setStatus(
-        "Ошибка: " +
-        error.message
-      );
-
-    }
-
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
   }
-);
 
-/* =========================================
-   СОЗДАНИЕ КРУГЛОГО АВАТАРА
-========================================= */
+  if (activeMode === "crop" && cropRect) {
+    drawCropOverlay();
+  }
+}
 
-async function buildRoundAvatarFile(
-  file,
-  targetSize
-) {
+function drawResizeEditor() {
+  const view = getResizeSourceRect();
 
-  const dataUrl =
-    await readFileAsDataURL(
-      file
-    );
+  editCtx.filter = buildCanvasFilterString(colorState);
 
-  const image =
-    await loadImage(
-      dataUrl
-    );
-
-  /*
-  берём квадрат по центру
-  */
-
-  const square =
-    Math.min(
-      image.width,
-      image.height
-    );
-
-  const srcX =
-    Math.round(
-      (image.width -
-       square) / 2
-    );
-
-  const srcY =
-    Math.round(
-      (image.height -
-       square) / 2
-    );
-
-  /*
-  создаём canvas
-  */
-
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
-
-  canvas.width =
-    targetSize;
-
-  canvas.height =
-    targetSize;
-
-  const ctx =
-    canvas.getContext(
-      "2d"
-    );
-
-  /*
-  делаем круг
-  */
-
-  ctx.beginPath();
-
-  ctx.arc(
-
-    targetSize / 2,
-
-    targetSize / 2,
-
-    targetSize / 2,
-
-    0,
-
-    Math.PI * 2
-
+  editCtx.drawImage(
+    sourceImage,
+    view.srcX, view.srcY, view.srcW, view.srcH,
+    0, 0, editCanvas.width, editCanvas.height
   );
 
-  ctx.closePath();
+  editCtx.filter = "none";
 
-  ctx.clip();
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
+  }
+
+  editCtx.save();
+  editCtx.strokeStyle = "#2563eb";
+  editCtx.lineWidth = 2;
+  editCtx.strokeRect(1, 1, editCanvas.width - 2, editCanvas.height - 2);
+
+  editCtx.beginPath();
+  editCtx.moveTo(editCanvas.width / 2 - 16, editCanvas.height / 2);
+  editCtx.lineTo(editCanvas.width / 2 + 16, editCanvas.height / 2);
+  editCtx.moveTo(editCanvas.width / 2, editCanvas.height / 2 - 16);
+  editCtx.lineTo(editCanvas.width / 2, editCanvas.height / 2 + 16);
+  editCtx.stroke();
+  editCtx.restore();
+}
+
+function drawCropOverlay() {
+  editCtx.save();
+  editCtx.fillStyle = "rgba(0, 0, 0, 0.45)";
+  editCtx.fillRect(0, 0, editCanvas.width, editCanvas.height);
+  editCtx.clearRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  editCtx.restore();
+
+  editCtx.filter = buildCanvasFilterString(colorState);
+
+  editCtx.save();
+  editCtx.beginPath();
+  editCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+  editCtx.clip();
+
+  editCtx.drawImage(
+    sourceImage,
+    0, 0, imageNaturalWidth, imageNaturalHeight,
+    0, 0, editCanvas.width, editCanvas.height
+  );
+
+  editCtx.restore();
+  editCtx.filter = "none";
+
+  if (colorState.temperature !== 0) {
+    editCtx.save();
+    editCtx.beginPath();
+    editCtx.rect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+    editCtx.clip();
+    applyTemperatureOverlay(editCtx, editCanvas.width, editCanvas.height, colorState.temperature);
+    editCtx.restore();
+  }
+
+  editCtx.strokeStyle = "#2563eb";
+  editCtx.lineWidth = 2;
+  editCtx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+}
+
+/*
+================================
+FILTERS
+================================
+*/
+
+function buildCanvasFilterString(color) {
+  const brightness = 100 + color.brightness;
+  const contrast = 100 + color.contrast;
+  const saturation = 100 + color.saturation;
+
+  return `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+}
+
+function applyTemperatureOverlay(ctx, width, height, temperature) {
+  const t = clamp(temperature, -100, 100);
+
+  ctx.save();
+
+  if (t > 0) {
+    const alpha = t / 250;
+    ctx.fillStyle = `rgba(255, 140, 0, ${alpha})`;
+    ctx.fillRect(0, 0, width, height);
+  } else if (t < 0) {
+    const alpha = Math.abs(t) / 250;
+    ctx.fillStyle = `rgba(0, 140, 255, ${alpha})`;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  ctx.restore();
+}
+
+/*
+================================
+RESIZE RECT
+================================
+*/
+
+function getResizeSourceRect() {
+  const zoom = Math.max(1, resizeView.zoom);
+
+  let srcW = imageNaturalWidth / zoom;
+  let srcH = imageNaturalHeight / zoom;
+
+  const canvasRatio = editCanvas.width / editCanvas.height;
+  const srcRatio = srcW / srcH;
+
+  if (srcRatio > canvasRatio) {
+    srcW = srcH * canvasRatio;
+  } else {
+    srcH = srcW / canvasRatio;
+  }
+
+  let srcX = resizeView.centerX - srcW / 2;
+  let srcY = resizeView.centerY - srcH / 2;
+
+  srcX = Math.max(0, Math.min(srcX, imageNaturalWidth - srcW));
+  srcY = Math.max(0, Math.min(srcY, imageNaturalHeight - srcH));
+
+  return { srcX, srcY, srcW, srcH };
+}
+
+/*
+================================
+BUILD FINAL FILE
+================================
+*/
+
+async function buildFinalFile(file, options = {}) {
+  const {
+    useCrop,
+    cropRectCanvas,
+    canvasWidth,
+    canvasHeight,
+    imageWidth,
+    imageHeight,
+    useResize,
+    resizeView,
+    targetSize = 800,
+    colorState,
+    quality = 0.8
+  } = options;
+
+  const dataUrl = await readFileAsDataURL(file);
+  const image = await loadImage(dataUrl);
+
+  let srcX = 0;
+  let srcY = 0;
+  let srcW = imageWidth;
+  let srcH = imageHeight;
 
   /*
-  рисуем изображение
+    Если resize реально используется — берём resize rect.
+    Иначе, если активен crop — берём crop.
+    Иначе — всю картинку.
   */
+  if (useResize) {
+    const rect = getResizeSourceRect();
+    srcX = Math.round(rect.srcX);
+    srcY = Math.round(rect.srcY);
+    srcW = Math.round(rect.srcW);
+    srcH = Math.round(rect.srcH);
+  } else if (useCrop && cropRectCanvas) {
+    const scaleX = imageWidth / canvasWidth;
+    const scaleY = imageHeight / canvasHeight;
 
-  ctx.drawImage(
+    srcX = Math.round(cropRectCanvas.x * scaleX);
+    srcY = Math.round(cropRectCanvas.y * scaleY);
+    srcW = Math.round(cropRectCanvas.width * scaleX);
+    srcH = Math.round(cropRectCanvas.height * scaleY);
+  }
 
+  srcX = clamp(srcX, 0, imageWidth - 1);
+  srcY = clamp(srcY, 0, imageHeight - 1);
+  srcW = clamp(srcW, 1, imageWidth - srcX);
+  srcH = clamp(srcH, 1, imageHeight - srcY);
+
+  /*
+    Один выбранный размер: 400–1200.
+    Используем его как максимум по большей стороне.
+  */
+  const scale = Math.min(
+    targetSize / srcW,
+    targetSize / srcH,
+    1
+  );
+
+  const targetWidth = Math.round(srcW * scale);
+  const targetHeight = Math.round(srcH * scale);
+
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = targetWidth;
+  outCanvas.height = targetHeight;
+
+  const outCtx = outCanvas.getContext("2d");
+  if (!outCtx) throw new Error("Canvas context недоступен.");
+
+  outCtx.filter = buildCanvasFilterString(colorState);
+
+  outCtx.drawImage(
     image,
-
-    srcX,
-    srcY,
-    square,
-    square,
-
-    0,
-    0,
-    targetSize,
-    targetSize
-
+    srcX, srcY, srcW, srcH,
+    0, 0, targetWidth, targetHeight
   );
 
-  /*
-  экспорт webp
-  */
+  outCtx.filter = "none";
 
-  const blob =
-    await canvasToBlob(
-      canvas,
-      "image/webp",
-      0.8
-    );
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(outCtx, targetWidth, targetHeight, colorState.temperature);
+  }
+
+  const blob = await canvasToBlob(outCanvas, "image/webp", quality);
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
 
   return new File(
-
     [blob],
+    baseName + ".webp",
+    { type: "image/webp" }
+  );
+}
 
-    "avatar.webp",
 
-    {
-      type:
-        "image/webp"
-    }
+/*
+================================
+СОЗДАТЬ КРУГЛЫЙ АВАТАР
+================================
+*/
 
+async function buildAvatarFile(file, options = {}) {
+  const {
+    cropRectCanvas,
+    canvasWidth,
+    canvasHeight,
+    imageWidth,
+    imageHeight,
+    targetSize = 800,
+    colorState,
+    quality = 0.8
+  } = options;
+
+  const dataUrl = await readFileAsDataURL(file);
+  const image = await loadImage(dataUrl);
+
+  let srcX, srcY, srcW, srcH;
+
+  /*
+    Если есть выделение crop — берём его
+    и приводим к квадрату.
+    Если выделения нет — берём квадрат по центру.
+  */
+  if (cropRectCanvas) {
+    const scaleX = imageWidth / canvasWidth;
+    const scaleY = imageHeight / canvasHeight;
+
+    const rawX = Math.round(cropRectCanvas.x * scaleX);
+    const rawY = Math.round(cropRectCanvas.y * scaleY);
+    const rawW = Math.round(cropRectCanvas.width * scaleX);
+    const rawH = Math.round(cropRectCanvas.height * scaleY);
+
+    const size = Math.min(rawW, rawH);
+
+    srcX = rawX + Math.round((rawW - size) / 2);
+    srcY = rawY + Math.round((rawH - size) / 2);
+    srcW = size;
+    srcH = size;
+  } else {
+    const size = Math.min(imageWidth, imageHeight);
+
+    srcX = Math.round((imageWidth - size) / 2);
+    srcY = Math.round((imageHeight - size) / 2);
+    srcW = size;
+    srcH = size;
+  }
+
+  srcX = clamp(srcX, 0, imageWidth - 1);
+  srcY = clamp(srcY, 0, imageHeight - 1);
+  srcW = clamp(srcW, 1, imageWidth - srcX);
+  srcH = clamp(srcH, 1, imageHeight - srcY);
+
+  /*
+    Создаём квадратный canvas под аватар
+  */
+  const outCanvas = document.createElement("canvas");
+  outCanvas.width = targetSize;
+  outCanvas.height = targetSize;
+
+  const outCtx = outCanvas.getContext("2d");
+  if (!outCtx) throw new Error("Canvas context недоступен.");
+
+  /*
+    Делаем круглую маску
+  */
+  outCtx.save();
+  outCtx.beginPath();
+  outCtx.arc(
+    targetSize / 2,
+    targetSize / 2,
+    targetSize / 2,
+    0,
+    Math.PI * 2
+  );
+  outCtx.closePath();
+  outCtx.clip();
+
+  /*
+    Применяем фильтры
+  */
+  outCtx.filter = buildCanvasFilterString(colorState);
+
+  /*
+    Рисуем квадратную область в круглый аватар
+  */
+  outCtx.drawImage(
+    image,
+    srcX, srcY, srcW, srcH,
+    0, 0, targetSize, targetSize
   );
 
-}
+  outCtx.filter = "none";
 
-/* =========================================
-   ЧТЕНИЕ ФАЙЛА
-========================================= */
+  /*
+    Температура поверх
+  */
+  if (colorState.temperature !== 0) {
+    applyTemperatureOverlay(outCtx, targetSize, targetSize, colorState.temperature);
+  }
 
-function readFileAsDataURL(
-  file
-) {
+  outCtx.restore();
 
-  return new Promise(
-    (resolve, reject) => {
+  /*
+    Сохраняем как webp с прозрачными углами
+  */
+  const blob = await canvasToBlob(outCanvas, "image/webp", quality);
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
 
-      const reader =
-        new FileReader();
-
-      reader.onload =
-        () =>
-          resolve(
-            reader.result
-          );
-
-      reader.onerror =
-        reject;
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
+  return new File(
+    [blob],
+    baseName + "_avatar.webp",
+    { type: "image/webp" }
   );
-
 }
 
-/* =========================================
-   ЗАГРУЗКА ИЗОБРАЖЕНИЯ
-========================================= */
+/*
+================================
+SHOW RESULT
+================================
+*/
 
-function loadImage(
-  src
-) {
+async function showResult(file) {
+  if (processedObjectUrl) {
+    URL.revokeObjectURL(processedObjectUrl);
+  }
 
-  return new Promise(
-    (resolve, reject) => {
+  processedObjectUrl = URL.createObjectURL(file);
+  resultPreview.src = processedObjectUrl;
+  resultPreview.style.display = "block";
 
-      const img =
-        new Image();
+  const meta = await getImageMetaFromObjectUrl(processedObjectUrl);
 
-      img.onload =
-        () =>
-          resolve(img);
+  const referenceSize = sourceFile && sourceFile.size > 0 ? sourceFile.size : file.size;
+  const savedPercent = referenceSize > 0
+    ? (((referenceSize - file.size) / referenceSize) * 100).toFixed(1)
+    : "0";
 
-      img.onerror =
-        reject;
+  resultInfo.textContent =
+    "Имя: " + file.name + "\n" +
+    "Тип: " + file.type + "\n" +
+    "Размер: " + formatSize(file.size) + "\n" +
+    "Разрешение: " + meta.width + " × " + meta.height + "\n" +
+    "Экономия: " + savedPercent + "%";
 
-      img.src =
-        src;
+  downloadBtn.disabled = false;
+}
 
+/*
+================================
+CROP POINTER
+================================
+*/
+
+editCanvas.addEventListener("mousedown", (event) => {
+  if (!sourceImage || activeMode !== "crop") return;
+
+  const pos = getMousePosOnCanvas(event);
+
+  isSelectingCrop = true;
+  cropStartX = pos.x;
+  cropStartY = pos.y;
+
+  cropRect = {
+    x: pos.x,
+    y: pos.y,
+    width: 0,
+    height: 0
+  };
+
+  drawEditor();
+});
+
+editCanvas.addEventListener("mousemove", (event) => {
+  if (!sourceImage) return;
+
+  if (activeMode === "crop" && isSelectingCrop) {
+    const pos = getMousePosOnCanvas(event);
+    updateCropByCurrentPoint(pos.x, pos.y);
+    drawEditor();
+  }
+
+  if (activeMode === "resize" && isPanningResize) {
+    const pos = getMousePosOnCanvas(event);
+    panResizeView(pos.x, pos.y);
+    drawEditor();
+    suppressResizeClick = true;
+  }
+});
+
+window.addEventListener("mouseup", () => {
+  if (activeMode === "crop" && isSelectingCrop) {
+    isSelectingCrop = false;
+    normalizeCropRect();
+    clampCropRectToCanvas();
+    drawEditor();
+  }
+
+  if (activeMode === "resize" && isPanningResize) {
+    isPanningResize = false;
+    updateModeUI();
+  }
+});
+
+/*
+================================
+RESIZE POINTER
+================================
+*/
+
+editCanvas.addEventListener("click", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
+
+  if (suppressResizeClick) {
+    suppressResizeClick = false;
+    return;
+  }
+
+  const pos = getMousePosOnCanvas(event);
+  setResizeCenterFromCanvasPoint(pos.x, pos.y);
+  drawEditor();
+});
+
+editCanvas.addEventListener("mousedown", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
+  if (resizeView.zoom <= 1) return;
+
+  const pos = getMousePosOnCanvas(event);
+
+  isPanningResize = true;
+  resizePanStartCanvasX = pos.x;
+  resizePanStartCanvasY = pos.y;
+  resizePanStartCenterX = resizeView.centerX;
+  resizePanStartCenterY = resizeView.centerY;
+  suppressResizeClick = false;
+
+  editCanvas.style.cursor = "grabbing";
+});
+
+editCanvas.addEventListener("wheel", (event) => {
+  if (!sourceImage || activeMode !== "resize") return;
+
+  event.preventDefault();
+
+  const mousePos = getMousePosOnCanvas(event);
+  const beforeRect = getResizeSourceRect();
+
+  const focusX = beforeRect.srcX + beforeRect.srcW * (mousePos.x / editCanvas.width);
+  const focusY = beforeRect.srcY + beforeRect.srcH * (mousePos.y / editCanvas.height);
+
+  const delta = event.deltaY < 0 ? 1.12 : 0.89;
+  const newZoom = clamp(resizeView.zoom * delta, 1, 20);
+
+  resizeView.zoom = newZoom;
+
+  const afterRect = getResizeSourceRect();
+
+  resizeView.centerX += focusX - (afterRect.srcX + afterRect.srcW * (mousePos.x / editCanvas.width));
+  resizeView.centerY += focusY - (afterRect.srcY + afterRect.srcH * (mousePos.y / editCanvas.height));
+
+  resizeView.centerX = clamp(resizeView.centerX, 0, imageNaturalWidth);
+  resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
+
+  updateModeUI();
+  drawEditor();
+}, { passive: false });
+
+/*
+================================
+TOUCH
+================================
+*/
+
+editCanvas.addEventListener("touchstart", (event) => {
+  if (!sourceImage) return;
+
+  if (activeMode === "crop") {
+    if (event.touches.length !== 1) return;
+
+    event.preventDefault();
+
+    const pos = getTouchPosOnCanvas(event);
+
+    isSelectingCrop = true;
+    cropStartX = pos.x;
+    cropStartY = pos.y;
+
+    cropRect = {
+      x: pos.x,
+      y: pos.y,
+      width: 0,
+      height: 0
+    };
+
+    drawEditor();
+    return;
+  }
+
+  if (activeMode === "resize") {
+    if (event.touches.length === 1) {
+      event.preventDefault();
+
+      const pos = getTouchPosOnCanvas(event);
+      setResizeCenterFromCanvasPoint(pos.x, pos.y);
+
+      if (resizeView.zoom > 1) {
+        isPanningResize = true;
+        resizePanStartCanvasX = pos.x;
+        resizePanStartCanvasY = pos.y;
+        resizePanStartCenterX = resizeView.centerX;
+        resizePanStartCenterY = resizeView.centerY;
+        suppressResizeClick = false;
+      }
+
+      drawEditor();
     }
-  );
 
-}
-
-/* =========================================
-   CANVAS → BLOB
-========================================= */
-
-function canvasToBlob(
-  canvas,
-  type,
-  quality
-) {
-
-  return new Promise(
-    (resolve) => {
-
-      canvas.toBlob(
-        resolve,
-        type,
-        quality
-      );
-
+    if (event.touches.length === 2) {
+      event.preventDefault();
+      pinchStartDistance = getTouchDistance(event);
+      pinchStartZoom = resizeView.zoom;
     }
-  );
+  }
+}, { passive: false });
 
+editCanvas.addEventListener("touchmove", (event) => {
+  if (!sourceImage) return;
+
+  if (activeMode === "crop") {
+    if (!isSelectingCrop || event.touches.length !== 1) return;
+
+    event.preventDefault();
+
+    const pos = getTouchPosOnCanvas(event);
+    updateCropByCurrentPoint(pos.x, pos.y);
+    drawEditor();
+    return;
+  }
+
+  if (activeMode === "resize") {
+    if (event.touches.length === 1 && isPanningResize && resizeView.zoom > 1) {
+      event.preventDefault();
+
+      const pos = getTouchPosOnCanvas(event);
+      panResizeView(pos.x, pos.y);
+      drawEditor();
+      suppressResizeClick = true;
+      return;
+    }
+
+    if (event.touches.length === 2 && pinchStartDistance !== null) {
+      event.preventDefault();
+
+      const distance = getTouchDistance(event);
+      const ratio = distance / pinchStartDistance;
+      resizeView.zoom = clamp(pinchStartZoom * ratio, 1, 20);
+
+      updateModeUI();
+      drawEditor();
+    }
+  }
+}, { passive: false });
+
+window.addEventListener("touchend", (event) => {
+  if (activeMode === "crop" && isSelectingCrop) {
+    isSelectingCrop = false;
+    normalizeCropRect();
+    clampCropRectToCanvas();
+    drawEditor();
+  }
+
+  if (activeMode === "resize") {
+    if (!event.touches || event.touches.length < 2) {
+      pinchStartDistance = null;
+    }
+
+    if (!event.touches || event.touches.length === 0) {
+      isPanningResize = false;
+      updateModeUI();
+    }
+  }
+}, { passive: false });
+
+/*
+================================
+HELPERS CROP
+================================
+*/
+
+function updateCropByCurrentPoint(currentX, currentY) {
+  let x = cropStartX;
+  let y = cropStartY;
+  let width = currentX - cropStartX;
+  let height = currentY - cropStartY;
+
+  const mode = cropModeSelect.value;
+
+  if (mode !== "free") {
+    const ratio = getCropRatio(mode);
+    const absWidth = Math.abs(width);
+    const absHeight = Math.abs(height);
+
+    if (absWidth / ratio > absHeight) {
+      height = Math.sign(height || 1) * Math.round(absWidth / ratio);
+    } else {
+      width = Math.sign(width || 1) * Math.round(absHeight * ratio);
+    }
+  }
+
+  cropRect = { x, y, width, height };
+  normalizeCropRect();
+  clampCropRectToCanvas();
 }
 
-/* =========================================
-   СТАТУС
-========================================= */
+function normalizeCropRect() {
+  if (!cropRect) return;
 
-function setStatus(
-  text
-) {
+  if (cropRect.width < 0) {
+    cropRect.x += cropRect.width;
+    cropRect.width = Math.abs(cropRect.width);
+  }
 
-  statusText.textContent =
-    text;
-
+  if (cropRect.height < 0) {
+    cropRect.y += cropRect.height;
+    cropRect.height = Math.abs(cropRect.height);
+  }
 }
 
+function clampCropRectToCanvas() {
+  if (!cropRect) return;
+
+  if (cropRect.x < 0) {
+    cropRect.width += cropRect.x;
+    cropRect.x = 0;
+  }
+
+  if (cropRect.y < 0) {
+    cropRect.height += cropRect.y;
+    cropRect.y = 0;
+  }
+
+  if (cropRect.x + cropRect.width > editCanvas.width) {
+    cropRect.width = editCanvas.width - cropRect.x;
+  }
+
+  if (cropRect.y + cropRect.height > editCanvas.height) {
+    cropRect.height = editCanvas.height - cropRect.y;
+  }
+
+  cropRect.width = Math.max(1, cropRect.width);
+  cropRect.height = Math.max(1, cropRect.height);
+}
+
+/*
+================================
+HELPERS RESIZE
+================================
+*/
+
+function setResizeCenterFromCanvasPoint(canvasX, canvasY) {
+  const rect = getResizeSourceRect();
+
+  const relX = canvasX / editCanvas.width;
+  const relY = canvasY / editCanvas.height;
+
+  resizeView.centerX = rect.srcX + rect.srcW * relX;
+  resizeView.centerY = rect.srcY + rect.srcH * relY;
+
+  resizeView.centerX = clamp(resizeView.centerX, 0, imageNaturalWidth);
+  resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
+}
+
+function panResizeView(currentCanvasX, currentCanvasY) {
+  /*
+    Берём размеры окна от стартового состояния.
+    Так drag работает стабильно и без рывков.
+  */
+  const zoom = Math.max(1, resizeView.zoom);
+
+  let srcW = imageNaturalWidth / zoom;
+  let srcH = imageNaturalHeight / zoom;
+
+  const canvasRatio = editCanvas.width / editCanvas.height;
+  const srcRatio = srcW / srcH;
+
+  if (srcRatio > canvasRatio) {
+    srcW = srcH * canvasRatio;
+  } else {
+    srcH = srcW / canvasRatio;
+  }
+
+  const imagePerCanvasX = srcW / editCanvas.width;
+  const imagePerCanvasY = srcH / editCanvas.height;
+
+  const dxCanvas = currentCanvasX - resizePanStartCanvasX;
+  const dyCanvas = currentCanvasY - resizePanStartCanvasY;
+
+  resizeView.centerX = resizePanStartCenterX - dxCanvas * imagePerCanvasX;
+  resizeView.centerY = resizePanStartCenterY - dyCanvas * imagePerCanvasY;
+
+  resizeView.centerX = clamp(resizeView.centerX, 0, imageNaturalWidth);
+  resizeView.centerY = clamp(resizeView.centerY, 0, imageNaturalHeight);
+}
+
+/*
+================================
+COMMON HELPERS
+================================
+*/
+
+function getCropRatio(mode) {
+  if (mode === "square") return 1 / 1;
+  if (mode === "landscape") return 4 / 3;
+  if (mode === "portrait") return 3 / 4;
+  return null;
+}
+
+function getMousePosOnCanvas(event) {
+  const rect = editCanvas.getBoundingClientRect();
+  const scaleX = editCanvas.width / rect.width;
+  const scaleY = editCanvas.height / rect.height;
+
+  return {
+    x: Math.round((event.clientX - rect.left) * scaleX),
+    y: Math.round((event.clientY - rect.top) * scaleY)
+  };
+}
+
+function getTouchPosOnCanvas(event) {
+  const touch = event.touches[0] || event.changedTouches[0];
+  const rect = editCanvas.getBoundingClientRect();
+  const scaleX = editCanvas.width / rect.width;
+  const scaleY = editCanvas.height / rect.height;
+
+  return {
+    x: Math.round((touch.clientX - rect.left) * scaleX),
+    y: Math.round((touch.clientY - rect.top) * scaleY)
+  };
+}
+
+function getTouchDistance(event) {
+  const t1 = event.touches[0];
+  const t2 = event.touches[1];
+  const dx = t2.clientX - t1.clientX;
+  const dy = t2.clientY - t1.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Ошибка чтения файла."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Ошибка загрузки изображения."));
+    img.src = src;
+  });
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Не удалось создать Blob."));
+        return;
+      }
+      resolve(blob);
+    }, type, quality);
+  });
+}
+
+function getImageMetaFromObjectUrl(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = () => reject(new Error("Не удалось прочитать размеры результата."));
+    img.src = url;
+  });
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+}
+
+function setStatus(text) {
+  statusBox.textContent = text;
+}
+
+function clearStatus() {
+  statusBox.textContent = "";
+}
+
+function clearCanvas() {
+  editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+  editCanvas.style.display = "none";
+  sourceImage = null;
+  cropRect = null;
+}
+
+function resetResult() {
+  if (processedObjectUrl) {
+    URL.revokeObjectURL(processedObjectUrl);
+    processedObjectUrl = null;
+  }
+
+  processedFile = null;
+  resultPreview.src = "";
+  resultPreview.style.display = "none";
+  resultInfo.textContent = "";
+  downloadBtn.disabled = true;
+}
 </script>
-
-
 
 
 
@@ -788,7 +1899,7 @@ function setStatus(
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-АВАТАР круглый| v1.5.1
+Круглая кнопка-  АВАТАР - круглый| v1.5.2
 
   </div>
 
