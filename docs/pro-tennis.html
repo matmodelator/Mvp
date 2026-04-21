@@ -111,30 +111,23 @@ button:hover {
 <form id="profileForm">
 
 <label>Game</label>
-
 <select id="game" required>
+  <option value="" disabled selected hidden>
+    choose game
+  </option>
+  <option value="both">tennis + padel</option>
+  <option value="tennis">tennis</option>
+  <option value="padel">padel</option>
+</select>
 
-<option value=""
-        disabled
-        selected
-        hidden>
-
-choose game
-
-</option>
-
-<option value="both">
-tennis + padel
-</option>
-
-<option value="tennis">
-tennis
-</option>
-
-<option value="padel">
-padel
-</option>
-
+<label>Events</label>
+<select id="events" required>
+  <option value="" disabled selected hidden>
+    choose events
+  </option>
+  <option value="both">singles + doubles</option>
+  <option value="singles">singles</option>
+  <option value="doubles">doubles</option>
 </select>
 
 <input id="nickname"
@@ -311,36 +304,16 @@ form.addEventListener(
     if (!user) return
 
     const payload = {
-
-      id:
-        user.id,
-
-      game:
-        game.value,
-
-      nickname:
-        nickname.value.trim(),
-
-      country:
-        country.value.trim(),
-
-      city:
-        city.value.trim(),
-
-      level:
-        Number(level.value),
-
-      experience:
-        experience.value,
-
-      events:
-        events.value.trim(),
-
-      updated_at:
-        new Date()
-          .toISOString()
-
-    }
+  id: user.id,
+  game: game.value,
+  nickname: nickname.value.trim(),
+  country: country.value.trim(),
+  city: city.value.trim(),
+  level: Number(level.value),
+  experience: experience.value,
+  events: events.value,
+  updated_at: new Date().toISOString()
+}
 
     const { error } =
       await supabase
@@ -389,7 +362,7 @@ loadProfile()
 
   <div class="row" id="build-top">
 
-  forms/save | v1.1.3
+  events | v1.1.4
 
   </div>
 
