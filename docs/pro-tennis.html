@@ -144,61 +144,40 @@ button:hover {
        placeholder="city" />
 
 <label>Level</label>
-
 <select id="level" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-choose level
-</option>
-
-<option value="10">10 — Beginner</option>
-<option value="9">9 — Rookie</option>
-<option value="8">8 — Amateur</option>
-<option value="7">7 — Advanced</option>
-<option value="6">6 — Skilled</option>
-<option value="5">5 — Medium</option>
-<option value="4">4 — Strong</option>
-<option value="3">3 — Expert</option>
-<option value="2">2 — Master</option>
-<option value="1">1 — Profi</option>
-
+  <option value="" disabled selected hidden>
+    choose level
+  </option>
+  <option value="10">10 — Beginner</option>
+  <option value="9">9 — Rookie</option>
+  <option value="8">8 — Amateur</option>
+  <option value="7">7 — Advanced</option>
+  <option value="6">6 — Skilled</option>
+  <option value="5">5 — Medium</option>
+  <option value="4">4 — Strong</option>
+  <option value="3">3 — Expert</option>
+  <option value="2">2 — Master</option>
+  <option value="1">1 — Profi</option>
 </select>
 
 <label>Experience</label>
-
 <select id="experience" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-choose experience
-</option>
-
-<option value="less_1_year">
-Less than 1 year
-</option>
-
-<option value="1_3_years">
-1–3 years
-</option>
-
-<option value="3_5_years">
-3–5 years
-</option>
-
-<option value="5_plus_years">
-5+ years
-</option>
-
+  <option value="" disabled selected hidden>
+    choose experience
+  </option>
+  <option value="less_1_year">
+    Less than 1 year
+  </option>
+  <option value="1_3_years">
+    1–3 years
+  </option>
+  <option value="3_5_years">
+    3–5 years
+  </option>
+  <option value="5_plus_years">
+    5+ years
+  </option>
 </select>
-
-<input id="events"
-       type="text"
-       placeholder="events" />
 
 <button type="submit">
 Сохранить профиль
@@ -229,11 +208,30 @@ const form =
 const message =
   document.getElementById('message')
 
-function showMessage(text, type = '') {
+const game =
+  document.getElementById('game')
 
+const events =
+  document.getElementById('events')
+
+const nickname =
+  document.getElementById('nickname')
+
+const country =
+  document.getElementById('country')
+
+const city =
+  document.getElementById('city')
+
+const level =
+  document.getElementById('level')
+
+const experience =
+  document.getElementById('experience')
+
+function showMessage(text, type = '') {
   message.textContent = text
   message.className = `msg ${type}`
-
 }
 
 async function loadProfile() {
@@ -246,16 +244,13 @@ async function loadProfile() {
       .getUser()
 
   if (!user) {
-
-    window.location.href =
-      'log.html'
-
+    window.location.href = 'log.html'
     return
-
   }
 
   const {
-    data
+    data,
+    error
   } =
     await supabase
       .from('profiles')
@@ -263,10 +258,18 @@ async function loadProfile() {
       .eq('id', user.id)
       .maybeSingle()
 
+  if (error) {
+    showMessage(error.message, 'error')
+    return
+  }
+
   if (!data) return
 
   game.value =
     data.game || ''
+
+  events.value =
+    data.events || ''
 
   nickname.value =
     data.nickname || ''
@@ -282,10 +285,6 @@ async function loadProfile() {
 
   experience.value =
     data.experience || ''
-
-  events.value =
-    data.events || ''
-
 }
 
 form.addEventListener(
@@ -301,19 +300,22 @@ form.addEventListener(
         .auth
         .getUser()
 
-    if (!user) return
+    if (!user) {
+      showMessage('Сессия не найдена', 'error')
+      return
+    }
 
     const payload = {
-  id: user.id,
-  game: game.value,
-  nickname: nickname.value.trim(),
-  country: country.value.trim(),
-  city: city.value.trim(),
-  level: Number(level.value),
-  experience: experience.value,
-  events: events.value,
-  updated_at: new Date().toISOString()
-}
+      id: user.id,
+      game: game.value,
+      events: events.value,
+      nickname: nickname.value.trim(),
+      country: country.value.trim(),
+      city: city.value.trim(),
+      level: Number(level.value),
+      experience: experience.value,
+      updated_at: new Date().toISOString()
+    }
 
     const { error } =
       await supabase
@@ -326,23 +328,12 @@ form.addEventListener(
         )
 
     if (error) {
-
-      showMessage(
-        error.message,
-        'error'
-      )
-
+      showMessage(error.message, 'error')
       return
-
     }
 
-    showMessage(
-      'Профиль сохранен',
-      'success'
-    )
-
+    showMessage('Профиль сохранен', 'success')
   }
-
 )
 
 loadProfile()
@@ -354,22 +345,14 @@ loadProfile()
      alt="MVP logo">
 </div>
 
-<!-- ========================================
-     SERVICE CONSOLE
-======================================== -->
-
 <div id="service-console">
 
   <div class="row" id="build-top">
-
-  events | v1.1.4
-
+   fix events | v1.1.5
   </div>
 
   <div class="row" id="build-down">
-
-  deploy: --
-
+    deploy: --
   </div>
 
 </div>
