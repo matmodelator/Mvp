@@ -1,474 +1,605 @@
 <!DOCTYPE html>
 <html lang="ru">
 
-<head>  
+<head>
 
-<meta charset="UTF-8" />
+  <meta charset="UTF-8" />
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
 
-<title>Профиль - знакомства, общение</title>
+  <title>Профиль - знакомства, общение</title>
 
-<link rel="stylesheet"
-      href="styles/console.css" />
+  <!-- СТИЛЬ КОНСОЛИ -->
+  <link rel="stylesheet"
+        href="styles/console.css" />
 
-<style>
+  <style>
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f8;
-  margin: 0;
-}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+    }
 
-header {
-  background: #2563eb;
-  color: white;
-  padding: 16px;
-  text-align: center;
-}
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
 
-.container {
-  max-width: 500px;
-  margin: 40px auto;
-  background: white;
-  padding: 24px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-h2 {
-  text-align: center;
-  margin-top: 0;
-}
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
 
-input,
-select,
-textarea,
-button {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
 
-button {
-  border: none;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
-}
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
 
-button:hover {
-  background: #1d4ed8;
-}
+    button:hover {
+      background: #1d4ed8;
+    }
 
-.msg {
-  margin-top: 14px;
-  text-align: center;
-}
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
 
-.error {
-  color: #b91c1c;
-}
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+    }
 
-.success {
-  color: #15803d;
-}
+    .error {
+      color: #b91c1c;
+    }
 
-/* LOGO */
+    .success {
+      color: #15803d;
+    }
 
-.logo-bottom {
-  width: 100%;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
+    /* ========================= */
+    /* LOGO BOTTOM */
+    /* ========================= */
 
-.logo-bottom img {
-  height: 60px;
-  width: auto;
-  opacity: 0.9;
-}
+    .logo-bottom {
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
 
-</style>
+    .logo-bottom img {
+      height: 60px;
+      width: auto;
+      opacity: 0.9;
+    }
+
+  </style>
 
 </head>
 
 <body>
 
-<header>
-<h1>Dating App MVP</h1>
-</header>
+  <header>
+    <h1>Dating App MVP</h1>
+  </header>
 
-<div class="container">
-
-<h2>Изменить профиль</h2>
-
-<form id="profileForm">
-
-<label>Mode</label>
-
-<select id="mode" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-
-choose mode
-
-</option>
-
-<option value="both">
-relationship + meetups
-</option>
-
-<option value="relationship">
-relationship
-</option>
-
-<option value="meetups">
-meetups
-</option>
-
-</select>
-
-<input id="nickname"
-       type="text"
-       placeholder="nickname"
-       required />
-
-<input id="country"
-       type="text"
-       placeholder="country" />
-
-<input id="city"
-       type="text"
-       placeholder="city" />
-
-<label>Sex</label>
-
-<select id="sex" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-
-choose orientation
-
-</option>
-
-<option value="hetero">
-hetero
-</option>
-
-<option value="homo">
-homo
-</option>
-
-<option value="bi">
-bi
-</option>
-
-<option value="couple">
-couple
-</option>
-
-<option value="other">
-other
-</option>
-
-</select>
-
-<label>Zodiac</label>
-
-<select id="zodiac" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-
-choose zodiac
-
-</option>
-
-<option value="Aries">Aries</option>
-<option value="Taurus">Taurus</option>
-<option value="Gemini">Gemini</option>
-<option value="Cancer">Cancer</option>
-<option value="Leo">Leo</option>
-<option value="Virgo">Virgo</option>
-<option value="Libra">Libra</option>
-<option value="Scorpio">Scorpio</option>
-<option value="Sagittarius">Sagittarius</option>
-<option value="Capricorn">Capricorn</option>
-<option value="Aquarius">Aquarius</option>
-<option value="Pisces">Pisces</option>
-
-</select>
-
-<label>Status</label>
-
-<select id="statusField" required>
-
-<option value=""
-        disabled
-        selected
-        hidden>
-
-choose status
-
-</option>
-
-<option value="Single">
-Single
-</option>
-
-<option value="Married">
-Married
-</option>
-
-<option value="Boyfriend">
-Boyfriend
-</option>
-
-<option value="Girlfriend">
-Girlfriend
-</option>
-
-</select>
-
-<button type="submit">
-
-Сохранить профиль
-
-</button>
-
-</form>
-
-<div id="message"
-     class="msg">
-
-</div>
-
-</div>
-
-<script type="module">
-
-import { createClient }
-from 'https://esm.sh/@supabase/supabase-js@2'
-
-const supabase =
-  createClient(
-    'https://fnodbpiwkkrdgqvmyanq.supabase.co',
-    'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
-  )
-
-const form =
-  document.getElementById('profileForm')
-
-const message =
-  document.getElementById('message')
-
-function showMessage(text, type = '') {
-
-  message.textContent = text
-  message.className = `msg ${type}`
-
-}
-
-async function loadProfile() {
-
-  const {
-    data: { user }
-  } =
-    await supabase
-      .auth
-      .getUser()
-
-  if (!user) {
-
-    window.location.href =
-      'log.html'
-
-    return
-
-  }
-
-  const {
-    data
-  } =
-    await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle()
-
-  if (!data) return
-
-  mode.value =
-    data.mode || ''
-
-  nickname.value =
-    data.nickname || ''
-
-  country.value =
-    data.country || ''
-
-  city.value =
-    data.city || ''
-
-  sex.value =
-    data.sex || ''
-
-  zodiac.value =
-    data.zodiac || ''
-
-  statusField.value =
-    data.status || ''
-
-}
-
-form.addEventListener(
-  'submit',
-  async function (event) {
-
-    event.preventDefault()
-
-    const {
-      data: { user }
-    } =
-      await supabase
-        .auth
-        .getUser()
-
-    if (!user) return
-
-    const payload = {
-
-      id:
-        user.id,
-
-      mode:
-        mode.value,
-
-      nickname:
-        nickname.value.trim(),
-
-      country:
-        country.value.trim(),
-
-      city:
-        city.value.trim(),
-
-      sex:
-        sex.value,
-
-      zodiac:
-        zodiac.value,
-
-      status:
-        statusField.value,
-
-      updated_at:
-        new Date()
-          .toISOString()
-
-    }
-
-    const { error } =
-      await supabase
-        .from('profiles')
-        .upsert(
-          payload,
-          {
-            onConflict: 'id'
-          }
-        )
-
-    if (error) {
-
-      showMessage(
-        error.message,
-        'error'
+  <div class="container">
+
+    <h2>Изменить профиль</h2>
+
+    <form id="profileForm">
+
+      <!-- ========================= -->
+      <!-- MODE -->
+      <!-- ========================= -->
+
+      <label for="mode">Mode</label>
+
+      <select id="mode" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose mode
+        </option>
+
+        <option value="both">
+          relationship + meetups
+        </option>
+
+        <option value="relationship">
+          relationship
+        </option>
+
+        <option value="meetups">
+          meetups
+        </option>
+      </select>
+
+      <!-- ========================= -->
+      <!-- NICKNAME -->
+      <!-- ========================= -->
+
+      <input id="nickname"
+             type="text"
+             placeholder="nickname"
+             required />
+
+      <!-- ========================= -->
+      <!-- COUNTRY -->
+      <!-- ========================= -->
+
+      <input id="country"
+             type="text"
+             placeholder="country" />
+
+      <!-- ========================= -->
+      <!-- CITY -->
+      <!-- ========================= -->
+
+      <input id="city"
+             type="text"
+             placeholder="city" />
+
+      <!-- ========================= -->
+      <!-- SEX -->
+      <!-- ========================= -->
+
+      <label for="sex">Sex</label>
+
+      <select id="sex" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose orientation
+        </option>
+
+        <option value="hetero">
+          hetero
+        </option>
+
+        <option value="homo">
+          homo
+        </option>
+
+        <option value="bi">
+          bi
+        </option>
+
+        <option value="couple">
+          couple
+        </option>
+
+        <option value="other">
+          other
+        </option>
+      </select>
+
+      <!-- ========================= -->
+      <!-- ZODIAC -->
+      <!-- ========================= -->
+
+      <label for="zodiac">Zodiac</label>
+
+      <select id="zodiac" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose zodiac
+        </option>
+
+        <option value="Aries">Aries</option>
+        <option value="Taurus">Taurus</option>
+        <option value="Gemini">Gemini</option>
+        <option value="Cancer">Cancer</option>
+        <option value="Leo">Leo</option>
+        <option value="Virgo">Virgo</option>
+        <option value="Libra">Libra</option>
+        <option value="Scorpio">Scorpio</option>
+        <option value="Sagittarius">Sagittarius</option>
+        <option value="Capricorn">Capricorn</option>
+        <option value="Aquarius">Aquarius</option>
+        <option value="Pisces">Pisces</option>
+      </select>
+
+      <!-- ========================= -->
+      <!-- STATUS -->
+      <!-- ========================= -->
+
+      <label for="statusField">Status</label>
+
+      <select id="statusField" required>
+        <option value=""
+                disabled
+                selected
+                hidden>
+          choose status
+        </option>
+
+        <option value="Single">
+          Single
+        </option>
+
+        <option value="Married">
+          Married
+        </option>
+
+        <option value="Boyfriend">
+          Boyfriend
+        </option>
+
+        <option value="Girlfriend">
+          Girlfriend
+        </option>
+      </select>
+
+      <!-- ========================= -->
+      <!-- BUTTONS -->
+      <!-- ========================= -->
+
+      <button type="submit">
+        Сохранить профиль
+      </button>
+
+      <button type="button"
+              id="photoButton"
+              onclick="goPhotoEditor()"
+              disabled>
+        Редактировать фото
+      </button>
+
+    </form>
+
+    <div id="message"
+         class="msg"></div>
+
+  </div>
+
+  <script type="module">
+
+    import { createClient }
+    from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase =
+      createClient(
+        'https://fnodbpiwkkrdgqvmyanq.supabase.co',
+        'sb_publishable_9GjllWmCfI2E7okWGOG9Wg_qCh8Gv6T'
       )
 
-      return
+    /* ========================================
+       ЭЛЕМЕНТЫ СТРАНИЦЫ
+    ======================================== */
+
+    const form =
+      document.getElementById('profileForm')
+
+    const message =
+      document.getElementById('message')
+
+    const photoButton =
+      document.getElementById('photoButton')
+
+    const mode =
+      document.getElementById('mode')
+
+    const nickname =
+      document.getElementById('nickname')
+
+    const country =
+      document.getElementById('country')
+
+    const city =
+      document.getElementById('city')
+
+    const sex =
+      document.getElementById('sex')
+
+    const zodiac =
+      document.getElementById('zodiac')
+
+    const statusField =
+      document.getElementById('statusField')
+
+    /* ========================================
+       СООБЩЕНИЕ
+    ======================================== */
+
+    function showMessage(text, type = '') {
+
+      message.textContent = text
+      message.className = `msg ${type}`
 
     }
 
-    showMessage(
-      'Профиль сохранен',
-      'success'
+    /* ========================================
+       РАЗБЛОКИРОВАТЬ КНОПКУ ФОТО
+    ======================================== */
+
+    function enablePhotoButton() {
+
+      photoButton.disabled = false
+
+    }
+
+    /* ========================================
+       ПЕРЕХОД НА СТРАНИЦУ ФОТО
+       СЛОТЫ ВЫБИРАЮТСЯ УЖЕ ТАМ
+    ======================================== */
+
+    function goPhotoEditor() {
+
+      window.location.href = 'gallery.html'
+
+    }
+
+    window.goPhotoEditor =
+      goPhotoEditor
+
+    /* ========================================
+       ЗАГРУЗКА ПРОФИЛЯ
+    ======================================== */
+
+    async function loadProfile() {
+
+      const {
+        data: { user },
+        error: userError
+      } =
+        await supabase.auth.getUser()
+
+      if (userError || !user) {
+
+        window.location.href = 'log.html'
+        return
+
+      }
+
+      const {
+        data,
+        error
+      } =
+        await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          'error'
+        )
+
+        return
+
+      }
+
+      /* если профиль уже есть —
+         подставляем данные
+         и разрешаем переход к фото */
+
+      if (data) {
+
+        mode.value =
+          data.mode || ''
+
+        nickname.value =
+          data.nickname || ''
+
+        country.value =
+          data.country || ''
+
+        city.value =
+          data.city || ''
+
+        sex.value =
+          data.sex || ''
+
+        zodiac.value =
+          data.zodiac || ''
+
+        statusField.value =
+          data.status || ''
+
+        enablePhotoButton()
+
+      }
+
+    }
+
+    /* ========================================
+       СОХРАНЕНИЕ ПРОФИЛЯ
+    ======================================== */
+
+    form.addEventListener(
+      'submit',
+      async function (event) {
+
+        event.preventDefault()
+
+        const {
+          data: { user },
+          error: userError
+        } =
+          await supabase.auth.getUser()
+
+        if (userError || !user) {
+
+          showMessage(
+            'Сессия не найдена',
+            'error'
+          )
+
+          return
+
+        }
+
+        const payload = {
+          id: user.id,
+          mode: mode.value,
+          nickname: nickname.value.trim(),
+          country: country.value.trim(),
+          city: city.value.trim(),
+          sex: sex.value,
+          zodiac: zodiac.value,
+          status: statusField.value,
+          updated_at: new Date().toISOString()
+        }
+
+        const { error } =
+          await supabase
+            .from('profiles')
+            .upsert(
+              payload,
+              {
+                onConflict: 'id'
+              }
+            )
+
+        if (error) {
+
+          showMessage(
+            error.message,
+            'error'
+          )
+
+          return
+
+        }
+
+        showMessage(
+          'Профиль сохранен. Теперь можно перейти к фото.',
+          'success'
+        )
+
+        /* после успешного сохранения
+           открываем доступ к фото */
+
+        enablePhotoButton()
+
+      }
     )
 
-  }
+    /* ========================================
+       СТАРТ
+    ======================================== */
 
-)
+    loadProfile()
 
-loadProfile()
+  </script>
 
-</script>
+  <div class="logo-bottom">
+    <img src="images/logo.svg"
+         alt="MVP logo">
+  </div>
 
-<div class="logo-bottom">
-<img src="images/logo.svg"
-     alt="MVP logo">
-</div>
+  <!-- ========================================
+       SERVICE CONSOLE
+       Верхняя строка редактируется вручную
+       Здесь задается:
+       - название страницы
+       - номер версии
+  ======================================== -->
 
-<div id="service-console">
+  <div id="service-console">
 
-<div class="row" id="build-top">
+    <div class="row" id="build-top">
 
-Sex| v1.1.6
+      dating double from tennis | v1.2.0
 
-</div>
+    </div>
 
-<div class="row" id="build-down">
+    <div class="row" id="build-down">
 
-deploy: --
+      deploy: --
 
-</div>
+    </div>
 
-</div>
+  </div>
 
-<script>
+  <!-- ========================================
+       SCRIPT
+       Автоматически выводит:
+       - дату
+       - время
+       Момент загрузки страницы
+  ======================================== -->
 
-(function () {
+  <script>
 
-const now = new Date()
+    (function () {
 
-const pad =
-  n => String(n).padStart(2,'0')
+      /* Текущая дата и время */
 
-const date =
-    pad(now.getDate())
-  + '.'
-  + pad(now.getMonth() + 1)
-  + '.'
-  + now.getFullYear()
+      const now = new Date()
 
-const time =
-    pad(now.getHours())
-  + ':'
-  + pad(now.getMinutes())
+      /* Добавляет ведущий ноль */
 
-document
-  .getElementById('build-down')
-  .textContent =
-    'deploy: '
-    + date
-    + ' '
-    + time
+      const pad = n =>
+        String(n).padStart(2, '0')
 
-})();
+      /* Формат даты */
 
-</script>
+      const date =
+          pad(now.getDate())
+        + '.'
+        + pad(now.getMonth() + 1)
+        + '.'
+        + now.getFullYear()
+
+      /* Формат времени */
+
+      const time =
+          pad(now.getHours())
+        + ':'
+        + pad(now.getMinutes())
+
+      /* Вывод в нижнюю строку */
+
+      document
+        .getElementById('build-down')
+        .textContent =
+          'deploy: '
+          + date
+          + ' '
+          + time
+
+    })();
+
+  </script>
 
 </body>
 </html>
