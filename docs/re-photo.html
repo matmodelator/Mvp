@@ -462,7 +462,7 @@ button.active {
   </button>
 
   <button type="button" id="uploadMvpBtn">
-    Upload to MVP
+    Load to MVP
   </button>
 </div>
 
@@ -981,38 +981,74 @@ backToOriginalBtn.addEventListener("click", async () => {
 ================================
 */
 
-document.getElementById('downloadBtn').addEventListener('click', () => {
-  if (!canvas) return
+document
+  .getElementById('downloadBtn')
+  .addEventListener('click', () => {
 
-  const link = document.createElement('a')
-  link.href = canvas.toDataURL('image/jpeg', 0.92)
-  link.download = 're-photo.jpg'
-  link.click()
-})
+    if (!processedFile) {
+      setStatus('ERROR: no result to save');
+      return;
+    }
+
+    const downloadUrl =
+      URL.createObjectURL(processedFile);
+
+    const link =
+      document.createElement('a');
+
+    link.href = downloadUrl;
+    link.download = processedFile.name || 're-photo.webp';
+    link.click();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(downloadUrl);
+    }, 1000);
+
+    setStatus('save to disk OK');
+  });
 
 /*
 ================================
 ЗАГРУЗИТЬ РЕЗУЛЬТАТ в ГАЛЕРЕЮ
 ================================
 */
- document.getElementById('uploadMvpBtn').addEventListener('click', () => {
-  if (!canvas) return
 
-  const params = new URLSearchParams(window.location.search)
+document
+  .getElementById('uploadMvpBtn')
+  .addEventListener('click', async () => {
 
-  const slot =
-    params.get('slot')
-    || localStorage.getItem('mvp_photo_slot')
-    || '0'
+    if (!processedFile) {
+      setStatus('ERROR: no result to upload');
+      return;
+    }
 
-  localStorage.setItem(
-    'rephoto_result',
-    canvas.toDataURL('image/jpeg', 0.92)
-  )
+    try {
+      const params =
+        new URLSearchParams(window.location.search);
 
-  window.location.href =
-    `up-photo.html?slot=${encodeURIComponent(slot)}`
-})
+      const slot =
+        params.get('slot')
+        || localStorage.getItem('mvp_photo_slot')
+        || '0';
+
+      const dataUrl =
+        await readFileAsDataURL(processedFile);
+
+      localStorage.setItem(
+        'rephoto_result',
+        dataUrl
+      );
+
+      setStatus('upload to MVP OK');
+
+      window.location.href =
+        'up-photo.html?slot='
+        + encodeURIComponent(slot);
+
+    } catch (error) {
+      setStatus('ERROR: ' + error.message);
+    }
+  });
   
 /*
 ================================
@@ -1060,11 +1096,11 @@ async function loadSourceFileIntoEditor(file) {
   editCanvas.height = Math.round(img.height * scale);
   editCanvas.style.display = "block";
 
-  originalInfo.textContent =
-    "Имя: " + file.name + "\n" +
-    "Тип: " + file.type + "\n" +
-    "Размер: " + formatSize(file.size) + "\n" +
-    "Разрешение: " + img.width + " × " + img.height + "\n" +
+   originalInfo.textContent =
+    "Name: " + file.name + "\n" +
+    "Type: " + file.type + "\n" +
+    "Size: " + formatSize(file.size) + "\n" +
+    "Resolution: " + img.width + " × " + img.height + "\n" +
     "Canvas: " + editCanvas.width + " × " + editCanvas.height;
 }
 
@@ -1386,7 +1422,7 @@ async function buildFinalFile(file, options = {}) {
   outCanvas.height = targetHeight;
 
   const outCtx = outCanvas.getContext("2d");
-  if (!outCtx) throw new Error("Canvas context недоступен.");
+  if (!outCtx) throw new Error("Canvas context unavailable.");
 
   outCtx.filter = buildCanvasFilterString(colorState);
 
@@ -1962,7 +1998,7 @@ function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Error image downloading"));
+    img.onerror = () => reject(new Error("image load error"));
     img.src = src;
   });
 }
@@ -1971,7 +2007,7 @@ function canvasToBlob(canvas, type, quality) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) {
-        reject(new Error("can't make Blob"));
+        reject(new Error("cannot create Blob"));
         return;
       }
       resolve(blob);
@@ -1983,7 +2019,7 @@ function getImageMetaFromObjectUrl(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve({ width: img.width, height: img.height });
-    img.onerror = () => reject(new Error("can't read image data"));
+    img.onerror = () => reject(new Error(cannot read image data"));
     img.src = url;
   });
 }
@@ -2116,7 +2152,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-download & upload buttons| v1.6.0
+fix buttons & notes| v1.6.1
 
   </div>
 
