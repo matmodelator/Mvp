@@ -234,7 +234,26 @@
           class="danger"
           id="clearBtn">
     Clear re-photo buffer
-  </button>
+</button>
+      
+    <button type="button"
+        class="secondary"
+        id="backRePhotoBtn">
+  Back to re-photo
+</button>
+
+<button type="button"
+        class="secondary"
+        id="forwardGalleryBtn">
+  Go to gallery
+</button>
+
+<button type="button"
+        class="secondary"
+        id="upMainBtn">
+  Go to main
+</button>
+  
 </div>
 
     <div id="status" class="status">
@@ -308,6 +327,45 @@
   const clearBtn =
     document.getElementById('clearBtn')
 
+const backRePhotoBtn =
+document.getElementById('backRePhotoBtn')
+
+const forwardGalleryBtn =
+document.getElementById('forwardGalleryBtn')
+
+const upMainBtn =
+document.getElementById('upMainBtn')
+
+/*
+================================
+NAVIGATION
+================================
+*/
+
+function goToRePhoto() {
+
+  const slot =
+    slotSelect.value || '0'
+
+  window.location.href =
+    're-photo.html?slot=' + slot
+
+}
+
+function goToGallery() {
+
+  window.location.href =
+    'gallery.html'
+
+}
+
+function goToMain() {
+
+  window.location.href =
+    'main.html'
+
+}
+   
   /*
   ========================================
   UTILS
@@ -771,6 +829,14 @@
   backBtn.addEventListener('click', goBack)
   clearBtn.addEventListener('click', clearRePhotoBuffer)
 
+backRePhotoBtn
+  .addEventListener('click', goToRePhoto)
+
+forwardGalleryBtn
+  .addEventListener('click', goToGallery)
+
+upMainBtn
+  .addEventListener('click', goToMain)
   /*
   ========================================
   START
@@ -797,7 +863,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-script  change| v1.0.2
+redirect| v1.0.3
 
   </div>
 
