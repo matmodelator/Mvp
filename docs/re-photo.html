@@ -1508,7 +1508,7 @@ async function buildAvatarFile(file, options = {}) {
   outCanvas.height = targetSize;
 
   const outCtx = outCanvas.getContext("2d");
-  if (!outCtx) throw new Error("Canvas context недоступен.");
+  if (!outCtx) throw new Error("Canvas context unavailable");
 
   /* Круглая маска */
   outCtx.save();
@@ -1571,12 +1571,12 @@ async function showResult(file) {
     ? (((referenceSize - file.size) / referenceSize) * 100).toFixed(1)
     : "0";
 
-  resultInfo.textContent =
-    "Имя: " + file.name + "\n" +
-    "Тип: " + file.type + "\n" +
-    "Размер: " + formatSize(file.size) + "\n" +
-    "Разрешение: " + meta.width + " × " + meta.height + "\n" +
-    "Экономия: " + savedPercent + "%";
+ resultInfo.textContent =
+  "Name: " + file.name + "\n" +
+  "Type: " + file.type + "\n" +
+  "Size: " + formatSize(file.size) + "\n" +
+  "Resolution: " + meta.width + " × " + meta.height + "\n" +
+  "Saved: " + savedPercent + "%";
 
   downloadBtn.disabled = false;
 }
@@ -1989,7 +1989,7 @@ function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Error file reading"));
+    reader.onerror = () => reject(new Error("file read error"));
     reader.readAsDataURL(file);
   });
 }
@@ -2019,7 +2019,7 @@ function getImageMetaFromObjectUrl(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve({ width: img.width, height: img.height });
-    img.onerror = () => reject(new Error(cannot read image data"));
+    img.onerror = () => reject(new Error("cannot read image data"));
     img.src = url;
   });
 }
@@ -2152,7 +2152,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-fix buttons & notes| v1.6.1
+fix errors & notes| v1.6.2
 
   </div>
 
