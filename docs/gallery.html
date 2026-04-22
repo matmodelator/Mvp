@@ -30,18 +30,18 @@
     }
 
     .page {
-      max-width: 980px;
+      max-width: 760px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px;
     }
 
     .topbar {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .topbar-left,
@@ -54,11 +54,11 @@
     button {
       border: none;
       border-radius: 8px;
-      padding: 9px 12px;
+      padding: 8px 10px;
       background: #2563eb;
       color: white;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     button:hover {
@@ -92,37 +92,38 @@
     .status-box {
       background: white;
       border-radius: 12px;
-      padding: 12px 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin-bottom: 16px;
-      line-height: 1.45;
+      padding: 10px 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+      line-height: 1.4;
       white-space: pre-line;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .section {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       background: white;
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     }
 
     .section h2 {
-      margin: 0 0 12px 0;
-      font-size: 18px;
+      margin: 0 0 8px 0;
+      font-size: 16px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(108px, 108px));
+      gap: 8px;
+      justify-content: start;
     }
 
     .slot {
       border: 1px solid #d1d5db;
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 7px;
       background: #fafafa;
     }
 
@@ -135,35 +136,35 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 4px;
+      margin-bottom: 6px;
     }
 
     .slot-title {
       font-weight: 700;
-      font-size: 13px;
-      line-height: 1.2;
+      font-size: 11px;
+      line-height: 1.1;
     }
 
     .slot-number {
-      font-size: 11px;
+      font-size: 10px;
       color: #6b7280;
       background: #e5e7eb;
-      padding: 3px 7px;
+      padding: 2px 6px;
       border-radius: 999px;
       white-space: nowrap;
     }
 
     .preview-wrap {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      height: 92px;
       background: #e5e7eb;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       position: relative;
     }
 
@@ -176,36 +177,37 @@
 
     .empty-text {
       color: #6b7280;
-      font-size: 12px;
+      font-size: 10px;
       text-align: center;
-      padding: 8px;
+      padding: 6px;
     }
 
     .slot-actions {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     .slot-actions input[type="file"] {
       width: 100%;
-      font-size: 12px;
-      padding: 6px;
+      font-size: 10px;
+      padding: 4px;
       margin-top: 0;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #ccc;
       background: white;
     }
 
     .slot-actions button {
       width: 100%;
-      padding: 8px 10px;
-      font-size: 12px;
+      padding: 6px 8px;
+      font-size: 10px;
+      border-radius: 6px;
     }
 
     .private-note {
-      margin-top: 8px;
-      font-size: 11px;
+      margin-top: 5px;
+      font-size: 10px;
       color: #6b7280;
       text-align: center;
     }
@@ -234,15 +236,15 @@
 
     @media (max-width: 640px) {
       .page {
-        padding: 12px;
-      }
-
-      .section {
-        padding: 12px;
+        padding: 10px;
       }
 
       .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .preview-wrap {
+        height: 84px;
       }
     }
   </style>
@@ -839,6 +841,7 @@
           'Ошибка сессии:\n' +
           sessionError.message
         )
+        console.log('session error:', sessionError)
         return false
       }
 
@@ -861,7 +864,11 @@
 
       if (userError || !user) {
         currentUser = null
-        window.location.href = 'log.html'
+        setStatus(
+          'Пользователь не найден.\n' +
+          'Сначала войди в аккаунт.'
+        )
+        console.log('user error:', userError)
         return false
       }
 
@@ -912,6 +919,7 @@
           'Ошибка создания пустых слотов:\n' +
           error.message
         )
+        console.log('fill slots error:', error)
         return
       }
 
@@ -936,12 +944,16 @@
 
       clearAllPhotos()
 
-      setStatus('Загружаю gallery...')
+      setStatus(
+        'Загружаю gallery...\n' +
+        'table: gallery\n' +
+        'user: ' + currentUser.id
+      )
 
       const { data, error } =
         await supabase
           .from('gallery')
-          .select('photo_number, photo_url')
+          .select('*')
           .eq('user_id', currentUser.id)
           .order('photo_number', { ascending: true })
 
@@ -950,22 +962,31 @@
           'Ошибка загрузки gallery:\n' +
           error.message
         )
+        console.log('gallery load error:', error)
         return
       }
 
-      if (data && data.length) {
-        data.forEach(row => {
-          showPhoto(
-            row.photo_number,
-            row.photo_url || ''
-          )
-        })
+      console.log('gallery rows:', data)
+
+      if (!data || !data.length) {
+        setStatus(
+          'Gallery пустая.\n' +
+          'Нажми Create empty slots'
+        )
+        return
       }
 
+      data.forEach(row => {
+        showPhoto(
+          row.photo_number,
+          row.photo_url || ''
+        )
+      })
+
       setStatus(
-        `User: ${currentUser.email || 'no email'}\n` +
-        `ID: ${currentUser.id}\n` +
-        'Gallery loaded'
+        'Gallery loaded\n' +
+        'rows: ' + data.length + '\n' +
+        'user: ' + currentUser.id
       )
     }
 
@@ -995,7 +1016,10 @@
       const file =
         input.files?.[0]
 
-      if (!file) return
+      if (!file) {
+        setStatus('Файл не выбран')
+        return
+      }
 
       if (!file.type.startsWith('image/')) {
         setStatus('Можно загружать только image/*')
@@ -1004,10 +1028,16 @@
       }
 
       setSlotLoading(number, true)
-      setStatus(`Загрузка фото ${number}...`)
 
       const filePath =
         getFilePath(currentUser.id, number, file)
+
+      setStatus(
+        'Upload start\n' +
+        'slot: ' + number + '\n' +
+        'path: ' + filePath + '\n' +
+        'name: ' + file.name
+      )
 
       const { error: uploadError } =
         await supabase
@@ -1022,9 +1052,10 @@
       if (uploadError) {
         setSlotLoading(number, false)
         setStatus(
-          `Ошибка upload для ${number}:\n` +
+          'Ошибка upload в storage:\n' +
           uploadError.message
         )
+        console.log('storage upload error:', uploadError)
         input.value = ''
         return
       }
@@ -1037,6 +1068,8 @@
 
       const publicUrl =
         publicData?.publicUrl || null
+
+      console.log('publicUrl:', publicUrl)
 
       const { error: dbError } =
         await supabase
@@ -1055,9 +1088,10 @@
       if (dbError) {
         setSlotLoading(number, false)
         setStatus(
-          `Ошибка записи в БД для ${number}:\n` +
+          'Ошибка записи в gallery:\n' +
           dbError.message
         )
+        console.log('gallery upsert error:', dbError)
         input.value = ''
         return
       }
@@ -1067,9 +1101,9 @@
       setSlotLoading(number, false)
 
       setStatus(
-        `User: ${currentUser.email || 'no email'}\n` +
-        `ID: ${currentUser.id}\n` +
-        `Фото ${number} загружено`
+        'Фото загружено\n' +
+        'slot: ' + number + '\n' +
+        'url: ' + publicUrl
       )
 
       input.value = ''
@@ -1108,6 +1142,7 @@
           `Ошибка очистки слота ${number}:\n` +
           error.message
         )
+        console.log('delete photo error:', error)
         return
       }
 
@@ -1180,7 +1215,7 @@
 
     <div class="row" id="build-top">
 
-      slots & account | v1.0.1
+      size & download | v1.0.2
 
     </div>
 
