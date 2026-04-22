@@ -462,7 +462,7 @@ button.active {
   </button>
 
   <button type="button" id="uploadMvpBtn">
-    Load to MVP
+    Upload to MVP
   </button>
 </div>
 
@@ -1006,7 +1006,6 @@ document
 
     setStatus('save to disk OK');
   });
-
 /*
 ================================
 ЗАГРУЗИТЬ РЕЗУЛЬТАТ в ГАЛЕРЕЮ
@@ -1031,6 +1030,11 @@ document
         || localStorage.getItem('mvp_photo_slot')
         || '0';
 
+      const returnPage =
+        params.get('from')
+        || localStorage.getItem('mvp_photo_return')
+        || 'gallery.html';
+
       const dataUrl =
         await readFileAsDataURL(processedFile);
 
@@ -1039,14 +1043,29 @@ document
         dataUrl
       );
 
-      setStatus('upload to MVP OK');
+      localStorage.setItem(
+        'mvp_photo_slot',
+        String(slot)
+      );
+
+      localStorage.setItem(
+        'mvp_photo_return',
+        returnPage
+      );
+
+      setStatus(
+        'upload to MVP OK'
+      );
 
       window.location.href =
         'up-photo.html?slot='
         + encodeURIComponent(slot);
 
     } catch (error) {
-      setStatus('ERROR: ' + error.message);
+      setStatus(
+        'ERROR: ' +
+        (error.message || error)
+      );
     }
   });
   
@@ -2152,7 +2171,7 @@ function resetResult() {
   <div class="row" id="build-top">
 
     <!-- ВВОД ВРУЧНУЮ -->
-fix errors & notes| v1.6.2
+связка с up-photo/ load &save| v1.7.0
 
   </div>
 
