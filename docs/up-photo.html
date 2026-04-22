@@ -210,29 +210,32 @@
     </div>
 
     <div class="buttons">
-      <button onclick="readFromRePhoto()">
-        Read from re-photo
-      </button>
+  <button type="button" id="readBtn">
+    Read from re-photo
+  </button>
 
-      <button onclick="uploadPhoto()">
-        Upload
-      </button>
+  <button type="button" id="uploadBtn">
+    Upload
+  </button>
 
-      <button class="secondary"
-              onclick="loadCurrentSlotPhoto()">
-        Load current slot
-      </button>
+  <button type="button"
+          class="secondary"
+          id="loadSlotBtn">
+    Load current slot
+  </button>
 
-      <button class="secondary"
-              onclick="goBack()">
-        Back
-      </button>
+  <button type="button"
+          class="secondary"
+          id="backBtn">
+    Back
+  </button>
 
-      <button class="danger"
-              onclick="clearRePhotoBuffer()">
-        Clear re-photo buffer
-      </button>
-    </div>
+  <button type="button"
+          class="danger"
+          id="clearBtn">
+    Clear re-photo buffer
+  </button>
+</div>
 
     <div id="status" class="status">
       Проверяем сессию...
@@ -241,20 +244,9 @@
   </div>
 
   <script type="module">
-    import { createClient }
-    from 'https://esm.sh/@supabase/supabase-js@2'
-
-    const SUPABASE_URL =
-      'https://YOUR-PROJECT.supabase.co'
-
-    const SUPABASE_ANON_KEY =
-      'YOUR_ANON_KEY'
-
-    const supabase =
-      createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      )
+  import { supabase }
+  from './supabase-config.js'
+ 
 
     const BUCKET_NAME = 'photos'
 
@@ -292,6 +284,20 @@
     const sourceLabel =
       document.getElementById('sourceLabel')
 
+const readBtn =
+ document.getElementById('readBtn')
+
+const uploadBtn =
+  document.getElementById('uploadBtn')
+
+const loadSlotBtn =
+  document.getElementById('loadSlotBtn')
+
+const backBtn =
+  document.getElementById('backBtn')
+
+const clearBtn =
+  document.getElementById('clearBtn')
     /*
     ========================================
     UTILS
@@ -739,11 +745,11 @@
     ========================================
     */
 
-    window.readFromRePhoto = readFromRePhoto
-    window.uploadPhoto = uploadPhoto
-    window.goBack = goBack
-    window.clearRePhotoBuffer = clearRePhotoBuffer
-    window.loadCurrentSlotPhoto = loadCurrentSlotPhoto
+    readBtn.addEventListener('click', readFromRePhoto)
+uploadBtn.addEventListener('click', uploadPhoto)
+loadSlotBtn.addEventListener('click', loadCurrentSlotPhoto)
+backBtn.addEventListener('click', goBack)
+clearBtn.addEventListener('click', clearRePhotoBuffer)
 
     buildSlotOptions()
     setSourceLabel()
@@ -765,7 +771,7 @@
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-Start | v1.0.0
+switch to supabase-config & buttons | v1.0.1
 
   </div>
 
