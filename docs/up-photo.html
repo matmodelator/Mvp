@@ -243,519 +243,545 @@
 
   </div>
 
-  <script type="module">
-  import { supabase }
-  from './supabase-config.js'
- 
+ <script type="module">
+  import { supabase } from './supabase-config.js'
 
-    const BUCKET_NAME = 'photos'
+  /*
+  ========================================
+  SETTINGS
+  ========================================
+  */
 
-    /*
-    ========================================
-    КЛЮЧ БУФЕРА ИЗ RE-PHOTO
-    ========================================
-    */
+  const BUCKET_NAME = 'photos'
+  const REPHOTO_STORAGE_KEY = 'rephoto_result'
 
-    const REPHOTO_STORAGE_KEY = 'rephoto_result'
+  /*
+  ========================================
+  STATE
+  ========================================
+  */
 
-    let currentUser = null
-    let currentImageBlob = null
-    let currentImageUrl = ''
-    let currentSource = 'none'
+  let currentUser = null
+  let currentImageBlob = null
+  let currentImageUrl = ''
+  let currentSource = 'none'
 
-    const preview =
-      document.getElementById('preview')
+  /*
+  ========================================
+  DOM
+  ========================================
+  */
 
-    const emptyPreview =
-      document.getElementById('emptyPreview')
+  const preview =
+    document.getElementById('preview')
 
-    const statusBox =
-      document.getElementById('status')
+  const emptyPreview =
+    document.getElementById('emptyPreview')
 
-    const fileInput =
-      document.getElementById('fileInput')
+  const statusBox =
+    document.getElementById('status')
 
-    const slotSelect =
-      document.getElementById('slotSelect')
+  const fileInput =
+    document.getElementById('fileInput')
 
-    const sectionLabel =
-      document.getElementById('sectionLabel')
+  const slotSelect =
+    document.getElementById('slotSelect')
 
-    const sourceLabel =
-      document.getElementById('sourceLabel')
+  const sectionLabel =
+    document.getElementById('sectionLabel')
 
-const readBtn =
- document.getElementById('readBtn')
+  const sourceLabel =
+    document.getElementById('sourceLabel')
 
-const uploadBtn =
-  document.getElementById('uploadBtn')
+  const readBtn =
+    document.getElementById('readBtn')
 
-const loadSlotBtn =
-  document.getElementById('loadSlotBtn')
+  const uploadBtn =
+    document.getElementById('uploadBtn')
 
-const backBtn =
-  document.getElementById('backBtn')
+  const loadSlotBtn =
+    document.getElementById('loadSlotBtn')
 
-const clearBtn =
-  document.getElementById('clearBtn')
-    /*
-    ========================================
-    UTILS
-    ========================================
-    */
+  const backBtn =
+    document.getElementById('backBtn')
 
-    function setStatus(text, cls = '') {
-      statusBox.className = 'status'
-      if (cls) statusBox.classList.add(cls)
-      statusBox.textContent = text
+  const clearBtn =
+    document.getElementById('clearBtn')
+
+  /*
+  ========================================
+  UTILS
+  ========================================
+  */
+
+  function setStatus(text, cls = '') {
+    statusBox.className = 'status'
+    if (cls) statusBox.classList.add(cls)
+    statusBox.textContent = text
+  }
+
+  function getSectionBySlot(slot) {
+    if (slot === 0) return 'avatar'
+    if (slot >= 1 && slot <= 3) return 'base'
+    if (slot >= 4 && slot <= 6) return 'advanced'
+    if (slot >= 7 && slot <= 9) return 'private'
+    if (slot === 10) return 'bonus'
+    return 'unknown'
+  }
+
+  function refreshSectionLabel() {
+    const slot = Number(slotSelect.value)
+    sectionLabel.textContent = getSectionBySlot(slot)
+  }
+
+  function setSourceLabel() {
+    sourceLabel.textContent = currentSource
+  }
+
+  function showPreview(url) {
+    currentImageUrl = url || ''
+
+    if (url) {
+      preview.src = url
+      preview.style.display = 'block'
+      emptyPreview.style.display = 'none'
+    } else {
+      preview.removeAttribute('src')
+      preview.style.display = 'none'
+      emptyPreview.style.display = 'block'
+    }
+  }
+
+  function parseSlotFromUrl() {
+    const params = new URLSearchParams(window.location.search)
+    const slot = Number(params.get('slot'))
+
+    if (Number.isInteger(slot) && slot >= 0 && slot <= 10) {
+      return slot
     }
 
-    function getSectionBySlot(slot) {
-      if (slot === 0) return 'avatar'
-      if (slot >= 1 && slot <= 3) return 'base'
-      if (slot >= 4 && slot <= 6) return 'advanced'
-      if (slot >= 7 && slot <= 9) return 'private'
-      if (slot === 10) return 'bonus'
-      return 'unknown'
+    return 0
+  }
+
+  function buildSlotOptions() {
+    slotSelect.innerHTML = ''
+
+    for (let i = 0; i <= 10; i++) {
+      const option = document.createElement('option')
+      option.value = String(i)
+      option.textContent = `${i} — ${getSectionBySlot(i)}`
+      slotSelect.appendChild(option)
     }
 
-    function refreshSectionLabel() {
-      const slot = Number(slotSelect.value)
-      sectionLabel.textContent =
-        getSectionBySlot(slot)
-    }
+    slotSelect.value = String(parseSlotFromUrl())
+    refreshSectionLabel()
+  }
 
-    function setSourceLabel() {
-      sourceLabel.textContent = currentSource
-    }
+  async function ensureSession() {
+    const {
+      data: { user },
+      error
+    } = await supabase.auth.getUser()
 
-    function showPreview(url) {
-      currentImageUrl = url || ''
-
-      if (url) {
-        preview.src = url
-        preview.style.display = 'block'
-        emptyPreview.style.display = 'none'
-      } else {
-        preview.removeAttribute('src')
-        preview.style.display = 'none'
-        emptyPreview.style.display = 'block'
-      }
-    }
-
-    function parseSlotFromUrl() {
-      const params =
-        new URLSearchParams(window.location.search)
-
-      const slot =
-        Number(params.get('slot'))
-
-      if (Number.isInteger(slot) &&
-          slot >= 0 &&
-          slot <= 10) {
-        return slot
-      }
-
-      return 0
-    }
-
-    function buildSlotOptions() {
-      slotSelect.innerHTML = ''
-
-      for (let i = 0; i <= 10; i++) {
-        const option =
-          document.createElement('option')
-
-        option.value = String(i)
-        option.textContent =
-          `${i} — ${getSectionBySlot(i)}`
-
-        slotSelect.appendChild(option)
-      }
-
-      slotSelect.value = String(parseSlotFromUrl())
-      refreshSectionLabel()
-    }
-
-    async function ensureSession() {
-      const {
-        data: { user },
-        error
-      } = await supabase.auth.getUser()
-
-      if (error || !user) {
-        currentUser = null
-        setStatus(
-          'Нет активной сессии.\nСначала войди в MVP.',
-          'err'
-        )
-        return false
-      }
-
-      currentUser = user
-
+    if (error || !user) {
+      currentUser = null
       setStatus(
-        `User: ${user.email || 'no email'}\n` +
-        `ID: ${user.id}\n` +
-        `Slot: ${slotSelect.value} (${getSectionBySlot(Number(slotSelect.value))})`
+        'No active session.\nPlease sign in to MVP first.',
+        'err'
       )
-
-      return true
+      console.log('ensureSession error:', error)
+      return false
     }
 
-    async function dataUrlToBlob(dataUrl) {
-      const response = await fetch(dataUrl)
-      return await response.blob()
+    currentUser = user
+
+    setStatus(
+      `User: ${user.email || 'no email'}\n` +
+      `ID: ${user.id}\n` +
+      `Slot: ${slotSelect.value} (${getSectionBySlot(Number(slotSelect.value))})`
+    )
+
+    return true
+  }
+
+  async function dataUrlToBlob(dataUrl) {
+    const response = await fetch(dataUrl)
+    return await response.blob()
+  }
+
+  async function urlToBlob(url) {
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`cannot fetch image: ${response.status}`)
     }
+    return await response.blob()
+  }
 
-    function getFileExtFromBlob(blob) {
-      const type = blob.type || ''
+  function getFileExtFromBlob(blob) {
+    const type = blob.type || ''
 
-      if (type.includes('png')) return 'png'
-      if (type.includes('webp')) return 'webp'
-      if (type.includes('jpeg')) return 'jpg'
-      if (type.includes('jpg')) return 'jpg'
-      return 'jpg'
-    }
+    if (type.includes('png')) return 'png'
+    if (type.includes('webp')) return 'webp'
+    if (type.includes('jpeg')) return 'jpg'
+    if (type.includes('jpg')) return 'jpg'
+    return 'jpg'
+  }
 
-    function buildStoragePath(userId, slot, blob) {
-      const ext = getFileExtFromBlob(blob)
-      return `${userId}/${slot}.${ext}`
-    }
+  function buildStoragePath(userId, slot, blob) {
+    const ext = getFileExtFromBlob(blob)
+    return `${userId}/${slot}.${ext}`
+  }
 
-    /*
-    ========================================
-    RE-PHOTO BUFFER
-    ========================================
-    */
+  /*
+  ========================================
+  RE-PHOTO BUFFER
+  ========================================
+  */
 
-    async function readFromRePhoto() {
-      const raw =
-        localStorage.getItem(REPHOTO_STORAGE_KEY)
+  async function readFromRePhoto() {
+    const raw = localStorage.getItem(REPHOTO_STORAGE_KEY)
 
-      if (!raw) {
-        currentImageBlob = null
-        currentSource = 'none'
-        setSourceLabel()
-        showPreview('')
-        setStatus(
-          `В localStorage нет ключа "${REPHOTO_STORAGE_KEY}".\n` +
-          `Сначала сохрани результат re-photo в этот ключ\n` +
-          `или выбери файл вручную.`,
-          'warn'
-        )
-        return
-      }
-
-      try {
-        /*
-        Поддерживаем два варианта:
-        1. строка data:image/...;base64,...
-        2. JSON: { dataUrl: "...", name: "...", type: "..." }
-        */
-
-        let dataUrl = ''
-
-        if (raw.startsWith('data:image/')) {
-          dataUrl = raw
-        } else {
-          const parsed = JSON.parse(raw)
-          dataUrl = parsed.dataUrl || ''
-        }
-
-        if (!dataUrl.startsWith('data:image/')) {
-          throw new Error('invalid image data')
-        }
-
-        const blob =
-          await dataUrlToBlob(dataUrl)
-
-        currentImageBlob = blob
-        currentSource = `re-photo localStorage: ${REPHOTO_STORAGE_KEY}`
-        setSourceLabel()
-        showPreview(dataUrl)
-
-        setStatus(
-          `Результат re-photo прочитан.\n` +
-          `Размер: ${Math.round(blob.size / 1024)} KB\n` +
-          `Тип: ${blob.type || 'unknown'}`
-        )
-
-      } catch (error) {
-        currentImageBlob = null
-        currentSource = 'none'
-        setSourceLabel()
-        showPreview('')
-
-        setStatus(
-          'Не удалось прочитать буфер re-photo.\n' +
-          String(error.message || error),
-          'err'
-        )
-      }
-    }
-
-    function clearRePhotoBuffer() {
-      localStorage.removeItem(REPHOTO_STORAGE_KEY)
-
-      if (currentSource.startsWith('re-photo')) {
-        currentImageBlob = null
-        currentSource = 'none'
-        setSourceLabel()
-        showPreview('')
-      }
-
-      setStatus(
-        `Ключ "${REPHOTO_STORAGE_KEY}" очищен`
-      )
-    }
-
-    /*
-    ========================================
-    MANUAL FILE
-    ========================================
-    */
-
-    fileInput.addEventListener('change', async () => {
-      const file = fileInput.files?.[0]
-
-      if (!file) return
-
-      if (!file.type.startsWith('image/')) {
-        setStatus(
-          'Можно выбрать только image/*',
-          'err'
-        )
-        return
-      }
-
-      currentImageBlob = file
-      currentSource = `manual file: ${file.name}`
-      setSourceLabel()
-
-      const objectUrl =
-        URL.createObjectURL(file)
-
-      showPreview(objectUrl)
-
-      setStatus(
-        `Выбран файл вручную.\n` +
-        `Имя: ${file.name}\n` +
-        `Размер: ${Math.round(file.size / 1024)} KB\n` +
-        `Тип: ${file.type}`
-      )
-    })
-
-    /*
-    ========================================
-    LOAD CURRENT SLOT PHOTO
-    ========================================
-    */
-
-    async function loadCurrentSlotPhoto() {
-      const ok = await ensureSession()
-      if (!ok) return
-
-      const slot = Number(slotSelect.value)
-
-      setStatus(
-        `Читаю текущий слот ${slot}...`
-      )
-
-      const { data, error } =
-        await supabase
-          .from('gallery')
-          .select('photo_url')
-          .eq('user_id', currentUser.id)
-          .eq('photo_number', slot)
-          .maybeSingle()
-
-      if (error) {
-        setStatus(
-          'Ошибка чтения gallery:\n' +
-          error.message,
-          'err'
-        )
-        return
-      }
-
-      if (!data || !data.photo_url) {
-        setStatus(
-          `Слот ${slot} пуст`
-        )
-        return
-      }
-
+    if (!raw) {
       currentImageBlob = null
+      currentSource = 'none'
+      setSourceLabel()
+      showPreview('')
+      setStatus(
+        `No localStorage key "${REPHOTO_STORAGE_KEY}".\n` +
+        `First save the result from re-photo into this key\n` +
+        `or choose a file manually.`,
+        'warn'
+      )
+      return
+    }
+
+    try {
+      let dataUrl = ''
+
+      if (raw.startsWith('data:image/')) {
+        dataUrl = raw
+      } else {
+        const parsed = JSON.parse(raw)
+        dataUrl = parsed.dataUrl || ''
+      }
+
+      if (!dataUrl.startsWith('data:image/')) {
+        throw new Error('invalid image data')
+      }
+
+      const blob = await dataUrlToBlob(dataUrl)
+
+      currentImageBlob = blob
+      currentSource = `re-photo localStorage: ${REPHOTO_STORAGE_KEY}`
+      setSourceLabel()
+      showPreview(dataUrl)
+
+      setStatus(
+        `Re-photo result loaded.\n` +
+        `Size: ${Math.round(blob.size / 1024)} KB\n` +
+        `Type: ${blob.type || 'unknown'}`,
+        'ok'
+      )
+    } catch (error) {
+      currentImageBlob = null
+      currentSource = 'none'
+      setSourceLabel()
+      showPreview('')
+
+      setStatus(
+        'Failed to read re-photo buffer.\n' +
+        String(error.message || error),
+        'err'
+      )
+    }
+  }
+
+  function clearRePhotoBuffer() {
+    localStorage.removeItem(REPHOTO_STORAGE_KEY)
+
+    if (currentSource.startsWith('re-photo')) {
+      currentImageBlob = null
+      currentSource = 'none'
+      setSourceLabel()
+      showPreview('')
+    }
+
+    setStatus(
+      `Key "${REPHOTO_STORAGE_KEY}" cleared.`,
+      'ok'
+    )
+  }
+
+  /*
+  ========================================
+  MANUAL FILE
+  ========================================
+  */
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files?.[0]
+
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setStatus(
+        'Only image/* files are allowed.',
+        'err'
+      )
+      return
+    }
+
+    currentImageBlob = file
+    currentSource = `manual file: ${file.name}`
+    setSourceLabel()
+
+    const objectUrl = URL.createObjectURL(file)
+    showPreview(objectUrl)
+
+    setStatus(
+      `Manual file selected.\n` +
+      `Name: ${file.name}\n` +
+      `Size: ${Math.round(file.size / 1024)} KB\n` +
+      `Type: ${file.type}`,
+      'ok'
+    )
+  })
+
+  /*
+  ========================================
+  LOAD CURRENT SLOT PHOTO
+  ========================================
+  */
+
+  async function loadCurrentSlotPhoto() {
+    const ok = await ensureSession()
+    if (!ok) return
+
+    const slot = Number(slotSelect.value)
+
+    setStatus(
+      `Reading current slot ${slot}...`
+    )
+
+    const { data, error } =
+      await supabase
+        .from('gallery')
+        .select('photo_url')
+        .eq('user_id', currentUser.id)
+        .eq('photo_number', slot)
+        .maybeSingle()
+
+    if (error) {
+      setStatus(
+        'Gallery read error:\n' + error.message,
+        'err'
+      )
+      return
+    }
+
+    if (!data || !data.photo_url) {
+      setStatus(
+        `Slot ${slot} is empty.`,
+        'warn'
+      )
+      return
+    }
+
+    try {
+      const blob = await urlToBlob(data.photo_url)
+
+      currentImageBlob = blob
       currentSource = `gallery slot ${slot}`
       setSourceLabel()
       showPreview(data.photo_url)
 
       setStatus(
-        `Загружено текущее фото из gallery.\n` +
+        `Current slot photo loaded.\n` +
         `Slot: ${slot}\n` +
-        `URL: ${data.photo_url}`
+        `Type: ${blob.type || 'unknown'}\n` +
+        `URL: ${data.photo_url}`,
+        'ok'
       )
-    }
-
-    /*
-    ========================================
-    UPLOAD
-    ========================================
-    */
-
-    async function uploadPhoto() {
-      const ok = await ensureSession()
-      if (!ok) return
-
-      const slot = Number(slotSelect.value)
-
-      if (!Number.isInteger(slot) || slot < 0 || slot > 10) {
-        setStatus(
-          'Некорректный slot',
-          'err'
-        )
-        return
-      }
-
-      if (!currentImageBlob) {
-        setStatus(
-          'Нет картинки для upload.\n' +
-          'Сначала нажми Read from re-photo\n' +
-          'или выбери файл вручную.',
-          'warn'
-        )
-        return
-      }
-
-      if (currentImageBlob.size > 15 * 1024 * 1024) {
-        setStatus(
-          'Файл слишком большой. Максимум 15MB',
-          'err'
-        )
-        return
-      }
-
-      setStatus(
-        `Upload slot ${slot}...\n` +
-        `Section: ${getSectionBySlot(slot)}`
-      )
-
-      const path =
-        buildStoragePath(
-          currentUser.id,
-          slot,
-          currentImageBlob
-        )
-
-      const { error: storageError } =
-        await supabase
-          .storage
-          .from('photos')
-          .upload(
-            path,
-            currentImageBlob,
-            { upsert: true }
-          )
-
-      if (storageError) {
-        setStatus(
-          'Ошибка upload в Storage:\n' +
-          storageError.message,
-          'err'
-        )
-        return
-      }
-
-      const { data: publicData } =
-        supabase
-          .storage
-          .from('photos')
-          .getPublicUrl(path)
-
-      const photoUrl =
-        publicData?.publicUrl || null
-
-      if (!photoUrl) {
-        setStatus(
-          'Не удалось получить public URL',
-          'err'
-        )
-        return
-      }
-
-      const { error: dbError } =
-        await supabase
-          .from('gallery')
-          .upsert(
-            {
-              user_id: currentUser.id,
-              photo_number: slot,
-              photo_url: photoUrl
-            },
-            {
-              onConflict: 'user_id,photo_number'
-            }
-          )
-
-      if (dbError) {
-        setStatus(
-          'Ошибка записи в gallery:\n' +
-          dbError.message,
-          'err'
-        )
-        return
-      }
-
-      showPreview(photoUrl)
-      currentSource = `uploaded to gallery slot ${slot}`
+    } catch (error) {
+      currentImageBlob = null
+      currentSource = 'none'
       setSourceLabel()
 
       setStatus(
-        `Успешно загружено.\n` +
-        `User: ${currentUser.email || 'no email'}\n` +
-        `Slot: ${slot}\n` +
-        `Section: ${getSectionBySlot(slot)}\n` +
-        `Path: ${path}`
+        'Failed to fetch current slot image.\n' +
+        String(error.message || error),
+        'err'
       )
     }
+  }
 
-    /*
-    ========================================
-    NAV
-    ========================================
-    */
+  /*
+  ========================================
+  UPLOAD
+  ========================================
+  */
 
-    function goBack() {
-      window.history.back()
+  async function uploadPhoto() {
+    const ok = await ensureSession()
+    if (!ok) return
+
+    const slot = Number(slotSelect.value)
+
+    if (!Number.isInteger(slot) || slot < 0 || slot > 10) {
+      setStatus(
+        'Invalid slot.',
+        'err'
+      )
+      return
     }
 
-    slotSelect.addEventListener('change', () => {
-      refreshSectionLabel()
+    if (!currentImageBlob) {
+      setStatus(
+        'No image to upload.\n' +
+        'Click "Read from re-photo"\n' +
+        'or choose a file manually.',
+        'warn'
+      )
+      return
+    }
 
-      const slot = Number(slotSelect.value)
-      const url = new URL(window.location.href)
-      url.searchParams.set('slot', String(slot))
-      window.history.replaceState({}, '', url)
-    })
+    if (currentImageBlob.size > 15 * 1024 * 1024) {
+      setStatus(
+        'File is too large. Maximum is 15MB.',
+        'err'
+      )
+      return
+    }
 
-    /*
-    ========================================
-    START
-    ========================================
-    */
+    setStatus(
+      `Upload slot ${slot}...\n` +
+      `Section: ${getSectionBySlot(slot)}`
+    )
 
-    readBtn.addEventListener('click', readFromRePhoto)
-uploadBtn.addEventListener('click', uploadPhoto)
-loadSlotBtn.addEventListener('click', loadCurrentSlotPhoto)
-backBtn.addEventListener('click', goBack)
-clearBtn.addEventListener('click', clearRePhotoBuffer)
+    const path =
+      buildStoragePath(
+        currentUser.id,
+        slot,
+        currentImageBlob
+      )
 
-    buildSlotOptions()
+    const { error: storageError } =
+      await supabase
+        .storage
+        .from(BUCKET_NAME)
+        .upload(
+          path,
+          currentImageBlob,
+          { upsert: true }
+        )
+
+    if (storageError) {
+      setStatus(
+        'Storage upload error:\n' + storageError.message,
+        'err'
+      )
+      return
+    }
+
+    const { data: publicData } =
+      supabase
+        .storage
+        .from(BUCKET_NAME)
+        .getPublicUrl(path)
+
+    const photoUrl = publicData?.publicUrl || null
+
+    if (!photoUrl) {
+      setStatus(
+        'Failed to get public URL.',
+        'err'
+      )
+      return
+    }
+
+    const { error: dbError } =
+      await supabase
+        .from('gallery')
+        .upsert(
+          {
+            user_id: currentUser.id,
+            photo_number: slot,
+            photo_url: photoUrl
+          },
+          {
+            onConflict: 'user_id,photo_number'
+          }
+        )
+
+    if (dbError) {
+      setStatus(
+        'Gallery write error:\n' + dbError.message,
+        'err'
+      )
+      return
+    }
+
+    showPreview(photoUrl)
+    currentSource = `uploaded to gallery slot ${slot}`
     setSourceLabel()
-    ensureSession()
-    readFromRePhoto()
-  </script>
+
+    setStatus(
+      `Uploaded successfully.\n` +
+      `User: ${currentUser.email || 'no email'}\n` +
+      `Slot: ${slot}\n` +
+      `Section: ${getSectionBySlot(slot)}\n` +
+      `Path: ${path}`,
+      'ok'
+    )
+  }
+
+  /*
+  ========================================
+  NAV
+  ========================================
+  */
+
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back()
+      return
+    }
+
+    window.location.href = 'gallery.html'
+  }
+
+  slotSelect.addEventListener('change', () => {
+    refreshSectionLabel()
+
+    const slot = Number(slotSelect.value)
+    const url = new URL(window.location.href)
+    url.searchParams.set('slot', String(slot))
+    window.history.replaceState({}, '', url)
+  })
+
+  /*
+  ========================================
+  BUTTONS
+  ========================================
+  */
+
+  readBtn.addEventListener('click', readFromRePhoto)
+  uploadBtn.addEventListener('click', uploadPhoto)
+  loadSlotBtn.addEventListener('click', loadCurrentSlotPhoto)
+  backBtn.addEventListener('click', goBack)
+  clearBtn.addEventListener('click', clearRePhotoBuffer)
+
+  /*
+  ========================================
+  START
+  ========================================
+  */
+
+  buildSlotOptions()
+  setSourceLabel()
+  ensureSession()
+  readFromRePhoto()
+</script>
 
 <!-- ========================================
      SERVICE CONSOLE
@@ -771,7 +797,7 @@ clearBtn.addEventListener('click', clearRePhotoBuffer)
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-switch to supabase-config & buttons | v1.0.1
+script  change| v1.0.2
 
   </div>
 
