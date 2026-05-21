@@ -186,8 +186,14 @@ async function getLiveKitToken() {
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.error || "Token error");
-  }
+  console.error("TOKEN FUNCTION ERROR:", data);
+
+  throw new Error(
+    data.error ||
+    data.message ||
+    JSON.stringify(data)
+  );
+}
 
   return data.token;
 }
@@ -316,7 +322,7 @@ leaveBtn.addEventListener("click", leaveRoom);
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    function & buttons | v1.0.2
+    console.error | v1.0.3
 
   </div>
 
