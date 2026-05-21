@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MVP Video Room</title>
+
+<!-- СТИЛЬ КОНСОЛИ -->
+  <link rel="stylesheet"
+        href="styles/console.css" />
+
+  
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  padding: 16px;
+  background: #111827;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+main {
+  padding: 12px;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.video-box {
+  background: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 220px;
+  position: relative;
+}
+
+.video-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.label {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  background: rgba(0,0,0,0.55);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.controls {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  background: #111827;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button.danger {
+  background: #dc2626;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <div>MVP Video Room</div>
+  <div id="status">not connected</div>
+</header>
+
+<main>
+  <div id="videoGrid" class="video-grid"></div>
+</main>
+
+<div class="controls">
+  <button id="joinBtn">Join</button>
+  <button id="leaveBtn" class="danger">Leave</button>
+</div>
+
+<script type="module">
+
+import {
+  Room,
+  RoomEvent
+} from "https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.esm.mjs";
+
+/*
+========================================
+НАСТРОЙКИ
+========================================
+*/
+
+const LIVEKIT_URL =
+  "wss://mvp-81onftka.livekit.cloud";
+
+const SUPABASE_FUNCTION_URL =
+  "https://ТВОЙ-PROJECT.supabase.co/functions/v1/livekit-token";
+
+/*
+ВАЖНО:
+anon key Supabase можно держать в браузере.
+LiveKit API_SECRET — нельзя.
+*/
+
+const SUPABASE_ANON_KEY =
+  "ТВОЙ_SUPABASE_ANON_KEY";
+
+const roomName =
+  new URLSearchParams(window.location.search).get("room") || "test-room";
+
+const identity =
+  "user-" + Math.floor(Math.random() * 100000);
+
+let room = null;
+
+const videoGrid =
+  document.getElementById("videoGrid");
+
+const statusBox =
+  document.getElementById("status");
+
+const joinBtn =
+  document.getElementById("joinBtn");
+
+const leaveBtn =
+  document.getElementById("leaveBtn");
+
+/*
+========================================
+ПОЛУЧИТЬ LIVEKIT TOKEN
+========================================
+*/
+
+async function getLiveKitToken() {
+  const res = await fetch(SUPABASE_FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": "Bearer " + SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify({
+      room: roomName,
+      identity: identity
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Token error");
+  }
+
+  return data.token;
+}
+
+/*
+========================================
+ДОБАВИТЬ ВИДЕО НА ЭКРАН
+========================================
+*/
+
+function addTrack(track, participantName) {
+  if (track.kind !== "video")
+    return;
+
+  const box =
+    document.createElement("div");
+
+  box.className =
+    "video-box";
+
+  const element =
+    track.attach();
+
+  const label =
+    document.createElement("div");
+
+  label.className =
+    "label";
+
+  label.textContent =
+    participantName;
+
+  box.appendChild(element);
+  box.appendChild(label);
+
+  videoGrid.appendChild(box);
+}
+
+/*
+========================================
+ПОДКЛЮЧЕНИЕ К КОМНАТЕ
+========================================
+*/
+
+async function joinRoom() {
+  try {
+    statusBox.textContent =
+      "getting token...";
+
+    const token =
+      await getLiveKitToken();
+
+    room =
+      new Room();
+
+    room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      addTrack(track, participant.identity);
+    });
+
+    statusBox.textContent =
+      "connecting...";
+
+    await room.connect(
+      LIVEKIT_URL,
+      token
+    );
+
+    await room.localParticipant
+      .enableCameraAndMicrophone();
+
+    room.localParticipant.videoTrackPublications.forEach((publication) => {
+      if (publication.track) {
+        addTrack(publication.track, "me");
+      }
+    });
+
+    statusBox.textContent =
+      "connected: " + roomName;
+
+  } catch (err) {
+    console.error(err);
+
+    statusBox.textContent =
+      "error: " + err.message;
+  }
+}
+
+/*
+========================================
+ВЫХОД ИЗ КОМНАТЫ
+========================================
+*/
+
+function leaveRoom() {
+  if (room) {
+    room.disconnect();
+    room = null;
+  }
+
+  videoGrid.innerHTML =
+    "";
+
+  statusBox.textContent =
+    "disconnected";
+}
+
+joinBtn.addEventListener("click", joinRoom);
+leaveBtn.addEventListener("click", leaveRoom);
+
+</script>
+
+
+
+  
+<!-- ========================================
+     SERVICE CONSOLE
+     Верхняя строка редактируется вручную
+     Здесь задается:
+     - название страницы
+     - номер версии
+======================================== -->
+
+<div id="service-console">
+
+  <div class="row" id="build-top">
+
+    <!-- ВВОД ВРУЧНУЮ -->
+
+    GPT | v1.0.0
+
+  </div>
+
+  <div class="row" id="build-down">
+
+    deploy: --
+
+  </div>
+
+</div>
+
+<!-- ========================================
+     SCRIPT
+     Автоматически выводит:
+     - дату
+     - время
+     Момент загрузки страницы
+======================================== -->
+
+<script>
+
+(function () {
+
+  /* Текущая дата и время */
+
+  const now = new Date();
+
+  /* Добавляет ведущий ноль */
+
+  const pad = n =>
+    String(n).padStart(2, '0');
+
+  /* Формат даты */
+
+  const date =
+      pad(now.getDate())
+    + '.'
+    + pad(now.getMonth() + 1)
+    + '.'
+    + now.getFullYear();
+
+  /* Формат времени */
+
+  const time =
+      pad(now.getHours())
+    + ':'
+    + pad(now.getMinutes());
+
+  /* Вывод в нижнюю строку */
+
+  document
+    .getElementById('build-down')
+    .textContent =
+      'deploy: '
+      + date
+      + ' '
+      + time;
+
+})();
+
+</script>
+
+
+</body>
+</html>
+  
