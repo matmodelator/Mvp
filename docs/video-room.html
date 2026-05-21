@@ -127,16 +127,16 @@ const LIVEKIT_URL =
   "wss://mvp-81onftka.livekit.cloud";
 
 const SUPABASE_FUNCTION_URL =
-  "https://ТВОЙ-PROJECT.supabase.co/functions/v1/livekit-token";
+  "https://fnodbpiwkkrdgqvmyanq.supabase.co/functions/v1/livekit-token";
 
 /*
 ВАЖНО:
 anon key Supabase можно держать в браузере.
-LiveKit API_SECRET — нельзя.
+LiveKit API_SECRET — нельзя!!!!!!!!!!!!!!!
 */
 
 const SUPABASE_ANON_KEY =
-  "ТВОЙ_SUPABASE_ANON_KEY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZub2RicGl3a2tyZGdxdm15YW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NDk5MDAsImV4cCI6MjA4OTAyNTkwMH0.Gi4l3LAU3S4T77_2xgVWKmkeW34xblrJf04IlE4zu9I";
 
 const roomName =
   new URLSearchParams(window.location.search).get("room") || "test-room";
@@ -311,7 +311,7 @@ leaveBtn.addEventListener("click", leaveRoom);
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    GPT | v1.0.0
+    URL & Anon | v1.0.1
 
   </div>
 
