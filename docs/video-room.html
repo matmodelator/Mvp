@@ -68,14 +68,16 @@ main {
 }
 
 .controls {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 12px;
-  background: #111827;
   display: flex;
   gap: 10px;
+}
+
+header {
+  padding: 16px;
+  background: #111827;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
@@ -97,21 +99,24 @@ button.danger {
 <body>
 
 <header>
-  <div>MVP Video Room</div>
-  <div id="status">not connected</div>
+  <div>
+    <div>MVP Video Room</div>
+    <div id="status">not connected</div>
+  </div>
+
+  <div class="controls">
+    <button id="joinBtn">Join</button>
+    <button id="leaveBtn" class="danger">Leave</button>
+  </div>
 </header>
 
 <main>
   <div id="videoGrid" class="video-grid"></div>
 </main>
 
-<div class="controls">
-  <button id="joinBtn">Join</button>
-  <button id="leaveBtn" class="danger">Leave</button>
-</div>
-
 <script type="module">
 
+  
 import {
   Room,
   RoomEvent
@@ -311,7 +316,7 @@ leaveBtn.addEventListener("click", leaveRoom);
 
     <!-- ВВОД ВРУЧНУЮ -->
 
-    URL & Anon | v1.0.1
+    function & buttons | v1.0.2
 
   </div>
 
