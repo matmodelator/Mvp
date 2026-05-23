@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,10 +8,9 @@
 <title>MVP Video Room</title>
 
 <!-- СТИЛЬ КОНСОЛИ -->
-  <link rel="stylesheet"
-        href="styles/console.css" />
+<link rel="stylesheet"
+      href="styles/console.css" />
 
-  
 <style>
 * {
   box-sizing: border-box;
@@ -28,14 +26,21 @@ body {
 header {
   padding: 16px;
   background: #111827;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  gap: 16px;
 }
 
 main {
   padding: 12px;
 }
+
+/* ========================================
+   VIDEO GRID
+======================================== */
 
 .video-grid {
   display: grid;
@@ -47,8 +52,13 @@ main {
   background: #1e293b;
   border-radius: 12px;
   overflow: hidden;
+
   min-height: 220px;
   position: relative;
+
+  transition:
+    box-shadow 0.12s ease,
+    transform 0.12s ease;
 }
 
 .video-box video {
@@ -57,27 +67,64 @@ main {
   object-fit: cover;
 }
 
+/* ========================================
+   SPEAKING INDICATOR
+======================================== */
+
+.video-box.speaking {
+  box-shadow:
+    0 0 0 3px #22c55e,
+    0 0 24px rgba(34,197,94,0.7);
+}
+
+.audio-meter {
+  position: absolute;
+
+  left: 10px;
+  right: 10px;
+  bottom: 38px;
+
+  height: 7px;
+
+  background: rgba(255,255,255,0.18);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.audio-meter-fill {
+  width: 0%;
+  height: 100%;
+
+  background: #22c55e;
+  border-radius: 999px;
+
+  transition: width 0.08s linear;
+}
+
+/* ========================================
+   LABEL
+======================================== */
+
 .label {
   position: absolute;
   left: 10px;
   bottom: 10px;
+
   background: rgba(0,0,0,0.55);
+
   padding: 4px 8px;
   border-radius: 8px;
+
   font-size: 13px;
 }
+
+/* ========================================
+   CONTROLS
+======================================== */
 
 .controls {
   display: flex;
   gap: 10px;
-}
-
-header {
-  padding: 16px;
-  background: #111827;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 /* ========================================
@@ -112,10 +159,6 @@ button {
   overflow: hidden;
 }
 
-/* ========================================
-   HOVER
-======================================== */
-
 button:hover {
   transform:
     translateY(-2px)
@@ -126,10 +169,6 @@ button:hover {
   box-shadow:
     0 10px 24px rgba(37,99,235,0.35);
 }
-
-/* ========================================
-   ACTIVE
-======================================== */
 
 button:active {
   transform:
@@ -142,10 +181,6 @@ button:active {
     inset 0 2px 8px rgba(0,0,0,0.35);
 }
 
-/* ========================================
-   DANGER
-======================================== */
-
 button.danger {
   background: #dc2626;
 }
@@ -154,7 +189,7 @@ button.danger:hover {
   box-shadow:
     0 10px 24px rgba(220,38,38,0.35);
 }
-  
+
 </style>
 
 </head>
@@ -179,7 +214,6 @@ button.danger:hover {
 
 <script type="module">
 
-  
 import {
   Room,
   RoomEvent
@@ -212,7 +246,19 @@ const roomName =
 const identity =
   "user-" + Math.floor(Math.random() * 100000);
 
-let room = null;
+let room =
+  null;
+
+let audioMeterTimer =
+  null;
+
+/*
+Храним связь:
+identity участника → его карточка видео и индикатор звука
+*/
+
+const participantBoxes =
+  new Map();
 
 const videoGrid =
   document.getElementById("videoGrid");
@@ -233,30 +279,37 @@ const leaveBtn =
 */
 
 async function getLiveKitToken() {
-  const res = await fetch(SUPABASE_FUNCTION_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_ANON_KEY,
-      "Authorization": "Bearer " + SUPABASE_ANON_KEY
-    },
-    body: JSON.stringify({
-      room: roomName,
-      identity: identity
-    })
-  });
+  const res =
+    await fetch(SUPABASE_FUNCTION_URL, {
+      method: "POST",
 
-  const data = await res.json();
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY
+      },
+
+      body: JSON.stringify({
+        room: roomName,
+        identity: identity
+      })
+    });
+
+  const data =
+    await res.json();
 
   if (!res.ok) {
-  console.error("TOKEN FUNCTION ERROR:", data);
+    console.error(
+      "TOKEN FUNCTION ERROR:",
+      data
+    );
 
-  throw new Error(
-    data.error ||
-    data.message ||
-    JSON.stringify(data)
-  );
-}
+    throw new Error(
+      data.error ||
+      data.message ||
+      JSON.stringify(data)
+    );
+  }
 
   return data.token;
 }
@@ -269,6 +322,14 @@ async function getLiveKitToken() {
 
 function addTrack(track, participantName) {
   if (track.kind !== "video")
+    return;
+
+  /*
+  Если карточка этого участника уже есть —
+  второй раз не создаём.
+  */
+
+  if (participantBoxes.has(participantName))
     return;
 
   const box =
@@ -289,10 +350,111 @@ function addTrack(track, participantName) {
   label.textContent =
     participantName;
 
+  const meter =
+    document.createElement("div");
+
+  meter.className =
+    "audio-meter";
+
+  const meterFill =
+    document.createElement("div");
+
+  meterFill.className =
+    "audio-meter-fill";
+
+  meter.appendChild(meterFill);
+
   box.appendChild(element);
+  box.appendChild(meter);
   box.appendChild(label);
 
   videoGrid.appendChild(box);
+
+  participantBoxes.set(
+    participantName,
+    {
+      box: box,
+      meterFill: meterFill
+    }
+  );
+}
+
+/*
+========================================
+ОБНОВИТЬ ИНДИКАТОРЫ ЗВУКА
+========================================
+*/
+
+function updateAudioIndicators() {
+  if (!room)
+    return;
+
+  participantBoxes.forEach((data, participantName) => {
+
+    let participant =
+      null;
+
+    if (participantName === identity) {
+      participant =
+        room.localParticipant;
+    } else {
+      participant =
+        room.getParticipantByIdentity(participantName);
+    }
+
+    if (!participant) {
+      data.box.classList.remove("speaking");
+      data.meterFill.style.width = "0%";
+      return;
+    }
+
+    const level =
+      Math.round(
+        (participant.audioLevel || 0) * 100
+      );
+
+    const isSpeaking =
+      participant.isSpeaking === true;
+
+    data.box.classList.toggle(
+      "speaking",
+      isSpeaking
+    );
+
+    data.meterFill.style.width =
+      isSpeaking
+        ? level + "%"
+        : "0%";
+  });
+}
+
+/*
+========================================
+ЗАПУСТИТЬ ОБНОВЛЕНИЕ УРОВНЯ ЗВУКА
+========================================
+*/
+
+function startAudioMeterTimer() {
+  stopAudioMeterTimer();
+
+  audioMeterTimer =
+    setInterval(
+      updateAudioIndicators,
+      120
+    );
+}
+
+/*
+========================================
+ОСТАНОВИТЬ ОБНОВЛЕНИЕ УРОВНЯ ЗВУКА
+========================================
+*/
+
+function stopAudioMeterTimer() {
+  if (audioMeterTimer) {
+    clearInterval(audioMeterTimer);
+    audioMeterTimer = null;
+  }
 }
 
 /*
@@ -312,9 +474,53 @@ async function joinRoom() {
     room =
       new Room();
 
-    room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-      addTrack(track, participant.identity);
-    });
+    /*
+    Когда приходит видео другого участника —
+    добавляем его карточку.
+    */
+
+    room.on(
+      RoomEvent.TrackSubscribed,
+      (track, publication, participant) => {
+        addTrack(
+          track,
+          participant.identity
+        );
+      }
+    );
+
+    /*
+    Когда LiveKit обновляет список говорящих —
+    сразу обновляем цветовую рамку.
+    */
+
+    room.on(
+      RoomEvent.ActiveSpeakersChanged,
+      () => {
+        updateAudioIndicators();
+      }
+    );
+
+    /*
+    Если участник вышел —
+    удаляем его карточку.
+    */
+
+    room.on(
+      RoomEvent.ParticipantDisconnected,
+      participant => {
+        const data =
+          participantBoxes.get(participant.identity);
+
+        if (data) {
+          data.box.remove();
+
+          participantBoxes.delete(
+            participant.identity
+          );
+        }
+      }
+    );
 
     statusBox.textContent =
       "connecting...";
@@ -324,14 +530,40 @@ async function joinRoom() {
       token
     );
 
-    await room.localParticipant
-      .enableCameraAndMicrophone();
+    /*
+    На компьютере без камеры/микрофона это может упасть.
+    Поэтому не роняем всю комнату.
+    */
 
-    room.localParticipant.videoTrackPublications.forEach((publication) => {
-      if (publication.track) {
-        addTrack(publication.track, "me");
-      }
-    });
+    try {
+      await room.localParticipant
+        .enableCameraAndMicrophone();
+    } catch (deviceErr) {
+      console.warn(
+        "Camera/microphone not found:",
+        deviceErr
+      );
+    }
+
+    /*
+    Добавляем своё локальное видео.
+    Важно: используем identity, а не "me",
+    чтобы индикатор звука находил эту карточку.
+    */
+
+    room.localParticipant.videoTrackPublications
+      .forEach(publication => {
+
+        if (publication.track) {
+          addTrack(
+            publication.track,
+            identity
+          );
+        }
+
+      });
+
+    startAudioMeterTimer();
 
     statusBox.textContent =
       "connected: " + roomName;
@@ -351,10 +583,14 @@ async function joinRoom() {
 */
 
 function leaveRoom() {
+  stopAudioMeterTimer();
+
   if (room) {
     room.disconnect();
     room = null;
   }
+
+  participantBoxes.clear();
 
   videoGrid.innerHTML =
     "";
@@ -363,14 +599,18 @@ function leaveRoom() {
     "disconnected";
 }
 
-joinBtn.addEventListener("click", joinRoom);
-leaveBtn.addEventListener("click", leaveRoom);
+joinBtn.addEventListener(
+  "click",
+  joinRoom
+);
+
+leaveBtn.addEventListener(
+  "click",
+  leaveRoom
+);
 
 </script>
 
-
-
-  
 <!-- ========================================
      SERVICE CONSOLE
      Верхняя строка редактируется вручную
@@ -383,9 +623,7 @@ leaveBtn.addEventListener("click", leaveRoom);
 
   <div class="row" id="build-top">
 
-    <!-- ВВОД ВРУЧНУЮ -->
-
-    buttons hover | v1.0.3
+   audio meter | v1.0.4
 
   </div>
 
@@ -409,16 +647,11 @@ leaveBtn.addEventListener("click", leaveRoom);
 
 (function () {
 
-  /* Текущая дата и время */
-
-  const now = new Date();
-
-  /* Добавляет ведущий ноль */
+  const now =
+    new Date();
 
   const pad = n =>
     String(n).padStart(2, '0');
-
-  /* Формат даты */
 
   const date =
       pad(now.getDate())
@@ -427,14 +660,10 @@ leaveBtn.addEventListener("click", leaveRoom);
     + '.'
     + now.getFullYear();
 
-  /* Формат времени */
-
   const time =
       pad(now.getHours())
     + ':'
     + pad(now.getMinutes());
-
-  /* Вывод в нижнюю строку */
 
   document
     .getElementById('build-down')
@@ -448,7 +677,5 @@ leaveBtn.addEventListener("click", leaveRoom);
 
 </script>
 
-
 </body>
 </html>
-  
